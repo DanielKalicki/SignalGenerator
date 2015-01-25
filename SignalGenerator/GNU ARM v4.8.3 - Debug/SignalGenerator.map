@@ -17,7 +17,7 @@ Allocating common symbols
 Common symbol       size              file
 
 SystemCoreClock     0x4               ./CMSIS/efm32wg/system_efm32wg.o
-msTicks             0x4               ./src/blink.o
+msTicks             0x4               ./src/main.o
 
 Discarded input sections
 
@@ -46,9 +46,9 @@ Discarded input sections
  .ARM.attributes
                 0x00000000       0x37 ./src/AD9106.o
  .debug_frame   0x00000000       0x50 ./src/AD9106.o
- .text          0x00000000        0x0 ./src/blink.o
- .data          0x00000000        0x0 ./src/blink.o
- .bss           0x00000000        0x0 ./src/blink.o
+ .text          0x00000000        0x0 ./src/main.o
+ .data          0x00000000        0x0 ./src/main.o
+ .bss           0x00000000        0x0 ./src/main.o
  .text          0x00000000        0x0 ./emlib/em_assert.o
  .data          0x00000000        0x0 ./emlib/em_assert.o
  .bss           0x00000000        0x0 ./emlib/em_assert.o
@@ -436,7 +436,7 @@ LOAD c:/siliconlabs/simplicitystudio/v2/developer/toolchains/gnu_arm/4.8_2013q4/
 LOAD c:/siliconlabs/simplicitystudio/v2/developer/toolchains/gnu_arm/4.8_2013q4/bin/../lib/gcc/arm-none-eabi/4.8.3/armv7e-m/softfp/crtbegin.o
 LOAD c:/siliconlabs/simplicitystudio/v2/developer/toolchains/gnu_arm/4.8_2013q4/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7e-m/softfp/crt0.o
 LOAD ./src/AD9106.o
-LOAD ./src/blink.o
+LOAD ./src/main.o
 LOAD ./emlib/em_assert.o
 LOAD ./emlib/em_cmu.o
 LOAD ./emlib/em_ebi.o
@@ -477,17 +477,17 @@ LOAD c:/siliconlabs/simplicitystudio/v2/developer/toolchains/gnu_arm/4.8_2013q4/
                 0x00000154                _start
                 0x00000154                _mainCRTStartup
  .text.NVIC_SetPriority
-                0x000001c8       0x54 ./src/blink.o
+                0x000001c8       0x54 ./src/main.o
  .text.SysTick_Config
-                0x0000021c       0x44 ./src/blink.o
+                0x0000021c       0x44 ./src/main.o
  .text.CHIP_Init
-                0x00000260        0xc ./src/blink.o
+                0x00000260        0xc ./src/main.o
  .text.SysTick_Handler
-                0x0000026c       0x1c ./src/blink.o
+                0x0000026c       0x1c ./src/main.o
                 0x0000026c                SysTick_Handler
- .text.Delay    0x00000288       0x2c ./src/blink.o
+ .text.Delay    0x00000288       0x2c ./src/main.o
                 0x00000288                Delay
- .text.main     0x000002b4       0x54 ./src/blink.o
+ .text.main     0x000002b4       0x54 ./src/main.o
                 0x000002b4                main
  .text.assertEFM
                 0x00000308        0xc ./emlib/em_assert.o
@@ -721,7 +721,7 @@ LOAD c:/siliconlabs/simplicitystudio/v2/developer/toolchains/gnu_arm/4.8_2013q4/
  *(.bss*)
  .bss           0x20000070       0x1c c:/siliconlabs/simplicitystudio/v2/developer/toolchains/gnu_arm/4.8_2013q4/bin/../lib/gcc/arm-none-eabi/4.8.3/armv7e-m/softfp/crtbegin.o
  *(COMMON)
- COMMON         0x2000008c        0x4 ./src/blink.o
+ COMMON         0x2000008c        0x4 ./src/main.o
                 0x2000008c                msTicks
  COMMON         0x20000090        0x4 ./CMSIS/efm32wg/system_efm32wg.o
                 0x20000090                SystemCoreClock
@@ -755,7 +755,7 @@ OUTPUT(SignalGenerator.axf elf32-littlearm)
  .ARM.attributes
                 0x00000054       0x20 c:/siliconlabs/simplicitystudio/v2/developer/toolchains/gnu_arm/4.8_2013q4/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7e-m/softfp/crt0.o
  .ARM.attributes
-                0x00000074       0x37 ./src/blink.o
+                0x00000074       0x37 ./src/main.o
  .ARM.attributes
                 0x000000ab       0x37 ./emlib/em_assert.o
  .ARM.attributes
@@ -786,7 +786,7 @@ OUTPUT(SignalGenerator.axf elf32-littlearm)
                 0x0000033c       0x22 c:/siliconlabs/simplicitystudio/v2/developer/toolchains/gnu_arm/4.8_2013q4/bin/../lib/gcc/arm-none-eabi/4.8.3/armv7e-m/softfp/crtn.o
 
 .comment        0x00000000       0x70
- .comment       0x00000000       0x70 ./src/blink.o
+ .comment       0x00000000       0x70 ./src/main.o
                                  0x71 (size before relaxing)
  .comment       0x00000000       0x71 ./emlib/em_assert.o
  .comment       0x00000000       0x71 ./emlib/em_cmu.o
@@ -796,7 +796,7 @@ OUTPUT(SignalGenerator.axf elf32-littlearm)
  .comment       0x00000000       0x71 ./BSP/bsp_trace.o
 
 .debug_info     0x00000000     0x3688
- .debug_info    0x00000000      0x7a0 ./src/blink.o
+ .debug_info    0x00000000      0x7a0 ./src/main.o
  .debug_info    0x000007a0       0x76 ./emlib/em_assert.o
  .debug_info    0x00000816      0xfb4 ./emlib/em_cmu.o
  .debug_info    0x000017ca      0x4d0 ./emlib/em_gpio.o
@@ -806,7 +806,7 @@ OUTPUT(SignalGenerator.axf elf32-littlearm)
  .debug_info    0x00002ba1      0xae7 ./BSP/bsp_trace.o
 
 .debug_abbrev   0x00000000      0xa43
- .debug_abbrev  0x00000000      0x1af ./src/blink.o
+ .debug_abbrev  0x00000000      0x1af ./src/main.o
  .debug_abbrev  0x000001af       0x63 ./emlib/em_assert.o
  .debug_abbrev  0x00000212      0x2b9 ./emlib/em_cmu.o
  .debug_abbrev  0x000004cb      0x11e ./emlib/em_gpio.o
@@ -816,7 +816,7 @@ OUTPUT(SignalGenerator.axf elf32-littlearm)
  .debug_abbrev  0x000008ef      0x154 ./BSP/bsp_trace.o
 
 .debug_loc      0x00000000      0xe00
- .debug_loc     0x00000000      0x12c ./src/blink.o
+ .debug_loc     0x00000000      0x12c ./src/main.o
  .debug_loc     0x0000012c       0x38 ./emlib/em_assert.o
  .debug_loc     0x00000164      0x6d0 ./emlib/em_cmu.o
  .debug_loc     0x00000834      0x118 ./emlib/em_gpio.o
@@ -826,7 +826,7 @@ OUTPUT(SignalGenerator.axf elf32-littlearm)
 
 .debug_aranges  0x00000000      0x2e0
  .debug_aranges
-                0x00000000       0x48 ./src/blink.o
+                0x00000000       0x48 ./src/main.o
  .debug_aranges
                 0x00000048       0x20 ./emlib/em_assert.o
  .debug_aranges
@@ -843,7 +843,7 @@ OUTPUT(SignalGenerator.axf elf32-littlearm)
                 0x000002b8       0x28 ./BSP/bsp_trace.o
 
 .debug_ranges   0x00000000      0x250
- .debug_ranges  0x00000000       0x38 ./src/blink.o
+ .debug_ranges  0x00000000       0x38 ./src/main.o
  .debug_ranges  0x00000038       0x10 ./emlib/em_assert.o
  .debug_ranges  0x00000048      0x108 ./emlib/em_cmu.o
  .debug_ranges  0x00000150       0x30 ./emlib/em_gpio.o
@@ -851,34 +851,34 @@ OUTPUT(SignalGenerator.axf elf32-littlearm)
  .debug_ranges  0x000001d8       0x60 ./BSP/bsp_stk_leds.o
  .debug_ranges  0x00000238       0x18 ./BSP/bsp_trace.o
 
-.debug_line     0x00000000     0x16f9
- .debug_line    0x00000000      0x269 ./src/blink.o
- .debug_line    0x00000269       0x85 ./emlib/em_assert.o
- .debug_line    0x000002ee      0x81f ./emlib/em_cmu.o
- .debug_line    0x00000b0d      0x2cb ./emlib/em_gpio.o
- .debug_line    0x00000dd8       0xec ./CMSIS/efm32wg/startup_efm32wg.o
- .debug_line    0x00000ec4      0x2b2 ./CMSIS/efm32wg/system_efm32wg.o
- .debug_line    0x00001176      0x378 ./BSP/bsp_stk_leds.o
- .debug_line    0x000014ee      0x20b ./BSP/bsp_trace.o
+.debug_line     0x00000000     0x16f8
+ .debug_line    0x00000000      0x268 ./src/main.o
+ .debug_line    0x00000268       0x85 ./emlib/em_assert.o
+ .debug_line    0x000002ed      0x81f ./emlib/em_cmu.o
+ .debug_line    0x00000b0c      0x2cb ./emlib/em_gpio.o
+ .debug_line    0x00000dd7       0xec ./CMSIS/efm32wg/startup_efm32wg.o
+ .debug_line    0x00000ec3      0x2b2 ./CMSIS/efm32wg/system_efm32wg.o
+ .debug_line    0x00001175      0x378 ./BSP/bsp_stk_leds.o
+ .debug_line    0x000014ed      0x20b ./BSP/bsp_trace.o
 
-.debug_str      0x00000000     0x17c1
- .debug_str     0x00000000      0x7c8 ./src/blink.o
-                                0x823 (size before relaxing)
- .debug_str     0x000007c8       0x65 ./emlib/em_assert.o
+.debug_str      0x00000000     0x17c0
+ .debug_str     0x00000000      0x7c7 ./src/main.o
+                                0x822 (size before relaxing)
+ .debug_str     0x000007c7       0x65 ./emlib/em_assert.o
                                 0x160 (size before relaxing)
- .debug_str     0x0000082d      0x791 ./emlib/em_cmu.o
+ .debug_str     0x0000082c      0x791 ./emlib/em_cmu.o
                                 0xbe8 (size before relaxing)
- .debug_str     0x00000fbe      0x37e ./emlib/em_gpio.o
+ .debug_str     0x00000fbd      0x37e ./emlib/em_gpio.o
                                 0x55e (size before relaxing)
- .debug_str     0x0000133c      0x14d ./CMSIS/efm32wg/system_efm32wg.o
+ .debug_str     0x0000133b      0x14d ./CMSIS/efm32wg/system_efm32wg.o
                                 0x4f8 (size before relaxing)
- .debug_str     0x00001489      0x116 ./BSP/bsp_stk_leds.o
+ .debug_str     0x00001488      0x116 ./BSP/bsp_stk_leds.o
                                 0x783 (size before relaxing)
- .debug_str     0x0000159f      0x222 ./BSP/bsp_trace.o
+ .debug_str     0x0000159e      0x222 ./BSP/bsp_trace.o
                                 0x585 (size before relaxing)
 
 .debug_frame    0x00000000      0x8cc
- .debug_frame   0x00000000       0xb4 ./src/blink.o
+ .debug_frame   0x00000000       0xb4 ./src/main.o
  .debug_frame   0x000000b4       0x2c ./emlib/em_assert.o
  .debug_frame   0x000000e0      0x3d4 ./emlib/em_cmu.o
  .debug_frame   0x000004b4       0xac ./emlib/em_gpio.o
