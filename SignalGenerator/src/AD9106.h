@@ -145,12 +145,124 @@ typedef enum {
 typedef enum {
 	DAC4_GAIN_RNG = 0xC0,
 	DAC3_GAIN_RNG = 0x30,
-	DAC2_GAIN_RNG=0x0C,
-	DAC1_GAIN_RNG=0x03
-}DACxRANGE;
+	DAC2_GAIN_RNG = 0x0C,
+	DAC1_GAIN_RNG = 0x03
+} DACxRANGE_Reg;
 
+typedef enum {
+	DACx_RSET_EN = 0x8000, DACx_RSET_CAL = 0x1F00, DACx_RSET = 0x1F
+} DACxRSET_Reg;
 
+typedef enum {
 
+	COMP_OFFSET_OF = 0x4000,   //Read only
+	COMP_OFFSET_UF = 0x2000,   //Read only
+	RSET_CAL_OF = 0x1000,      //Read only
+	RSET_CAL_UF = 0x0800,      //Read only
+	GAIN_CAL_OF = 0x0400,      //Read only
+	GAIN_CAL_UF = 0x0200,      //Read only
+	CAL_RESET = 0x0100,
+	CAL_MODE = 0x0080,         //Read only
+	CAL_MODE_EN = 0x0040,
+	COMP_CAL_RNG = 0x0030,
+	CAL_CLK_EN = 0x0008,
+	CAL_CLK_DIV = 0x0007
+} CALCONFIG_Reg;
+
+typedef enum {
+
+	COMP_OFFSET_CAL = 0x7F00, //Read only
+	CAL_FIN = 0x0002,         //Read only
+	START_CAL = 0x0001
+} COMPOFFSET_Reg;
+
+typedef enum {
+	RAMPUPDATE = 0x0001
+} RAMUPDATE_Reg;
+
+typedef enum {
+
+	BUF_READ = 0x0008, MEM_ACCESS = 0x0004, PATTERN = 0x0002,        //Read only
+	RUN = 0x0001
+} PAT_STATUS_Reg;
+
+typedef enum {
+	PATTERN_RPT = 0x0001
+} PAT_TYPE_Reg;
+
+typedef enum {
+	PATTERN_DELAY = 0xFFFF
+} PATTERN_DLY_Reg;
+
+typedef enum {
+	DACx_DIG_OFFSET = 0xFFF0
+} DACxDOF_Reg;
+
+typedef enum {
+	PRESTORE_SEL4 = 0x3000,
+	WAVE_SEL4 = 0x0300,
+	PRESTORE_SEL3 = 0x30,
+	WAVE_SEL3 = 0x03,
+} WAV4_3CONFIG_Reg;
+
+typedef enum {
+	PRESTORE_SEL2 = 0x3000,
+	MASK_DAC4 = 0x0800,
+	CH2_ADD = 0x0400,
+	WAVE_SEL2 = 0x0300,
+	PRESTORE_SEL1 = 0x30,
+	MASK_DAC3 = 0x08,
+	CH1_ADD = 0x04,
+	WAVE_SEL1 = 0x03,
+} WAV2_1CONFIG_Reg;
+
+typedef enum {
+	HOLD = 0x0F00, PAT_PERIOD_BASE = 0xF0, START_DELAY_BASE = 0x0F,
+} PAT_TIMEBASE_Reg;
+
+typedef enum {
+	PATTERN_PERIOD = 0xFFFF
+} PAT_PERIOD_Reg;
+
+typedef enum {
+	DAC4_REPEAT_CYCLE = 0xFF00, DAC3_REPEAT_CYCLE = 0xFF
+} DAC4_3PATx_Reg;
+
+typedef enum {
+	DAC2_REPEAT_CYCLE = 0xFF00, DAC1_REPEAT_CYCLE = 0xFF
+} DAC2_1PATx_Reg;
+
+typedef enum {
+	DOUT_START = 0xFFFF,
+} DOUT_START_DLY_Reg;
+
+typedef enum {
+	DOUT_VAL = 0x20, DOUT_MODE = 0x10, DOUT_STOP = 0x0F
+} DOUT_CONFIG_Reg;
+
+typedef enum {
+	DACx_CONST = 0xFFF0
+} DACx_CST_Reg;
+
+typedef enum {
+	DACx_DIG_GAIN = 0xFFF0
+} DACx_DGAIN_Reg;
+
+typedef enum {
+	SAW_STEP4 = 0xFC00,  //Number of samples per step for DAC4.
+	SAW_TYPE4 = 0x0300,  //0- Ramp up saw wave. 1- Ramp down saw wave. 2- Triangle saw wave. 3- No wave, zero.
+	SAW_STEP3 = 0x00FC,
+	SAW_TYPE3 = 0x0003
+} SAW4_3CONFIG_Reg;
+
+typedef enum {
+	SAW_STEP2 = 0xFC00,  //Number of samples per step for DAC2.
+	SAW_TYPE2 = 0x0300,  //0- Ramp up saw wave. 1- Ramp down saw wave. 2- Triangle saw wave. 3- No wave, zero.
+	SAW_STEP1 = 0x00FC,
+	SAW_TYPE1 = 0x0003
+} SAW2_1CONFIG_Reg;
+
+//TODO  DDS_TW32_Reg  43page
 
 
 /** Helper method for writeReg and readReg methods
