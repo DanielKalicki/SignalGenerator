@@ -10,6 +10,7 @@
 #define AD9106_H_
 
 #include "em_usart.h"
+#include "spi.h"
 
 typedef enum {
 	SPICONFIG_ADDR,

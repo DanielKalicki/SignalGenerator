@@ -49,6 +49,31 @@ Discarded input sections
  .text          0x00000000        0x0 ./src/main.o
  .data          0x00000000        0x0 ./src/main.o
  .bss           0x00000000        0x0 ./src/main.o
+ .text          0x00000000        0x0 ./src/spi.o
+ .data          0x00000000        0x0 ./src/spi.o
+ .bss           0x00000000        0x0 ./src/spi.o
+ .rodata        0x00000000       0x18 ./src/spi.o
+ .text.spiInit  0x00000000       0xe0 ./src/spi.o
+ .text.spiDisable
+                0x00000000       0x54 ./src/spi.o
+ .text.spiTransfer
+                0x00000000       0x6c ./src/spi.o
+ .text.spiSendByte
+                0x00000000       0x34 ./src/spi.o
+ .text.spiGetByte
+                0x00000000       0x2c ./src/spi.o
+ .debug_info    0x00000000      0x6ae ./src/spi.o
+ .debug_abbrev  0x00000000      0x148 ./src/spi.o
+ .debug_loc     0x00000000      0x100 ./src/spi.o
+ .debug_aranges
+                0x00000000       0x40 ./src/spi.o
+ .debug_ranges  0x00000000       0x30 ./src/spi.o
+ .debug_line    0x00000000      0x264 ./src/spi.o
+ .debug_str     0x00000000      0x9ba ./src/spi.o
+ .comment       0x00000000       0x71 ./src/spi.o
+ .ARM.attributes
+                0x00000000       0x37 ./src/spi.o
+ .debug_frame   0x00000000       0xac ./src/spi.o
  .text          0x00000000        0x0 ./emlib/em_assert.o
  .data          0x00000000        0x0 ./emlib/em_assert.o
  .bss           0x00000000        0x0 ./emlib/em_assert.o
@@ -437,6 +462,7 @@ LOAD c:/siliconlabs/simplicitystudio/v2/developer/toolchains/gnu_arm/4.8_2013q4/
 LOAD c:/siliconlabs/simplicitystudio/v2/developer/toolchains/gnu_arm/4.8_2013q4/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7e-m/softfp/crt0.o
 LOAD ./src/AD9106.o
 LOAD ./src/main.o
+LOAD ./src/spi.o
 LOAD ./emlib/em_assert.o
 LOAD ./emlib/em_cmu.o
 LOAD ./emlib/em_ebi.o
