@@ -31,21 +31,23 @@ Discarded input sections
  .text          0x00000000        0x0 ./src/AD9106.o
  .data          0x00000000        0x0 ./src/AD9106.o
  .bss           0x00000000        0x0 ./src/AD9106.o
+ .text.setConfig
+                0x00000000       0x10 ./src/AD9106.o
  .text.writeReg
                 0x00000000       0x44 ./src/AD9106.o
  .text.readReg  0x00000000       0x3c ./src/AD9106.o
- .debug_info    0x00000000      0x15b ./src/AD9106.o
- .debug_abbrev  0x00000000       0x94 ./src/AD9106.o
- .debug_loc     0x00000000       0x70 ./src/AD9106.o
+ .debug_info    0x00000000      0x175 ./src/AD9106.o
+ .debug_abbrev  0x00000000       0xae ./src/AD9106.o
+ .debug_loc     0x00000000       0x9c ./src/AD9106.o
  .debug_aranges
-                0x00000000       0x28 ./src/AD9106.o
- .debug_ranges  0x00000000       0x18 ./src/AD9106.o
- .debug_line    0x00000000      0x11a ./src/AD9106.o
- .debug_str     0x00000000      0x241 ./src/AD9106.o
+                0x00000000       0x30 ./src/AD9106.o
+ .debug_ranges  0x00000000       0x20 ./src/AD9106.o
+ .debug_line    0x00000000      0x12b ./src/AD9106.o
+ .debug_str     0x00000000      0x24b ./src/AD9106.o
  .comment       0x00000000       0x71 ./src/AD9106.o
  .ARM.attributes
                 0x00000000       0x37 ./src/AD9106.o
- .debug_frame   0x00000000       0x50 ./src/AD9106.o
+ .debug_frame   0x00000000       0x68 ./src/AD9106.o
  .text          0x00000000        0x0 ./src/main.o
  .data          0x00000000        0x0 ./src/main.o
  .bss           0x00000000        0x0 ./src/main.o
@@ -61,19 +63,19 @@ Discarded input sections
  .text.spiSendByte
                 0x00000000       0x34 ./src/spi.o
  .text.spiGetByte
-                0x00000000       0x2c ./src/spi.o
- .debug_info    0x00000000      0x6ae ./src/spi.o
- .debug_abbrev  0x00000000      0x148 ./src/spi.o
- .debug_loc     0x00000000      0x100 ./src/spi.o
+                0x00000000       0x38 ./src/spi.o
+ .debug_info    0x00000000      0x6c1 ./src/spi.o
+ .debug_abbrev  0x00000000      0x12e ./src/spi.o
+ .debug_loc     0x00000000      0x10c ./src/spi.o
  .debug_aranges
                 0x00000000       0x40 ./src/spi.o
  .debug_ranges  0x00000000       0x30 ./src/spi.o
  .debug_line    0x00000000      0x264 ./src/spi.o
- .debug_str     0x00000000      0x9ba ./src/spi.o
+ .debug_str     0x00000000      0x9bf ./src/spi.o
  .comment       0x00000000       0x71 ./src/spi.o
  .ARM.attributes
                 0x00000000       0x37 ./src/spi.o
- .debug_frame   0x00000000       0xac ./src/spi.o
+ .debug_frame   0x00000000       0xb0 ./src/spi.o
  .text          0x00000000        0x0 ./emlib/em_assert.o
  .data          0x00000000        0x0 ./emlib/em_assert.o
  .bss           0x00000000        0x0 ./emlib/em_assert.o

@@ -47,9 +47,10 @@ extern "C" {
 
 void spiInit(void);
 void spiDisable(void);
-uint16_t spiAccess(uint8_t spiaddr, uint8_t spidata);
+uint16_t spiTransfer(uint8_t spiaddr, uint8_t spidata);
 void spiSendByte(uint8_t spidata);
-uint8_t spiGetByte(void);
+void spiSendWord(uint16_t spidata);
+uint8_t spiGetByte(uint8_t addr);
 
 
 #ifdef __cplusplus

@@ -105,25 +105,33 @@ uint16_t spiTransfer(uint8_t spiaddr, uint8_t spidata)
 
 void spiSendByte(uint8_t spidata)
 {
-  /* Write SPI address */
   USART_Tx(USART_USED, spidata);
-
-  /* Wait for transmission to finish */
   while (!(USART_USED->STATUS & USART_STATUS_TXC)) ;
-
-  /* Just ignore data read back */
   USART_Rx(USART_USED);
 }
 
 //
-uint8_t spiGetByte(void)
+uint8_t spiGetByte(uint8_t addr)
 {
-  /* Write SPI address */
-  USART_Tx(USART_USED, 0x00);
-
-  /* Wait for transmission to finish */
+  USART_Tx(USART_USED, addr);
   while (!(USART_USED->STATUS & USART_STATUS_TXC)) ;
-
-  /* Return the data read from SPI buffer */
   return(USART_Rx(USART_USED));
 }
+
+/*
+void spiSendWord(uint8_t spidata)
+{
+
+  USART_Tx(USART_USED, spidata);
+  while (!(USART_USED->STATUS & USART_STATUS_TXC)) ;
+  USART_Rx(USART_USED);
+}
+
+//
+uint16_t spiGetWord(uint8_t addr)
+{
+  USART_Tx(USART_USED, addr);
+  while (!(USART_USED->STATUS & USART_STATUS_TXC)) ;
+  return(USART_Rx(USART_USED));
+}
+*/

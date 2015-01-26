@@ -85,37 +85,38 @@ typedef enum {
 } AD9106RegAddress;
 
 //Proper BITMASKS for each register, allows us to write/ read to/from device in easy way , not overwriting whole register
-//4564	    112	     36	   4712	   1268	SignalGenerator.axf
 typedef enum {
 
-	LSBFIRST = 0x8000,
-	SPI3WIRE = 0x4000,
-	RESET = 0x2000,
-	DOUBLESPI = 0x1000,
-	SPI_DRV = 0x0800,
-	DOUT_EN = 0x0400,
-	DOUT_ENM = 0x0020,
-	SPI_DRVM = 0x0010,
-	DOUBLESPIM = 0x0008,
-	RESETM = 0x0004,
-	SPI3WIREM = 0x0002,
-	LSBFIRSTM = 0x0001
+	LSBFIRST = 0x8000, //LSB first selection. {{ 0- MSB first per SPI standard (default). 1- LSB first per SPI standard.
+	SPI3WIRE = 0x4000, //Selects if SPI is using 3-wire or 4-wire interface. {{0 - 4-wire SPI.  1- 3-wire SPI.
+	RESET = 0x2000, //Executes software reset of SPI and controllers, reloads default register values, except for Register 0x00.
+	DOUBLESPI = 0x1000, //Double SPI data line.
+	SPI_DRV = 0x0800,   //Double-drive ability for SPI output.
+	DOUT_EN = 0x0400,   //Enables DOUT signal on SDO/SDI2/DOUT pin.
+	DOUT_ENM = 0x0020,  //Enable DOUT signal on SDO/SDI2/DOUT pin.
+	SPI_DRVM = 0x0010,  //Double-drive ability for SPI output.
+	DOUBLESPIM = 0x0008,  //Double SPI data line.
+	RESETM = 0x0004, //Executes software reset of SPI and controllers, reloads default register values, except for Register 0x00.
+	SPI3WIREM = 0x0002, //Selects if SPI is using 3-wire or 4-wire interface.
+	LSBFIRSTM = 0x0001  //LSB first selection.
 } SPICONFIG_Reg;
+/*NOTE!!!SPICONFIG[10:15] should always be set to the mirror of SPICONFIG[5:0] to allow easy recovery of the SPI operation when
+ * the LSBFIRST bit is set incorrectly. Bit[15] = Bit[0], Bit[14] = Bit[1], Bit[13] = Bit[2], Bit[12] = Bit[3], Bit[11] = Bit[4] and Bit[10] = Bit[5].*/
 
 typedef enum {
 
-	CLK_LDO_STAT = 0x0800,  //Read only
-	DIG1_LDO_STAT = 0x0400, //Read only
-	DIG2_LDO_STAT = 0x0200, //Read only
-	PDN_LDO_CLK = 0x0100,
-	PDN_LDO_DIG1 = 0x0080,
-	PDN_LDO_DIG2 = 0x0040,
-	REF_PDN = 0x0020,
-	REF_EXT = 0x0010,
-	DAC1_SLEEP = 0x0008,
-	DAC2_SLEEP = 0x0004,
-	DAC3_SLEEP = 0x0002,
-	DAC4_SLEEP = 0x0001
+	CLK_LDO_STAT = 0x0800,  //Read only flag indicating CLKVDD_1P8 LDO is on.
+	DIG1_LDO_STAT = 0x0400, //Read only flag indicating DVDD1 LDO is on.
+	DIG2_LDO_STAT = 0x0200, //Read only flag indicating DVDD2 LDO is on.
+	PDN_LDO_CLK = 0x0100,   //Disables the CLKVDD_1P8 LDO. An external supply is required.
+	PDN_LDO_DIG1 = 0x0080,  //Disables the DVDD1 LDO. An external supply is required.
+	PDN_LDO_DIG2 = 0x0040,  //Disables the DVDD2 LDO. An external supply is required.
+	REF_PDN = 0x0020,		//Disables 10 kOm resistor that creates REFIO voltage. User can drive with external voltage or provide external BG resistor.
+	REF_EXT = 0x0010,		//Power down main BG reference including DAC bias.
+	DAC1_SLEEP = 0x0008,	//Disables DAC1 output current.
+	DAC2_SLEEP = 0x0004,	//Disables DAC2 output current.
+	DAC3_SLEEP = 0x0002,	//Disables DAC3 output current.
+	DAC4_SLEEP = 0x0001		//Disables DAC4 output current.
 } POWERCONFIG_Reg;
 
 typedef enum {
@@ -251,21 +252,105 @@ typedef enum {
 
 typedef enum {
 	SAW_STEP4 = 0xFC00,  //Number of samples per step for DAC4.
-	SAW_TYPE4 = 0x0300,  //0- Ramp up saw wave. 1- Ramp down saw wave. 2- Triangle saw wave. 3- No wave, zero.
+	SAW_TYPE4 = 0x0300, //0- Ramp up saw wave. 1- Ramp down saw wave. 2- Triangle saw wave. 3- No wave, zero.
 	SAW_STEP3 = 0x00FC,
 	SAW_TYPE3 = 0x0003
 } SAW4_3CONFIG_Reg;
 
 typedef enum {
 	SAW_STEP2 = 0xFC00,  //Number of samples per step for DAC2.
-	SAW_TYPE2 = 0x0300,  //0- Ramp up saw wave. 1- Ramp down saw wave. 2- Triangle saw wave. 3- No wave, zero.
+	SAW_TYPE2 = 0x0300, //0- Ramp up saw wave. 1- Ramp down saw wave. 2- Triangle saw wave. 3- No wave, zero.
 	SAW_STEP1 = 0x00FC,
 	SAW_TYPE1 = 0x0003
 } SAW2_1CONFIG_Reg;
 
-//TODO  DDS_TW32_Reg  43page
+///////////////
+typedef enum {
+	DDSTW_MSB = 0xFFFF  //DDS tuning word MSB.
+} DDS_TW32_Reg;
 
+typedef enum {
+	DDSTW_LSB = 0xFF00  //DDS tuning word LSB.
+} DDS_TW1_Reg;
 
+typedef enum {
+	DDSx_PHASE = 0xFFFF //DDSx phase offset.
+} DDSx_PW_Reg;
+
+typedef enum {
+	TRIG_DELAY_EN = 0x0002 //Enable start delay as trigger delay for all four channels.
+	/* Settings
+	 0 Delay repeats for all patterns.
+	 1 Delay is only at the start of first pattern.
+	 */
+} TRIG_TW_SEL_Reg;
+
+typedef enum {
+	DDS_COS_EN4 = 0x8000, //Enable DDS4 cosine output of DDS instead of sine wave.
+	DDS_MSB_EN4 = 0x4000, //Enable the clock for the RAM address. Increment is coming from the DDS4 MSB. Default is coming from DAC clock.
+	DDS_COS_EN3 = 0x0800, //Enable DDS3 cosine output of DDS instead of sine wave.
+	DDS_MSB_EN3 = 0x0400, //Enable the clock for the RAM address. Increment is coming from the DDS3 MSB. Default is coming from DAC clock.
+	PHASE_MEM_EN3 = 0x0200, //Enable DDS3 phase offset input coming from RAM reading START_ADDR3. Since phase word is 8 bits and RAM data is 14 bits, only 8 MSB of RAM are taken into account. Default is coming from SPI map, DDS3_PHASE.
+	DDS_COS_EN2 = 0x0080, //Enable DDS2 cosine output of DDS instead of sine wave.
+	DDS_MSB_EN2 = 0x0040, //Enable the clock for the RAM address. Increment is coming from the DDS2 MSB. Default is coming from DAC clock.
+	DDS_MSB_EN1 = 0x0004, //Enable the clock for the RAM address. Increment is coming from the DDS1 MSB. Default is coming from DAC clock.
+	TW_MEM_EN = 0x0001 //Enable DDS tuning word input coming from RAM reading using START_ADDR1. Since tuning word is 24 bits and RAM data is 14 bits, 10 bits are set to 0s depending on the value of the TW_MEM_SHIFT bits in the TW_RAM_CONFIG register. Default is coming from SPI map, DDSTW.
+} DDSx_CONFIG_Reg;
+
+typedef enum {
+	TW_MEM_SHIFT = 0x000F
+//settings NOTE! TW_MEM_EN1 must be set = 1 to use this bit field.
+	/*
+	 0x00   DDS1TW = {RAM[11:0],12'b0}
+	 0x01   DDS1TW = {DDS1TW[23],RAM[11:0],11'b0}
+	 0x02	DDS1TW = {DDS1TW[23:22],RAM[11:0],10'b0}
+	 0x03	DDS1TW = {DDS1TW[23:21],RAM[11:0],9'b0}
+	 0x04	DDS1TW = {DDS1TW[23:20],RAM[11:0],8'b0}
+	 0x05	DDS1TW = {DDS1TW[23:19],RAM[11:0],7'b0}
+	 0x06	DDS1TW = {DDS1TW[23:18],RAM[11:0],6'b0}
+	 0x07	DDS1TW = {DDS1TW[23:17],RAM[11:0],5'b0}
+	 0x08	DDS1TW = {DDS1TW[23:16],RAM[11:0],3'b0}
+	 0x09	DDS1TW = {DDS1TW[23:15],RAM[11:0],4'b0}
+	 0x0A	DDS1TW = {DDS1TW[23:14],RAM[11:0],2’b0}
+	 0x0B	DDS1TW = {DDS1TW[23:13],RAM[11:0],1’b0}
+	 0x0C	DDS1TW = {DDS1TW[23:12],RAM[11:0]}
+	 0x0D	DDS1TW = {DDS1TW[23:11],RAM[11:1]}
+	 0x0E	DDS1TW = {DDS1TW[23:10],RAM[11:2]}
+	 0x0F	DDS1TW = {DDS1TW[23:9],RAM[11:3]}
+	 0x10	DDS1TW = {DDS1TW[23:8],RAM[11:4]}
+	 x Reserved
+	 */
+} TW_RAM_CONFIG_Reg;
+
+typedef enum {
+	START_DELAYx = 0xFFFF,  //Start delay of DACx.
+} START_DLYx_REG;
+
+typedef enum {
+	START_ADDRx = 0xFFF0,  //RAM address where DACx starts to read waveform.
+} START_ADDRx_Reg;
+
+typedef enum {
+	STOP_ADDRx = 0xFFF0,  //RAM address where DACx stops to read waveform.
+} STOP_ADDRx_Reg;
+
+typedef enum {
+	DDS_CYCx = 0xFFFF // Number of sine wave cycles when DDS prestored waveform with start and stop delays is selected for DACx output.
+} DDS_CYCx_Reg;
+
+typedef enum {
+	ERROR_CLEAR = 0x8000,  		  //Writing this bit clears all errors.
+	CFG_ERROR_ = 0x7FC0,
+	DOUT_START_LG_ERR = 0x0020, //When DOUT_START is larger than pattern delay, this error is toggled.  /R only
+	PAT_DLY_SHORT_ERR = 0x0010, //When pattern delay value is smaller than default value, this error is toggled. /R only
+	DOUT_START_SHORT_ERR = 0x0008, //When DOUT_START value is smaller than default value, this error is toggled. /R only
+	PERIOD_SHORT_ERR = 0x0004, //When period register setting value is smaller than pattern play cycle, this error is toggled. /R only
+	ODD_ADDR_ERR = 0x0002, //When memory pattern play is not even in length in trigger delay mode, this error flag is toggled. /R only
+	MEM_READ_ERR = 0x0001 //When there is a memory read conflict, this error flag is toggled. /R only
+} CFG_ERROR_Reg;
+
+/***************************************************************************************************************************************************/
+//public methods
 /** Helper method for writeReg and readReg methods
  * @param uint16_t dataBitMask
  * @returns  ShiftValue
@@ -279,6 +364,9 @@ inline uint8_t getShiftValue(uint8_t dataBitMask) {
 	}
 	return shiftVal;
 }
+
+
+bool setConfig(void);
 
 bool writeReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t data);
 

@@ -12,6 +12,13 @@
 
 
 
+bool setConfig(void){
+
+
+	return true;
+}
+
+
 
 bool writeReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t data)
 {
