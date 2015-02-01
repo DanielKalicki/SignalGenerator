@@ -32,7 +32,7 @@ all: SignalGenerator.axf
 SignalGenerator.axf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GNU ARM C Linker'
-	arm-none-eabi-gcc -g -gdwarf-2 -mcpu=cortex-m4 -mthumb -T "SignalGenerator.ld" -Xlinker --gc-sections -Xlinker -Map="SignalGenerator.map" -mfpu=fpv4-sp-d16 -mfloat-abi=softfp --specs=nano.specs -o SignalGenerator.axf "./src/AD9106.o" "./src/main.o" "./src/spi.o" "./emlib/em_assert.o" "./emlib/em_cmu.o" "./emlib/em_ebi.o" "./emlib/em_emu.o" "./emlib/em_gpio.o" "./emlib/em_system.o" "./emlib/em_usart.o" "./CMSIS/efm32wg/startup_efm32wg.o" "./CMSIS/efm32wg/system_efm32wg.o" "./BSP/bsp_bcc.o" "./BSP/bsp_stk.o" "./BSP/bsp_stk_leds.o" "./BSP/bsp_trace.o" -Wl,--start-group -lgcc -lc -lnosys -Wl,--end-group
+	arm-none-eabi-gcc -g -gdwarf-2 -mcpu=cortex-m4 -mthumb -T "SignalGenerator.ld" -Xlinker --gc-sections -Xlinker -Map="SignalGenerator.map" -mfpu=fpv4-sp-d16 -mfloat-abi=softfp --specs=nano.specs -o SignalGenerator.axf "./src/AD9106.o" "./src/SPFD5408.o" "./src/main.o" "./src/spi.o" "./src/utils.o" "./emlib/em_assert.o" "./emlib/em_cmu.o" "./emlib/em_ebi.o" "./emlib/em_emu.o" "./emlib/em_gpio.o" "./emlib/em_system.o" "./emlib/em_usart.o" "./CMSIS/efm32wg/startup_efm32wg.o" "./CMSIS/efm32wg/system_efm32wg.o" "./BSP/bsp_bcc.o" "./BSP/bsp_stk.o" "./BSP/bsp_stk_leds.o" "./BSP/bsp_trace.o" -Wl,--start-group -lgcc -lc -lnosys -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
