@@ -19,8 +19,15 @@
 #include "em_cmu.h"
 
 
+#define _8_BIT_MODEx
+#define _16_BIT_MODE     //default
+#ifdef _8_BIT_MODE
+	#undef _16_BIT_MODE
+#endif
+
+
 //Basic Colors
-#define RED             0xf800
+#define RED         0xf800
 #define GREEN		0x07e0
 #define BLUE		0x001f
 #define BLACK		0x0000
@@ -47,8 +54,8 @@
 #define CS_PIN      9
 #define CS_PORT     gpioPortB
 #define CS_OUTPUT() GPIO_PinModeSet(CS_PORT, CS_PIN, gpioModePushPull, 1);
-#define CS_HIGH()   GPIO_PinOutSet(CS_PORT , CS_PIN );
-#define CS_LOW()    GPIO_PinOutClear(CS_PORT , CS_PIN );
+#define CS_HIGH_()   GPIO_PinOutSet(CS_PORT , CS_PIN );
+#define CS_LOW_()    GPIO_PinOutClear(CS_PORT , CS_PIN );
 //------------------RS----------------------
 
 #define RS_PIN      10
@@ -115,6 +122,8 @@
 #define TFT_PIN_D8_OUTPUT() GPIO_PinModeSet(TFT_PORT_D8,TFT_PIN_D8, gpioModePushPull, 1);
 #define TFT_PIN_D8_INPUT()  GPIO_PinModeSet(TFT_PORT_D8,TFT_PIN_D8, gpioModeInput, 0);
 
+#ifdef _16_BIT_MODE
+
 #define TFT_PORT_D7 gpioPortD
 #define TFT_PIN_D7 7
 #define TFT_PIN_D7_OUTPUT() GPIO_PinModeSet(TFT_PORT_D7,TFT_PIN_D7, gpioModePushPull, 1);
@@ -156,6 +165,7 @@
 #define TFT_PIN_D0_OUTPUT() GPIO_PinModeSet(TFT_PORT_D0,TFT_PIN_D0, gpioModePushPull, 1);
 #define TFT_PIN_D0_INPUT()  GPIO_PinModeSet(TFT_PORT_D0,TFT_PIN_D0, gpioModeInput, 0);
 
+#endif
 //========================================
 
 /**Macro definitions for char display direction**/
@@ -166,32 +176,32 @@
 
 void SPFD5408Init(void);
 void SPFD5408PaintScreenBlack(void);
-void SPFD5408SendCommand(unsigned int index);
-void SPFD5408SendData(unsigned int data);
-unsigned int SPFD5408ReadRegister(unsigned int index);
+void SPFD5408SendCommand(uint16_t index);
+void SPFD5408SendData(uint16_t data);
+uint16_t SPFD5408ReadRegister(uint16_t index);
 
-void SPFD5408SetXY(unsigned int poX, unsigned int poY);
-void SPFD5408SetPixel(unsigned int poX, unsigned int poY, unsigned int color);
-void SPFD5408DrawLine(unsigned int x0, unsigned int y0, unsigned int x1,
-		unsigned int y1, unsigned int color);
-void SPFD5408DrawVerticalLine(unsigned int poX, unsigned int poY,
-		unsigned int length, unsigned int color);
-void SPFD5408DrawHorizontalLine(unsigned int poX, unsigned int poY,
-		unsigned int length, unsigned int color);
-void SPFD5408DrawRectangle(unsigned int poX, unsigned int poY,
-		unsigned int length, unsigned int width, unsigned int color);
-void SPFD5408FillRectangle(unsigned int poX, unsigned int poY,
-		unsigned int length, unsigned int width, unsigned int color);
-void SPFD5408DrawCircle(int poX, int poY, int r, unsigned int color);
-void SPFD5408FillCircle(int poX, int poY, int r, unsigned int color);
-void SPFD5408DrawChar(unsigned int poX, unsigned int poY, unsigned char ascii,
-		unsigned int size, unsigned int fgcolor);
-void SPFD5408DrawString(unsigned int poX, unsigned int poY, char *string,
-		unsigned int size, unsigned int fgcolor);
+void SPFD5408SetXY(uint16_t poX, uint16_t poY);
+void SPFD5408SetPixel(uint16_t poX, uint16_t poY, uint16_t color);
+void SPFD5408DrawLine(uint16_t x0, uint16_t y0, uint16_t x1,
+		uint16_t y1, uint16_t color);
+void SPFD5408DrawVerticalLine(uint16_t poX, uint16_t poY,
+		uint16_t length, uint16_t color);
+void SPFD5408DrawHorizontalLine(uint16_t poX, uint16_t poY,
+		uint16_t length, uint16_t color);
+void SPFD5408DrawRectangle(uint16_t poX, uint16_t poY,
+		uint16_t length, uint16_t width, uint16_t color);
+void SPFD5408FillRectangle(uint16_t poX, uint16_t poY,
+		uint16_t length, uint16_t width, uint16_t color);
+void SPFD5408DrawCircle(int poX, int poY, int r, uint16_t color);
+void SPFD5408FillCircle(int poX, int poY, int r, uint16_t color);
+void SPFD5408DrawChar(uint16_t poX, uint16_t poY, unsigned char ascii,
+		uint16_t size, uint16_t fgcolor);
+void SPFD5408DrawString(uint16_t poX, uint16_t poY, char *string,
+		uint16_t size, uint16_t fgcolor);
 void SPFD5408DrawBmp(unsigned short ulXs, unsigned short ulYs,
 		unsigned short length, unsigned short height, unsigned short *buf);
 
-void SPFD5408SetOrientation(unsigned int HV);
+void SPFD5408SetOrientation(uint16_t HV);
 void SPFD5408SetDisplayDirect(unsigned char Direction);
 
 #endif /*_SPFD5408_H*/

@@ -2,11 +2,11 @@
 #include "utils.h"
 #include "font.h"
 
-static unsigned char DisplayDirect = LEFT2RIGHT;
+static uint8_t DisplayDirect = LEFT2RIGHT;
 static void exitStandBy(void);
 
-/*hardware dependent method*/
-static void pinWrite(GPIO_Port_TypeDef port, unsigned int pin, uint8_t mask) {
+/*hardware dependent methods*/
+static void pinWrite(GPIO_Port_TypeDef port, uint8_t pin, uint8_t mask) {
 
 	if (!mask) {
 		GPIO_PinOutClear(port, pin);
@@ -14,6 +14,14 @@ static void pinWrite(GPIO_Port_TypeDef port, unsigned int pin, uint8_t mask) {
 		GPIO_PinOutSet(port, pin);
 }
 
+
+
+static uint16_t pinRead(GPIO_Port_TypeDef port, uint8_t pin) {
+
+	return GPIO_PinOutGet(port, pin);
+}
+
+/*hardware dependent methods - end*/
 
 static void allDataPinsInput(void) {
 	TFT_PIN_D15_INPUT()
@@ -24,6 +32,7 @@ static void allDataPinsInput(void) {
 	TFT_PIN_D10_INPUT()
 	TFT_PIN_D9_INPUT()
 	TFT_PIN_D8_INPUT()
+#ifdef _16_BIT_MODE
 	TFT_PIN_D7_INPUT()
 	TFT_PIN_D6_INPUT()
 	TFT_PIN_D5_INPUT()
@@ -32,6 +41,7 @@ static void allDataPinsInput(void) {
 	TFT_PIN_D2_INPUT()
 	TFT_PIN_D1_INPUT()
 	TFT_PIN_D0_INPUT()
+#endif
 
 }
 
@@ -44,6 +54,7 @@ static void allDataPinsOutput(void) {
 	TFT_PIN_D10_OUTPUT()
 	TFT_PIN_D9_OUTPUT()
 	TFT_PIN_D8_OUTPUT()
+#ifdef _16_BIT_MODE
 	TFT_PIN_D7_OUTPUT()
 	TFT_PIN_D6_OUTPUT()
 	TFT_PIN_D5_OUTPUT()
@@ -52,28 +63,33 @@ static void allDataPinsOutput(void) {
 	TFT_PIN_D2_OUTPUT()
 	TFT_PIN_D1_OUTPUT()
 	TFT_PIN_D0_OUTPUT()
+#endif
 }
 
 static void allDataPinsLow(void) {
-	pinWrite(TFT_PORT_D15,TFT_PIN_D15, 0);
-	pinWrite(TFT_PORT_D14,TFT_PIN_D14, 0);
-	pinWrite(TFT_PORT_D13,TFT_PIN_D13, 0);
-	pinWrite(TFT_PORT_D12,TFT_PIN_D12, 0);
-	pinWrite(TFT_PORT_D11,TFT_PIN_D11, 0);
-	pinWrite(TFT_PORT_D10,TFT_PIN_D10, 0);
-	pinWrite(TFT_PORT_D9,TFT_PIN_D9, 0);
-	pinWrite(TFT_PORT_D8,TFT_PIN_D8, 0);
-	pinWrite(TFT_PORT_D7,TFT_PIN_D7, 0);
-	pinWrite(TFT_PORT_D6,TFT_PIN_D6, 0);
-	pinWrite(TFT_PORT_D5,TFT_PIN_D5, 0);
-	pinWrite(TFT_PORT_D4,TFT_PIN_D4, 0);
-	pinWrite(TFT_PORT_D3,TFT_PIN_D3, 0);
-	pinWrite(TFT_PORT_D2,TFT_PIN_D2, 0);
-	pinWrite(TFT_PORT_D1,TFT_PIN_D1, 0);
-	pinWrite(TFT_PORT_D0,TFT_PIN_D0, 0);
+	pinWrite(TFT_PORT_D15, TFT_PIN_D15, 0);
+	pinWrite(TFT_PORT_D14, TFT_PIN_D14, 0);
+	pinWrite(TFT_PORT_D13, TFT_PIN_D13, 0);
+	pinWrite(TFT_PORT_D12, TFT_PIN_D12, 0);
+	pinWrite(TFT_PORT_D11, TFT_PIN_D11, 0);
+	pinWrite(TFT_PORT_D10, TFT_PIN_D10, 0);
+	pinWrite(TFT_PORT_D9, TFT_PIN_D9, 0);
+	pinWrite(TFT_PORT_D8, TFT_PIN_D8, 0);
+#ifdef _16_BIT_MODE
+	pinWrite(TFT_PORT_D7, TFT_PIN_D7, 0);
+	pinWrite(TFT_PORT_D6, TFT_PIN_D6, 0);
+	pinWrite(TFT_PORT_D5, TFT_PIN_D5, 0);
+	pinWrite(TFT_PORT_D4, TFT_PIN_D4, 0);
+	pinWrite(TFT_PORT_D3, TFT_PIN_D3, 0);
+	pinWrite(TFT_PORT_D2, TFT_PIN_D2, 0);
+	pinWrite(TFT_PORT_D1, TFT_PIN_D1, 0);
+	pinWrite(TFT_PORT_D0, TFT_PIN_D0, 0);
+#endif
 }
 
-static void pushData(unsigned char data) {
+static void pushData(uint16_t data) {
+#ifdef _8_BIT_MODE
+	data= (uint8_t)data;
 	pinWrite(TFT_PORT_D15,TFT_PIN_D15, (data >> 7) & 0x01);
 	pinWrite(TFT_PORT_D14,TFT_PIN_D14, (data >> 6) & 0x01);
 	pinWrite(TFT_PORT_D13,TFT_PIN_D13, (data >> 5) & 0x01);
@@ -82,27 +98,66 @@ static void pushData(unsigned char data) {
 	pinWrite(TFT_PORT_D10,TFT_PIN_D10, (data >> 2) & 0x01);
 	pinWrite(TFT_PORT_D9,TFT_PIN_D9, (data >> 1) & 0x01);
 	pinWrite(TFT_PORT_D8,TFT_PIN_D8, data & 0x01);
+
+#else
+	pinWrite(TFT_PORT_D15, TFT_PIN_D15, (data >> 15) & 0x01);
+	pinWrite(TFT_PORT_D14, TFT_PIN_D14, (data >> 14) & 0x01);
+	pinWrite(TFT_PORT_D13, TFT_PIN_D13, (data >> 13) & 0x01);
+	pinWrite(TFT_PORT_D12, TFT_PIN_D12, (data >> 12) & 0x01);
+	pinWrite(TFT_PORT_D11, TFT_PIN_D11, (data >> 11) & 0x01);
+	pinWrite(TFT_PORT_D10, TFT_PIN_D10, (data >> 10) & 0x01);
+	pinWrite(TFT_PORT_D9, TFT_PIN_D9, (data >> 9) & 0x01);
+	pinWrite(TFT_PORT_D8, TFT_PIN_D8, (data >> 8) & 0x01);
+	pinWrite(TFT_PORT_D7, TFT_PIN_D7, (data >> 7) & 0x01);
+	pinWrite(TFT_PORT_D6, TFT_PIN_D6, (data >> 6) & 0x01);
+	pinWrite(TFT_PORT_D5, TFT_PIN_D5, (data >> 5) & 0x01);
+	pinWrite(TFT_PORT_D4, TFT_PIN_D4, (data >> 4) & 0x01);
+	pinWrite(TFT_PORT_D3, TFT_PIN_D3, (data >> 3) & 0x01);
+	pinWrite(TFT_PORT_D2, TFT_PIN_D2, (data >> 2) & 0x01);
+	pinWrite(TFT_PORT_D1, TFT_PIN_D1, (data >> 1) & 0x01);
+	pinWrite(TFT_PORT_D0, TFT_PIN_D0, data & 0x01);
+
+#endif
 }
 
-static unsigned char getData(void) {
-	unsigned char data = 0;
+static uint16_t getData(void) {
+	uint16_t data = 0;
+#ifdef _8_BIT_MODE
+
 	Delay(100);
-	data |= GPIO_PinOutGet(TFT_PORT_D15, TFT_PIN_D15) << 7;
-	data |= GPIO_PinOutGet(TFT_PORT_D14, TFT_PIN_D14) << 6;
-	data |= GPIO_PinOutGet(TFT_PORT_D13, TFT_PIN_D13) << 5;
-	data |= GPIO_PinOutGet(TFT_PORT_D12, TFT_PIN_D12) << 4;
-	data |= GPIO_PinOutGet(TFT_PORT_D11, TFT_PIN_D11) << 3;
-	data |= GPIO_PinOutGet(TFT_PORT_D10, TFT_PIN_D10) << 2;
-	data |= GPIO_PinOutGet(TFT_PORT_D9, TFT_PIN_D9) << 1;
-	data |= GPIO_PinOutGet(TFT_PORT_D8, TFT_PIN_D8) << 0;
+	data |= pinRead(TFT_PORT_D15, TFT_PIN_D15) << 7;
+	data |= pinRead(TFT_PORT_D14, TFT_PIN_D14) << 6;
+	data |= pinRead(TFT_PORT_D13, TFT_PIN_D13) << 5;
+	data |= pinRead(TFT_PORT_D12, TFT_PIN_D12) << 4;
+	data |= pinRead(TFT_PORT_D11, TFT_PIN_D11) << 3;
+	data |= pinRead(TFT_PORT_D10, TFT_PIN_D10) << 2;
+	data |= pinRead(TFT_PORT_D9, TFT_PIN_D9) << 1;
+	data |= pinRead(TFT_PORT_D8, TFT_PIN_D8) << 0;
+#else
+	Delay(100);
+	data |= pinRead(TFT_PORT_D15, TFT_PIN_D15) << 15;
+	data |= pinRead(TFT_PORT_D14, TFT_PIN_D14) << 14;
+	data |= pinRead(TFT_PORT_D13, TFT_PIN_D13) << 13;
+	data |= pinRead(TFT_PORT_D12, TFT_PIN_D12) << 12;
+	data |= pinRead(TFT_PORT_D11, TFT_PIN_D11) << 11;
+	data |= pinRead(TFT_PORT_D10, TFT_PIN_D10) << 10;
+	data |= pinRead(TFT_PORT_D9, TFT_PIN_D9) << 9;
+	data |= pinRead(TFT_PORT_D8, TFT_PIN_D8) << 8;
+	data |= pinRead(TFT_PORT_D7, TFT_PIN_D7) << 7;
+	data |= pinRead(TFT_PORT_D6, TFT_PIN_D6) << 6;
+	data |= pinRead(TFT_PORT_D5, TFT_PIN_D5) << 5;
+	data |= pinRead(TFT_PORT_D4, TFT_PIN_D4) << 4;
+	data |= pinRead(TFT_PORT_D3, TFT_PIN_D3) << 3;
+	data |= pinRead(TFT_PORT_D2, TFT_PIN_D2) << 2;
+	data |= pinRead(TFT_PORT_D1, TFT_PIN_D1) << 1;
+	data |= pinRead(TFT_PORT_D0, TFT_PIN_D0) << 0;
+
+#endif
 	return data;
+
 }
 
-
-
-
-
-void SPFD5408SendCommand(unsigned int index) {
+void SPFD5408SendCommand(uint16_t index) {
 	CS_LOW()
 	;
 	RS_LOW()
@@ -114,6 +169,7 @@ void SPFD5408SendCommand(unsigned int index) {
 
 	WR_LOW()
 	;
+#ifdef _8_BIT_MODE
 	pushData(0);
 	WR_HIGH()
 	;
@@ -121,14 +177,16 @@ void SPFD5408SendCommand(unsigned int index) {
 	WR_LOW()
 	;
 	pushData(index & 0xff);
+#else
+	pushData(index);
+#endif
 	WR_HIGH()
 	;
-
 	CS_HIGH()
 	;
 }
 
-void SPFD5408SendData(unsigned int data) {
+void SPFD5408SendData(uint16_t data) {
 	CS_LOW()
 	;
 	RS_HIGH()
@@ -138,6 +196,7 @@ void SPFD5408SendData(unsigned int data) {
 
 	WR_LOW()
 	;
+#ifdef _8_BIT_MODE
 	pushData((data & 0xff00) >> 8);
 	WR_HIGH()
 	;
@@ -145,6 +204,9 @@ void SPFD5408SendData(unsigned int data) {
 	WR_LOW()
 	;
 	pushData(data & 0xff);
+#else
+	pushData(data);
+#endif
 	WR_HIGH()
 	;
 
@@ -152,8 +214,8 @@ void SPFD5408SendData(unsigned int data) {
 	;
 }
 
-unsigned int SPFD5408ReadRegister(unsigned int index) {
-	unsigned int data = 0;
+uint16_t SPFD5408ReadRegister(uint16_t index) {
+	uint16_t data = 0;
 
 	CS_LOW()
 	;
@@ -162,13 +224,17 @@ unsigned int SPFD5408ReadRegister(unsigned int index) {
 
 	WR_LOW()
 	;
+#ifdef _8_BIT_MODE
 	pushData(0);
 	WR_HIGH()
 	;
 
 	WR_LOW()
 	;
+	pushData(index & 0xff);
+#else
 	pushData(index);
+#endif
 	WR_HIGH()
 	;
 
@@ -181,6 +247,7 @@ unsigned int SPFD5408ReadRegister(unsigned int index) {
 	;
 	RD_HIGH()
 	;
+#ifdef _8_BIT_MODE
 	data |= getData() << 8;
 
 	RD_LOW()
@@ -188,6 +255,9 @@ unsigned int SPFD5408ReadRegister(unsigned int index) {
 	RD_HIGH()
 	;
 	data |= getData();
+#else
+	data = getData();
+#endif
 
 	CS_HIGH()
 	;
@@ -196,7 +266,8 @@ unsigned int SPFD5408ReadRegister(unsigned int index) {
 }
 
 void SPFD5408Init(void) {
-	CLOCKS_ENABLE();
+	CLOCKS_ENABLE()
+	;
 
 	CS_OUTPUT()
 	;
@@ -305,7 +376,7 @@ void SPFD5408Init(void) {
 }
 
 void SPFD5408PaintScreenBlack(void) {
-	unsigned int i, f;
+	uint16_t i, f;
 	for (i = 0; i < 320; i++) {
 		for (f = 0; f < 240; f++) {
 			SPFD5408SendData(BLACK);
@@ -321,7 +392,7 @@ void exitStandBy(void) {
 	SPFD5408SendData(0x0133);
 }
 
-void SPFD5408SetOrientation(unsigned int HV) //horizontal or vertical
+void SPFD5408SetOrientation(uint16_t HV) //horizontal or vertical
 {
 	SPFD5408SendCommand(0x03);
 	if (HV == 1) //vertical
@@ -338,7 +409,7 @@ void SPFD5408SetDisplayDirect(unsigned char Direction) {
 	DisplayDirect = Direction;
 }
 
-void SPFD5408SetXY(unsigned int poX, unsigned int poY) {
+void SPFD5408SetXY(uint16_t poX, uint16_t poY) {
 	SPFD5408SendCommand(0x0020); //X
 	SPFD5408SendData(poX);
 	SPFD5408SendCommand(0x0021); //Y
@@ -346,12 +417,12 @@ void SPFD5408SetXY(unsigned int poX, unsigned int poY) {
 	SPFD5408SendCommand(0x0022); //Start to write to display RAM
 }
 
-void SPFD5408SetPixel(unsigned int poX, unsigned int poY, unsigned int color) {
+void SPFD5408SetPixel(uint16_t poX, uint16_t poY, uint16_t color) {
 	SPFD5408SetXY(poX, poY);
 	SPFD5408SendData(color);
 }
 
-void SPFD5408DrawCircle(int poX, int poY, int r, unsigned int color) {
+void SPFD5408DrawCircle(int poX, int poY, int r, uint16_t color) {
 	int x = -r, y = 0, err = 2 - 2 * r, e2;
 	do {
 		SPFD5408SetPixel(poX - x, poY + y, color);
@@ -369,7 +440,7 @@ void SPFD5408DrawCircle(int poX, int poY, int r, unsigned int color) {
 	} while (x <= 0);
 }
 
-void SPFD5408FillCircle(int poX, int poY, int r, unsigned int color) {
+void SPFD5408FillCircle(int poX, int poY, int r, uint16_t color) {
 	int x = -r, y = 0, err = 2 - 2 * r, e2;
 	do {
 		SPFD5408DrawVerticalLine(poX - x, poY - y, 2 * y, color);
@@ -386,8 +457,8 @@ void SPFD5408FillCircle(int poX, int poY, int r, unsigned int color) {
 	} while (x <= 0);
 }
 
-void SPFD5408DrawLine(unsigned int x0, unsigned int y0, unsigned int x1,
-		unsigned int y1, unsigned int color) {
+void SPFD5408DrawLine(uint16_t x0, uint16_t y0, uint16_t x1,
+		uint16_t y1, uint16_t color) {
 	int x = x1 - x0;
 	int y = y1 - y0;
 	int dx = abs(x), sx = x0 < x1 ? 1 : -1;
@@ -411,9 +482,9 @@ void SPFD5408DrawLine(unsigned int x0, unsigned int y0, unsigned int x1,
 	}
 }
 
-void SPFD5408DrawVerticalLine(unsigned int poX, unsigned int poY,
-		unsigned int length, unsigned int color) {
-	unsigned int i;
+void SPFD5408DrawVerticalLine(uint16_t poX, uint16_t poY,
+		uint16_t length, uint16_t color) {
+	uint16_t i;
 
 	SPFD5408SetXY(poX, poY);
 	SPFD5408SetOrientation(1);
@@ -426,9 +497,9 @@ void SPFD5408DrawVerticalLine(unsigned int poX, unsigned int poY,
 	}
 }
 
-void SPFD5408DrawHorizontalLine(unsigned int poX, unsigned int poY,
-		unsigned int length, unsigned int color) {
-	unsigned int i;
+void SPFD5408DrawHorizontalLine(uint16_t poX, uint16_t poY,
+		uint16_t length, uint16_t color) {
+	uint16_t i;
 
 	SPFD5408SetXY(poX, poY);
 	SPFD5408SetOrientation(0);
@@ -440,8 +511,8 @@ void SPFD5408DrawHorizontalLine(unsigned int poX, unsigned int poY,
 	}
 }
 
-void SPFD5408DrawRectangle(unsigned int poX, unsigned int poY,
-		unsigned int length, unsigned int width, unsigned int color) {
+void SPFD5408DrawRectangle(uint16_t poX, uint16_t poY,
+		uint16_t length, uint16_t width, uint16_t color) {
 	SPFD5408DrawHorizontalLine(poX, poY, length, color);
 	SPFD5408DrawHorizontalLine(poX, poY + width, length, color);
 
@@ -449,9 +520,9 @@ void SPFD5408DrawRectangle(unsigned int poX, unsigned int poY,
 	SPFD5408DrawVerticalLine(poX + length, poY, width, color);
 }
 
-void SPFD5408FillRectangle(unsigned int poX, unsigned int poY,
-		unsigned int length, unsigned int width, unsigned int color) {
-	unsigned int i;
+void SPFD5408FillRectangle(uint16_t poX, uint16_t poY,
+		uint16_t length, uint16_t width, uint16_t color) {
+	uint16_t i;
 
 	for (i = 0; i < width; i++) {
 		if (DisplayDirect == LEFT2RIGHT)
@@ -466,8 +537,8 @@ void SPFD5408FillRectangle(unsigned int poX, unsigned int poY,
 	}
 }
 
-void SPFD5408DrawChar(unsigned int poX, unsigned int poY, unsigned char ascii,
-		unsigned int size, unsigned int fgcolor) {
+void SPFD5408DrawChar(uint16_t poX, uint16_t poY, unsigned char ascii,
+		uint16_t size, uint16_t fgcolor) {
 	unsigned char i, f, temp = 0;
 
 	SPFD5408SetXY(poX, poY);
@@ -497,8 +568,8 @@ void SPFD5408DrawChar(unsigned int poX, unsigned int poY, unsigned char ascii,
 	}
 }
 
-void SPFD5408DrawString(unsigned int poX, unsigned int poY, char *string,
-		unsigned int size, unsigned int fgcolor) {
+void SPFD5408DrawString(uint16_t poX, uint16_t poY, char *string,
+		uint16_t size, uint16_t fgcolor) {
 	//unsigned char i;
 
 	while (*string++) {
@@ -549,5 +620,4 @@ void SPFD5408DrawBmp(unsigned short ulXs, unsigned short ulYs,
 		buf += length_null;
 	}
 }
-
 
