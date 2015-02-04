@@ -32,8 +32,8 @@ extern "C" {
 #define USART_READ     1
 #define USART_WRITE    0
 
-#define CS_LOW()        GPIO_PinOutClear(PORT_SPI_CS , PIN_SPI_CS );
-#define CS_HIGH()       GPIO_PinOutSet(PORT_SPI_CS , PIN_SPI_CS );
+#define CS_LOW_()        GPIO_PinOutClear(PORT_SPI_CS , PIN_SPI_CS );
+#define CS_HIGH_()       GPIO_PinOutSet(PORT_SPI_CS , PIN_SPI_CS );
 
 #define MOSI_LOW()      GPIO_PinOutClear(PORT_SPI_MOSI , PIN_SPI_MOSI );
 #define MOSI_HIGH()     GPIO_PinOutSet(PORT_SPI_MOSI , PIN_SPI_MOSI );

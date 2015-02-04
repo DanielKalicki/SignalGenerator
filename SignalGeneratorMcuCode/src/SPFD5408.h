@@ -54,8 +54,8 @@
 #define CS_PIN      9
 #define CS_PORT     gpioPortB
 #define CS_OUTPUT() GPIO_PinModeSet(CS_PORT, CS_PIN, gpioModePushPull, 1);
-#define CS_HIGH_()   GPIO_PinOutSet(CS_PORT , CS_PIN );
-#define CS_LOW_()    GPIO_PinOutClear(CS_PORT , CS_PIN );
+#define CS_HIGH()   GPIO_PinOutSet(CS_PORT , CS_PIN );
+#define CS_LOW()    GPIO_PinOutClear(CS_PORT , CS_PIN );
 //------------------RS----------------------
 
 #define RS_PIN      10
@@ -83,84 +83,84 @@
 
 //------------------DATA-------------------
 #define TFT_PORT_D15 gpioPortD
-#define TFT_PIN_D15 15
+#define TFT_PIN_D15 7
 #define TFT_PIN_D15_OUTPUT() GPIO_PinModeSet(TFT_PORT_D15,TFT_PIN_D15, gpioModePushPull, 1);
 #define TFT_PIN_D15_INPUT()  GPIO_PinModeSet(TFT_PORT_D15,TFT_PIN_D15, gpioModeInput, 0);
 
 #define TFT_PORT_D14 gpioPortD
-#define TFT_PIN_D14 14
+#define TFT_PIN_D14 6
 #define TFT_PIN_D14_OUTPUT() GPIO_PinModeSet(TFT_PORT_D14,TFT_PIN_D14, gpioModePushPull, 1);
 #define TFT_PIN_D14_INPUT()  GPIO_PinModeSet(TFT_PORT_D14,TFT_PIN_D14, gpioModeInput, 0);
 
 #define TFT_PORT_D13 gpioPortD
-#define TFT_PIN_D13 13
+#define TFT_PIN_D13 5
 #define TFT_PIN_D13_OUTPUT() GPIO_PinModeSet(TFT_PORT_D13,TFT_PIN_D13, gpioModePushPull, 1);
 #define TFT_PIN_D13_INPUT()  GPIO_PinModeSet(TFT_PORT_D13,TFT_PIN_D13, gpioModeInput, 0);
 
 #define TFT_PORT_D12 gpioPortD
-#define TFT_PIN_D12 12
+#define TFT_PIN_D12 4
 #define TFT_PIN_D12_OUTPUT() GPIO_PinModeSet(TFT_PORT_D12,TFT_PIN_D12, gpioModePushPull, 1);
 #define TFT_PIN_D12_INPUT()  GPIO_PinModeSet(TFT_PORT_D12,TFT_PIN_D12, gpioModeInput, 0);
 
 #define TFT_PORT_D11 gpioPortD
-#define TFT_PIN_D11 11
+#define TFT_PIN_D11 3
 #define TFT_PIN_D11_OUTPUT() GPIO_PinModeSet(TFT_PORT_D11,TFT_PIN_D11, gpioModePushPull, 1);
 #define TFT_PIN_D11_INPUT()  GPIO_PinModeSet(TFT_PORT_D11,TFT_PIN_D11, gpioModeInput, 0);
 
 #define TFT_PORT_D10 gpioPortD
-#define TFT_PIN_D10 10
+#define TFT_PIN_D10 2
 #define TFT_PIN_D10_OUTPUT() GPIO_PinModeSet(TFT_PORT_D10,TFT_PIN_D10, gpioModePushPull, 1);
 #define TFT_PIN_D10_INPUT()  GPIO_PinModeSet(TFT_PORT_D10,TFT_PIN_D10, gpioModeInput, 0);
 
 #define TFT_PORT_D9 gpioPortD
-#define TFT_PIN_D9  9
+#define TFT_PIN_D9  1
 #define TFT_PIN_D9_OUTPUT() GPIO_PinModeSet(TFT_PORT_D9,TFT_PIN_D9, gpioModePushPull, 1);
 #define TFT_PIN_D9_INPUT()  GPIO_PinModeSet(TFT_PORT_D9,TFT_PIN_D9, gpioModeInput, 0);
 
 #define TFT_PORT_D8 gpioPortD
-#define TFT_PIN_D8  8
+#define TFT_PIN_D8  0  // spi here!!!!!!!!!!!!!!!
 #define TFT_PIN_D8_OUTPUT() GPIO_PinModeSet(TFT_PORT_D8,TFT_PIN_D8, gpioModePushPull, 1);
 #define TFT_PIN_D8_INPUT()  GPIO_PinModeSet(TFT_PORT_D8,TFT_PIN_D8, gpioModeInput, 0);
 
 #ifdef _16_BIT_MODE
 
-#define TFT_PORT_D7 gpioPortD
+#define TFT_PORT_D7 gpioPortC
 #define TFT_PIN_D7 7
 #define TFT_PIN_D7_OUTPUT() GPIO_PinModeSet(TFT_PORT_D7,TFT_PIN_D7, gpioModePushPull, 1);
 #define TFT_PIN_D7_INPUT()  GPIO_PinModeSet(TFT_PORT_D7,TFT_PIN_D7, gpioModeInput, 0);
 
-#define TFT_PORT_D6 gpioPortD
+#define TFT_PORT_D6 gpioPortC
 #define TFT_PIN_D6 6
 #define TFT_PIN_D6_OUTPUT() GPIO_PinModeSet(TFT_PORT_D6,TFT_PIN_D6, gpioModePushPull, 1);
 #define TFT_PIN_D6_INPUT()  GPIO_PinModeSet(TFT_PORT_D6,TFT_PIN_D6, gpioModeInput, 0);
 
-#define TFT_PORT_D5 gpioPortD
+#define TFT_PORT_D5 gpioPortC
 #define TFT_PIN_D5 5
 #define TFT_PIN_D5_OUTPUT() GPIO_PinModeSet(TFT_PORT_D5,TFT_PIN_D5, gpioModePushPull, 1);
 #define TFT_PIN_D5_INPUT()  GPIO_PinModeSet(TFT_PORT_D5,TFT_PIN_D5, gpioModeInput, 0);
 
-#define TFT_PORT_D4 gpioPortD
+#define TFT_PORT_D4 gpioPortC
 #define TFT_PIN_D4 4
 #define TFT_PIN_D4_OUTPUT() GPIO_PinModeSet(TFT_PORT_D4,TFT_PIN_D4, gpioModePushPull, 1);
 #define TFT_PIN_D4_INPUT()  GPIO_PinModeSet(TFT_PORT_D4,TFT_PIN_D4, gpioModeInput, 0);
 
-#define TFT_PORT_D3 gpioPortD
+#define TFT_PORT_D3 gpioPortC
 #define TFT_PIN_D3 3
 #define TFT_PIN_D3_OUTPUT() GPIO_PinModeSet(TFT_PORT_D3,TFT_PIN_D3, gpioModePushPull, 1);
 #define TFT_PIN_D3_INPUT()  GPIO_PinModeSet(TFT_PORT_D3,TFT_PIN_D3, gpioModeInput, 0);
 
-#define TFT_PORT_D2 gpioPortD
+#define TFT_PORT_D2 gpioPortC
 #define TFT_PIN_D2 2
 #define TFT_PIN_D2_OUTPUT() GPIO_PinModeSet(TFT_PORT_D2,TFT_PIN_D2, gpioModePushPull, 1);
 #define TFT_PIN_D2_INPUT()  GPIO_PinModeSet(TFT_PORT_D2,TFT_PIN_D2, gpioModeInput, 0);
 
 
-#define TFT_PORT_D1 gpioPortD
+#define TFT_PORT_D1 gpioPortC
 #define TFT_PIN_D1  1
 #define TFT_PIN_D1_OUTPUT() GPIO_PinModeSet(TFT_PORT_D1,TFT_PIN_D1, gpioModePushPull, 1);
 #define TFT_PIN_D1_INPUT()  GPIO_PinModeSet(TFT_PORT_D1,TFT_PIN_D1, gpioModeInput, 0);
 
-#define TFT_PORT_D0 gpioPortD
+#define TFT_PORT_D0 gpioPortC
 #define TFT_PIN_D0 0
 #define TFT_PIN_D0_OUTPUT() GPIO_PinModeSet(TFT_PORT_D0,TFT_PIN_D0, gpioModePushPull, 1);
 #define TFT_PIN_D0_INPUT()  GPIO_PinModeSet(TFT_PORT_D0,TFT_PIN_D0, gpioModeInput, 0);
@@ -179,6 +179,9 @@ void SPFD5408PaintScreenBlack(void);
 void SPFD5408SendCommand(uint16_t index);
 void SPFD5408SendData(uint16_t data);
 uint16_t SPFD5408ReadRegister(uint16_t index);
+void SPFD5408WriteRegister(uint16_t index, uint16_t data);
+void SPFD5408WriteData(uint16_t data);
+void SPFD5408WriteCommand(uint16_t data);
 
 void SPFD5408SetXY(uint16_t poX, uint16_t poY);
 void SPFD5408SetPixel(uint16_t poX, uint16_t poY, uint16_t color);
