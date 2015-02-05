@@ -176,12 +176,6 @@
 
 void SPFD5408Init(void);
 void SPFD5408PaintScreenBlack(void);
-void SPFD5408SendCommand(uint16_t index);
-void SPFD5408SendData(uint16_t data);
-uint16_t SPFD5408ReadRegister(uint16_t index);
-void SPFD5408WriteRegister(uint16_t index, uint16_t data);
-void SPFD5408WriteData(uint16_t data);
-void SPFD5408WriteCommand(uint16_t data);
 
 void SPFD5408SetXY(uint16_t poX, uint16_t poY);
 void SPFD5408SetPixel(uint16_t poX, uint16_t poY, uint16_t color);

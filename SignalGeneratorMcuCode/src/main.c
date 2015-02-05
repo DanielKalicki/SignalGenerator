@@ -28,13 +28,12 @@ int main(void) {
 		while (1)
 			;
 	CMU_ClockEnable(cmuClock_HFPER, true);
-	CMU_ClockEnable(cmuClock_GPIO, true);
 	SPFD5408Init();
 	BSP_LedsInit();
 	BSP_LedSet(0);
 	//SPFD5408SetOrientation(1) ;//vertical
-	SPFD5408DrawString(100, 100, "TEST", 4, BLACK);
-	//SPFD5408DrawString(0, 0, "TEST", 4, BLACK);
+	SPFD5408DrawString(100, 100, "AES", 4, BLACK);
+	SPFD5408DrawString(10, 200, "KOL", 3, BLUE);
 	while (1) {
 		BSP_LedToggle(0);
 		BSP_LedToggle(1);
