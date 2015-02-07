@@ -40,13 +40,28 @@ int main(void) {
 	//SPFD5408DrawString(10, 200, "KOL", 3, BLUE);
 	SegmentLCD_Number(100);
 	//    SegmentLCD_Write(string);
-	spiInit();
+	//spiInit();
+
+
+	//TESTS !!!!!! software SPIS
+	CMU_ClockEnable(cmuClock_GPIO, true);
+	CMU_ClockEnable(cmuClock_HFPER, true);
+	GPIO_PinModeSet(SPI_PORT_MOSI, SPI_PIN_MOSI, gpioModePushPull, 1);
+	GPIO_PinModeSet(SPI_PORT_MISO, SPI_PIN_MISO, gpioModeInput, 0);
+	GPIO_PinModeSet(SPI_PORT_CLK, SPI_PIN_CLK, gpioModePushPull, 1);
+	// Keep CS high to not activate slave
+	GPIO_PinModeSet(SPI_PORT_CS, SPI_PIN_CS, gpioModePushPull, 1);
+
+
+
+
 	uint16_t i=0;
 	while (1) {
 		BSP_LedToggle(0);
 		BSP_LedToggle(1);
 		Delay(1000);
-		i=spiReadWord(DOUT_START_DLY);
-		SegmentLCD_Number((int)i);
+		i=spiReadWordSoftware((uint16_t)PAT_PERIOD);
+		//i=spiReadWord((uint16_t)PAT_PERIOD);
+		SegmentLCD_Number(i);
 	}
 }
