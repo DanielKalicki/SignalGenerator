@@ -32,22 +32,23 @@ extern "C" {
 #define USART_READ     1
 #define USART_WRITE    0
 
-#define CS_LOW_()        GPIO_PinOutClear(PORT_SPI_CS , PIN_SPI_CS );
-#define CS_HIGH_()       GPIO_PinOutSet(PORT_SPI_CS , PIN_SPI_CS );
+#define SPI_CS_LOW()        GPIO_PinOutClear(PORT_SPI_CS , PIN_SPI_CS );
+#define SPI_CS_HIGH()       GPIO_PinOutSet(PORT_SPI_CS , PIN_SPI_CS );
 
-#define MOSI_LOW()      GPIO_PinOutClear(PORT_SPI_MOSI , PIN_SPI_MOSI );
-#define MOSI_HIGH()     GPIO_PinOutSet(PORT_SPI_MOSI , PIN_SPI_MOSI );
+#define SPI_MOSI_LOW()      GPIO_PinOutClear(PORT_SPI_MOSI , PIN_SPI_MOSI );
+#define SPI_MOSI_HIGH()     GPIO_PinOutSet(PORT_SPI_MOSI , PIN_SPI_MOSI );
 
-#define SCK_LOW()       GPIO_PinOutClear(PORT_SPI_CLK , PIN_SPI_CLK );
-#define SCK_HIGH()      GPIO_PinOutSet(PORT_SPI_CLK , PIN_SPI_CLK );
+#define SPI_SCK_LOW()       GPIO_PinOutClear(PORT_SPI_CLK , PIN_SPI_CLK );
+#define SPI_SCK_HIGH()      GPIO_PinOutSet(PORT_SPI_CLK , PIN_SPI_CLK );
 
-#define RESET_LOW()     GPIO_PinOutClear(PORT_SPI_RESET , PIN_SPI_RESET );
-#define RESET_HIGH()    GPIO_PinOutSet(PORT_SPI_RESET , PIN_SPI_RESET );
+#define SPI_RESET_LOW()     GPIO_PinOutClear(PORT_SPI_RESET , PIN_SPI_RESET );
+#define SPI_RESET_HIGH()    GPIO_PinOutSet(PORT_SPI_RESET , PIN_SPI_RESET );
 
 
 void spiInit(void);
 void spiDisable(void);
 uint16_t spiTransfer(uint8_t spiaddr, uint8_t spidata);
+uint16_t spiReadWord(uint16_t spiaddr);
 void spiSendByte(uint8_t spidata);
 void spiSendWord(uint16_t spidata);
 uint8_t spiGetByte(uint8_t addr);
