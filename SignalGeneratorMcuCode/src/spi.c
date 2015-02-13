@@ -164,6 +164,45 @@ uint16_t spiReadWord(uint16_t addr) {
 
 }
 
+uint16_t spiWriteWordSoftware(uint16_t addr, uint16_t data) {
+	SPI_SCK_HIGH()
+	Delay(1);
+	addr &= ~0x8000; //writing
+	SPI_CS_LOW()
+
+	for (int i = 0; i < 16; i++) {
+
+		if (addr & 0x8000)
+			SPI_MOSI_HIGH()
+		else
+			SPI_MOSI_LOW()
+		SPI_SCK_LOW()
+		Delay(1);
+		SPI_SCK_HIGH()
+		addr <<= 1;
+		Delay(1);
+
+	}
+
+	for (int i = 0; i < 16; i++) {
+
+			if (data&(1<<(15-i)))
+				SPI_MOSI_HIGH()
+			else
+				SPI_MOSI_LOW()
+			SPI_SCK_LOW()
+			Delay(1);
+			SPI_SCK_HIGH()
+			addr <<= 1;
+			Delay(1);
+
+		}
+
+	SPI_CS_HIGH()
+	return data;
+
+}
+
 uint16_t spiReadWordSoftware(uint16_t addr) {
 	uint16_t data = 0;
 	SPI_SCK_HIGH()

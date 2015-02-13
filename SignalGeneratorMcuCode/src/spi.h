@@ -50,6 +50,7 @@ void spiSendByte(uint8_t spidata);
 void spiSendWord(uint16_t spidata);
 uint8_t spiGetByte(uint8_t addr);
 
+uint16_t spiWriteWordSoftware(uint16_t addr, uint16_t data);
 uint16_t spiReadWordSoftware(uint16_t addr); //
 
 

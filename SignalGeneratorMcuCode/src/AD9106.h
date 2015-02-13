@@ -13,7 +13,7 @@
 #include "spi.h"
 
 typedef enum {
-	SPICONFIG_ADDR,
+	SPICONFIG_ADDR=0x00,
 	POWERCONFIG,
 	CLOCKCONFIG,
 	REFADJ,
@@ -27,12 +27,12 @@ typedef enum {
 	DAC2RSET,
 	DAC1RSET,
 	CALCONFIG,
-	COMPOFFSET,
-	RAMUPDATE,
+	COMPOFFSET=0x000E,
+	RAMUPDATE=0x001D,
 	PAT_STATUS,
 	PAT_TYPE,
-	PATTERN_DLY,
-	DAC4DOF,
+	PATTERN_DLY=0x0020,
+	DAC4DOF=0x0022,
 	DAC3DOF,
 	DAC2DOF,
 	DAC1DOF,
@@ -364,7 +364,6 @@ inline uint8_t getShiftValue(uint8_t dataBitMask) {
 	}
 	return shiftVal;
 }
-
 
 bool setConfig(void);
 
