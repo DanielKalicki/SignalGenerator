@@ -1,2 +1,14 @@
 The voltage output from AD9106 is converter to current allowing constant current output.
 The maximum amplitude will be in range of 1A.
+The bandwidth is 1MHz.
+The bidirectional current will be generated using improve Howland circuit.
+
+The op amp for the Howland circuit can be selected from:
+AD8027 - 4.3nV/rHz, 190MHz (-3dB G=1), 12V supply, about 40mA output current, 900uV offset.
+AD8045 - 3nV/rHz, 1GHz (-3dB G=1), 12V supply, 70mA output current, 1mV offset
+AD8055 - 6nV/rHz, 300MHz(-3dB G=1, 40MHz 0.1dB), +-5V supply, 60mA output current, 5mV offset
+AD4896 - 1nV/rHz, 230MHz (-3dB G=1) 10V supply, 80mA output current, 0.5mV offset
+AD8021 - 2.1nV/rHz, 200MHz (-3dB G=1) 24V supply, 60mA output current, 1mV offset
+ADA4637-1 - 6.1nV/rHz, 79MHz, 30V supply, 45mA output current, 200uV offset
+
+For this module a ADA4637-1 was selected, beacuse it has the lowest input bias current of 5pA maximum, this will reduce the buffer op amp influence on the output current. The high supply voltage will improve the output current range.
