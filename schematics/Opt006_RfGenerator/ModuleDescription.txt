@@ -1,0 +1,3 @@
+100MHz to 2GHz rf generator.
+Signals from waveform generator (AD9106) can ge used to modulate the rf signal.
+The modulation schema can be select from AM, FM, PM, QAM, FSK, PSK, ASK etc.

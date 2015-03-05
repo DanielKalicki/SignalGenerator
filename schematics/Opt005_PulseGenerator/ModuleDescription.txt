@@ -1,0 +1,2 @@
+This module is used to generate fast rising and falling pulses with arbitrary amplitude.
+User can select the width, height and falling and rising time of the pulse.

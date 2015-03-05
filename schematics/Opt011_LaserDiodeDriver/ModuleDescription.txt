@@ -1,0 +1,2 @@
+Laser diode module driver for optical communication. 
+The waveform generator AD9106 output can be used to modulate the laser driving circuit.

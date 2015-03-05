@@ -1,0 +1,1 @@
+Precision AC signal with selectable frequency and amplitude.

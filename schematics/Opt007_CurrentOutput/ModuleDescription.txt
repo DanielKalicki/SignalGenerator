@@ -1,0 +1,2 @@
+The voltage output from AD9106 is converter to current allowing constant current output.
+The maximum amplitude will be in range of 1A.

@@ -1,0 +1,2 @@
+LT3751 based on high output voltage module.
+High voltage current sensing is describe in http://cds.linear.com/docs/en/application-note/an105fa.pdf on Figure 13.

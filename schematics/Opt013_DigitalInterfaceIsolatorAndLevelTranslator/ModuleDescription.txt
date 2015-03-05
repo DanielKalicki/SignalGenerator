@@ -1,0 +1,1 @@
+This module allows the user to connect digital signal which will be than optical isolated and outputed on a digital output connector.

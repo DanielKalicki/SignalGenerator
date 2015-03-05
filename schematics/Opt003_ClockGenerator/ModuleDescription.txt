@@ -1,0 +1,1 @@
+This board is used to generate clock sources with user define frequency kHz to GHz and clock outputs with LVPECL/LVDS, HCSL, CMOS, SSTL/HSTL formats. 
