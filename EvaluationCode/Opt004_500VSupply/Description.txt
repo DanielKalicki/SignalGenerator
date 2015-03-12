@@ -1,0 +1,1 @@
+Basic code for AVR Atmega32 used to control the MCP4728 DAC, which is used to select the output voltage.
