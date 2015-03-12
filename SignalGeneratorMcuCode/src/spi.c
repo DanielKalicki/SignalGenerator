@@ -6,6 +6,30 @@
 #include "spi.h"
 #include "utils.h"
 
+//private variables:
+
+typedef struct {
+	GPIO_Port_TypeDef spiPort;
+	uint8_t spiPin;
+} SpiPio;
+
+static SpiPio mSpiMOSI;
+static SpiPio mSpiMISO;
+static SpiPio mSpiCLK;
+static SpiPio mSpiCS;
+
+#define SPI_CS_LOW()        GPIO_PinOutClear(mSpiCS.spiPort ,mSpiCS.spiPin );
+#define SPI_CS_HIGH()       GPIO_PinOutSet(mSpiCS.spiPort , mSpiCS.spiPin );
+
+#define SPI_MOSI_LOW()      GPIO_PinOutClear(mSpiMOSI.spiPort, mSpiMOSI.spiPin );
+#define SPI_MOSI_HIGH()     GPIO_PinOutSet(mSpiMOSI.spiPort, mSpiMOSI.spiPin );
+
+#define SPI_SCK_LOW()       GPIO_PinOutClear(mSpiCLK.spiPort , mSpiCLK.spiPin );
+#define SPI_SCK_HIGH()      GPIO_PinOutSet(mSpiCLK.spiPort , mSpiCLK.spiPin );
+
+//#define SPI_RESET_LOW()     GPIO_PinOutClear(SPI_PORT_RESET , SPI_PIN_RESET ); not used
+//#define SPI_RESET_HIGH()    GPIO_PinOutSet(SPI_PORT_RESET , SPI_PIN_RESET );
+
 /* @brief  init spi*/
 
 void spiInit(void) {
@@ -164,6 +188,30 @@ uint16_t spiReadWord(uint16_t addr) {
 
 }
 
+//software
+
+void spiInitSoftware(GPIO_Port_TypeDef spiPortMOSI, uint8_t spiPinMOSI,
+		GPIO_Port_TypeDef spiPortMISO, uint8_t spiPinMISO,
+		GPIO_Port_TypeDef spiPortCLK, uint8_t spiPinCLK,
+		GPIO_Port_TypeDef spiPortCS, uint8_t spiPinCS) {
+	CMU_ClockEnable(cmuClock_GPIO, true);
+	GPIO_PinModeSet(spiPortMOSI, spiPinMOSI, gpioModePushPull, 1);
+	GPIO_PinModeSet(spiPortMISO, spiPinMISO, gpioModeInput, 0);
+	GPIO_PinModeSet(spiPortCLK, spiPinCLK, gpioModePushPull, 1);
+	// Keep CS high to not activate slave
+	GPIO_PinModeSet(spiPortCS, spiPinCS, gpioModePushPull, 1);
+
+	mSpiMOSI.spiPort = spiPortMOSI;
+	mSpiMOSI.spiPin = spiPinMOSI;
+	mSpiMISO.spiPort = spiPortMISO;
+	mSpiMISO.spiPin = spiPinMISO;
+	mSpiCLK.spiPort = spiPortCLK;
+	mSpiCLK.spiPin = spiPinCLK;
+	mSpiCS.spiPort = spiPortCS;
+	mSpiCS.spiPin = spiPinCS;
+
+}
+
 uint16_t spiWriteWordSoftware(uint16_t addr, uint16_t data) {
 	SPI_SCK_HIGH()
 	Delay(1);
@@ -173,9 +221,9 @@ uint16_t spiWriteWordSoftware(uint16_t addr, uint16_t data) {
 	for (int i = 0; i < 16; i++) {
 
 		if (addr & 0x8000)
-			SPI_MOSI_HIGH()
+		SPI_MOSI_HIGH()
 		else
-			SPI_MOSI_LOW()
+		SPI_MOSI_LOW()
 		SPI_SCK_LOW()
 		Delay(1);
 		SPI_SCK_HIGH()
@@ -186,17 +234,17 @@ uint16_t spiWriteWordSoftware(uint16_t addr, uint16_t data) {
 
 	for (int i = 0; i < 16; i++) {
 
-			if (data&(1<<(15-i)))
-				SPI_MOSI_HIGH()
-			else
-				SPI_MOSI_LOW()
-			SPI_SCK_LOW()
-			Delay(1);
-			SPI_SCK_HIGH()
-			addr <<= 1;
-			Delay(1);
+		if (data & (1 << (15 - i)))
+		SPI_MOSI_HIGH()
+		else
+		SPI_MOSI_LOW()
+		SPI_SCK_LOW()
+		Delay(1);
+		SPI_SCK_HIGH()
+		addr <<= 1;
+		Delay(1);
 
-		}
+	}
 
 	SPI_CS_HIGH()
 	return data;
@@ -213,9 +261,9 @@ uint16_t spiReadWordSoftware(uint16_t addr) {
 	for (int i = 0; i < 16; i++) {
 
 		if (addr & 0x8000)
-			SPI_MOSI_HIGH()
+		SPI_MOSI_HIGH()
 		else
-			SPI_MOSI_LOW()
+		SPI_MOSI_LOW()
 		SPI_SCK_LOW()
 		Delay(1);
 		SPI_SCK_HIGH()
@@ -237,3 +285,6 @@ uint16_t spiReadWordSoftware(uint16_t addr) {
 	return data;
 
 }
+
+
+

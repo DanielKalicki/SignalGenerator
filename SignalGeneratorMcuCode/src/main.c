@@ -19,6 +19,9 @@
 #include "drivers/segmentlcd.h"
 #include "spi.h"
 #include "SPFD5408.h"
+#include "ADS7843.h"
+
+volatile bool mADS7843ScreenTouched;
 
 void AD9106_test(void){
 	static uint16_t counter=0;
@@ -59,14 +62,13 @@ int main(void) {
 		while (1)
 			;
 	CMU_ClockEnable(cmuClock_HFPER, true);
-	//SPFD5408Init();
+
+	//----------------------- AD9106 first working tests -----------------------
+	/*
 	BSP_LedsInit();
 	BSP_LedSet(0);
 	SegmentLCD_Init(false);
 	SegmentLCD_AllOff();
-	//SPFD5408SetOrientation(1) ;//vertical
-	//SPFD5408DrawString(100, 100, "AES", 4, BLACK);
-	//SPFD5408DrawString(10, 200, "KOL", 3, BLUE);
 	SegmentLCD_Number(100);
 	//    SegmentLCD_Write(string);
 	//spiInit();
@@ -91,4 +93,45 @@ int main(void) {
 		BSP_LedToggle(1);
 		AD9106_test();
 	}
+	*/
+
+
+	//----------------------- SPFD5408 first working tests -----------------------
+	SPFD5408Init();
+	BSP_LedsInit();
+	BSP_LedSet(0);
+	BSP_LedClear(1);
+	SegmentLCD_Init(false);
+	SegmentLCD_AllOff();
+	SPFD5408SetOrientation(0) ;//vertical
+	//SPFD5408DrawString(100, 100, "AES", 4, BLACK);
+	//SPFD5408DrawString(10, 200, "KOL", 3, BLUE);
+	SegmentLCD_Number(100);
+
+
+
+	uint16_t i=0;
+	uint16_t counter=0;
+	 char buf[10];
+
+	while (1) {
+		i++;
+		if(mADS7843ScreenTouched){
+		SegmentLCD_Number((int)(getCoordinates().x));
+		Delay(2000);
+		}
+		else SegmentLCD_Number(1111);
+		/*
+		counter = snprintf ( buf, 10, "Num %d", i );
+		if(counter!=-1)
+			SPFD5408DrawString(0, 0, buf, 3, BLACK);
+		BSP_LedToggle(0);
+		BSP_LedToggle(1);
+		Delay(1000);
+		*/
+
+
+	}
+
+
 }
