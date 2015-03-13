@@ -10,10 +10,11 @@
 #include "stdio.h"
 #include "utils.h"
 #include "drivers/gpiointerrupt.h"
+#include "bsp.h"
 
 TouchInfo tTouchData;
 static TouchPoint mPointCoordinates={0};
-extern volatile bool mADS7843ScreenTouched= false;
+extern volatile bool mADS7843ScreenTouched;
 #define ADS7843_ENABLE_TOUCH_INT
 
 
@@ -24,7 +25,7 @@ TouchPoint getCoordinates(void){
 
 
 static void ADS7843SpiWriteByteSoftware(uint8_t data) {
-	Delay(1);
+	///////////////////////////////////////////////////////////////	Delay(1);
 
 	for (int i = 0; i < 8; i++) {
 
@@ -38,11 +39,11 @@ static void ADS7843SpiWriteByteSoftware(uint8_t data) {
 		ADS7843_CLK_HIGH()
 		;
 
-		Delay(1);
+		///////////////////////////////////////////////////////////////		Delay(1);
 		ADS7843_CLK_LOW()
 		;
 		data <<= 1;
-		Delay(1);
+		///////////////////////////////////////////////////////////////		Delay(1);
 
 	}
 
@@ -51,16 +52,16 @@ static void ADS7843SpiWriteByteSoftware(uint8_t data) {
 static uint8_t ADS7843SpiReadByteSoftware(void) {
 	uint8_t data = 0;
 	ADS7843_CLK_HIGH()
-	Delay(1);
+	///////////////////////////////////////////////////////////////	Delay(1);
 
 	for (int i = 0; i < 8; i++) {
 		ADS7843_CLK_LOW()
-		Delay(1);
+		///////////////////////////////////////////////////////////////		Delay(1);
 		ADS7843_CLK_HIGH()
 		data |=
 				((GPIO_PinInGet(ADS7843_PORT_MISO, ADS7843_PIN_MISO) << (8 - i)));
 
-		Delay(1);
+		///////////////////////////////////////////////////////////////		Delay(1);
 
 	}
 	return data;
@@ -69,7 +70,7 @@ static uint8_t ADS7843SpiReadByteSoftware(void) {
 
 static void ADS7843PenIRQCallback(uint8_t pin) {
 
-	if (pin == ADS7843_PIN_INT) {
+	if (pin == ADS7843_PIN_INT&&!mADS7843ScreenTouched) {
 		uint16_t x, y;
 		ADS7843_INT_IRQ_CONFIG_PIN_DISABLE()
 		if (ADS7843_GET_INT_PIN()) {
@@ -116,8 +117,10 @@ void ADS7843Init(void) {
 	GPIOINT_Init();
 	ADS7843_INT_INPUT()
 	;
-	ADS7843_INT_IRQ_CONFIG_FALLING(true); //falling edge
+	//ADS7843_INT_IRQ_CONFIG_FALLING(true); //falling edge
 	GPIOINT_CallbackRegister(ADS7843_PIN_INT, ADS7843PenIRQCallback);
+	GPIO_IntConfig(ADS7843_PORT_INT, ADS7843_PIN_INT, true, false, true);
+
 
 #endif
 
@@ -150,7 +153,7 @@ void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 // Chip select
 	ADS7843_CS_LOW()
 	;
-	Delay(10);
+	///////////////////////////////////////////////////////////////Delay(1);
 
 // Send read x command
 	ADS7843SpiWriteByteSoftware(ADS7843_READ_X); //read x command
@@ -161,7 +164,7 @@ void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 #else
 
 // The conversion needs 8us to complete
-	Delay(240);
+	////////////////////////////////////////////////////////////////Delay(1);
 #endif
 
 // Read the high 8bit of the 12bit conversion result
@@ -179,7 +182,7 @@ void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 #else
 
 // The conversion needs 8us to complete
-	Delay(240);
+	////////////////////////////////////////////////////////////////Delay(1);
 #endif
 
 // Read the high 8bit of the 12bit conversion result

@@ -21,7 +21,7 @@
 #include "SPFD5408.h"
 #include "ADS7843.h"
 
-volatile bool mADS7843ScreenTouched;
+volatile bool mADS7843ScreenTouched =false;
 
 void AD9106_test(void){
 	static uint16_t counter=0;
@@ -107,6 +107,7 @@ int main(void) {
 	//SPFD5408DrawString(100, 100, "AES", 4, BLACK);
 	//SPFD5408DrawString(10, 200, "KOL", 3, BLUE);
 	SegmentLCD_Number(100);
+	 ADS7843Init();
 
 
 
@@ -118,17 +119,19 @@ int main(void) {
 		i++;
 		if(mADS7843ScreenTouched){
 		SegmentLCD_Number((int)(getCoordinates().x));
-		Delay(2000);
-		}
-		else SegmentLCD_Number(1111);
-		/*
-		counter = snprintf ( buf, 10, "Num %d", i );
-		if(counter!=-1)
-			SPFD5408DrawString(0, 0, buf, 3, BLACK);
 		BSP_LedToggle(0);
 		BSP_LedToggle(1);
 		Delay(1000);
-		*/
+		mADS7843ScreenTouched=false;
+		}
+		else SegmentLCD_Number(i);
+		/*
+		counter = snprintf ( buf, 10, "Num %d", i );
+		if(counter!=-1)
+			SPFD5408DrawString(0, 0, buf, 3, BLACK);*/
+
+		Delay(100);
+
 
 
 	}
