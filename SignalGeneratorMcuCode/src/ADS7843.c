@@ -13,7 +13,7 @@
 #include "bsp.h"
 
 TouchInfo tTouchData;
-static TouchPoint mPointCoordinates={0};
+static TouchPoint mPointCoordinates={100};
 extern volatile bool mADS7843ScreenTouched;
 #define ADS7843_ENABLE_TOUCH_INT
 
@@ -30,40 +30,43 @@ static void ADS7843SpiWriteByteSoftware(uint8_t data) {
 	for (int i = 0; i < 8; i++) {
 
 		if (data & 0x80) {
-			ADS7843_MOSI_HIGH()
-			;
+			ADS7843_MOSI_HIGH();
 		} else {
-			ADS7843_MOSI_LOW()
-			;
+			ADS7843_MOSI_LOW();
 		}
-		ADS7843_CLK_HIGH()
-		;
-
+		ADS7843_CLK_HIGH();
+		for(int i=0;i<100;i++);
 		///////////////////////////////////////////////////////////////		Delay(1);
-		ADS7843_CLK_LOW()
-		;
+		ADS7843_CLK_LOW();
 		data <<= 1;
 		///////////////////////////////////////////////////////////////		Delay(1);
 
 	}
-
+	//ADS7843_MOSI_LOW();
 }
 
 static uint8_t ADS7843SpiReadByteSoftware(void) {
 	uint8_t data = 0;
-	ADS7843_CLK_HIGH()
+	ADS7843_CLK_HIGH();
 	///////////////////////////////////////////////////////////////	Delay(1);
 
 	for (int i = 0; i < 8; i++) {
-		ADS7843_CLK_LOW()
+		//ADS7843_CLK_HIGH();
+		ADS7843_CLK_LOW();
+		for(int i=0;i<100;i++);
 		///////////////////////////////////////////////////////////////		Delay(1);
-		ADS7843_CLK_HIGH()
-		data |=
-				((GPIO_PinInGet(ADS7843_PORT_MISO, ADS7843_PIN_MISO) << (8 - i)));
+		ADS7843_CLK_HIGH();
+		data |=((GPIO_PinInGet(ADS7843_PORT_MISO, ADS7843_PIN_MISO) << (7 - i)));
+		//ADS7843_CLK_LOW();
+		//data |=((GPIO_PinInGet(ADS7843_PORT_MISO, ADS7843_PIN_MISO) << (7 - i)));
 
 		///////////////////////////////////////////////////////////////		Delay(1);
 
 	}
+	ADS7843_CLK_LOW();
+	for(int i=0;i<100;i++);
+	ADS7843_MOSI_LOW();
+	for(int i=0;i<100;i++);
 	return data;
 
 }
@@ -72,7 +75,7 @@ static void ADS7843PenIRQCallback(uint8_t pin) {
 
 	if (pin == ADS7843_PIN_INT&&!mADS7843ScreenTouched) {
 		uint16_t x, y;
-		ADS7843_INT_IRQ_CONFIG_PIN_DISABLE()
+		ADS7843_INT_IRQ_CONFIG_PIN_DISABLE();
 		if (ADS7843_GET_INT_PIN()) {
 			// Change to falling trigger edge when pen up
 			ADS7843_INT_IRQ_CONFIG_FALLING(true);
@@ -115,11 +118,11 @@ void ADS7843Init(void) {
 
 	/* Initialize GPIO interrupt dispatcher */
 	GPIOINT_Init();
-	ADS7843_INT_INPUT()
-	;
-	//ADS7843_INT_IRQ_CONFIG_FALLING(true); //falling edge
+	ADS7843_INT_INPUT();
+
 	GPIOINT_CallbackRegister(ADS7843_PIN_INT, ADS7843PenIRQCallback);
-	GPIO_IntConfig(ADS7843_PORT_INT, ADS7843_PIN_INT, true, false, true);
+	//GPIO_IntConfig(ADS7843_PORT_INT, ADS7843_PIN_INT, true, false, true);
+	ADS7843_INT_IRQ_CONFIG_FALLING(true); //falling edge
 
 
 #endif
@@ -151,8 +154,10 @@ uint16_t ADS7843PenInq(void) {
 //*****************************************************************************
 void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 // Chip select
-	ADS7843_CS_LOW()
-	;
+
+	ADS7843_CS_LOW();
+
+
 	///////////////////////////////////////////////////////////////Delay(1);
 
 // Send read x command
@@ -165,6 +170,7 @@ void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 
 // The conversion needs 8us to complete
 	////////////////////////////////////////////////////////////////Delay(1);
+			for(int x=0;x<10;x++);
 #endif
 
 // Read the high 8bit of the 12bit conversion result
@@ -183,6 +189,7 @@ void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 
 // The conversion needs 8us to complete
 	////////////////////////////////////////////////////////////////Delay(1);
+			for(int x=0;x<10;x++);
 #endif
 
 // Read the high 8bit of the 12bit conversion result

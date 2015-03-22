@@ -200,6 +200,8 @@ void spiInitSoftware(GPIO_Port_TypeDef spiPortMOSI, uint8_t spiPinMOSI,
 	GPIO_PinModeSet(spiPortCLK, spiPinCLK, gpioModePushPull, 1);
 	// Keep CS high to not activate slave
 	GPIO_PinModeSet(spiPortCS, spiPinCS, gpioModePushPull, 1);
+	GPIO_PinOutClear(spiPortCLK, spiPinCLK);
+	GPIO_PinOutClear(spiPortMOSI, spiPortMOSI);
 
 	mSpiMOSI.spiPort = spiPortMOSI;
 	mSpiMOSI.spiPin = spiPinMOSI;
