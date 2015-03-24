@@ -9,7 +9,7 @@
 #include "ADS7843.h"
 #include "stdio.h"
 #include "utils.h"
-#include "drivers/gpiointerrupt.h"
+#include "../drivers/gpiointerrupt.h"
 #include "bsp.h"
 
 TouchInfo tTouchData;

@@ -8,7 +8,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "utils.h"
+
 #include "em_device.h"
 #include "em_chip.h"
 #include "em_cmu.h"
@@ -16,10 +16,50 @@
 #include "em_emu.h"
 #include "bsp.h"
 #include "bsp_trace.h"
-#include "drivers/segmentlcd.h"
+#include "../drivers/segmentlcd.h"
 #include "spi.h"
 #include "SPFD5408.h"
 #include "ADS7843.h"
+#include "../FreeRtos/FreeRTOS.h"
+#include "../FreeRtos/task.h"
+#include "../FreeRtos/queue.h"
+#include "../FreeRtos/semphr.h"
+#include "../FreeRtos/croutine.h"
+#include "../FreeRtos/FreeRTOSConfig.h"
+#include "../drivers/sleep.h"
+
+#define FREE_RTOS_ENABLED 1
+
+#if !FREE_RTOS_ENABLED
+ #include "utils.h"
+#endif
+//********************************RTOS****************************************
+#if FREE_RTOS_ENABLED
+#define STACK_SIZE_FOR_TASK    (configMINIMAL_STACK_SIZE + 10)
+#define TASK_PRIORITY          (tskIDLE_PRIORITY + 1)
+
+	typedef struct {
+		/* Delay between blink of led */portTickType delay;
+		/* Number of led */
+		int ledNo;
+	} TaskParams_t;
+
+	static void ledBlinkTask(void *pParameters) {
+		TaskParams_t * pData = (TaskParams_t*) pParameters;
+		const portTickType delay = pData->delay;
+
+		for (;;) {
+			BSP_LedToggle(pData->ledNo);
+			vTaskDelay(delay);
+		}
+	}
+
+	/* Parameters value for taks*/
+	static TaskParams_t parametersToTask1 = { 1000 / portTICK_RATE_MS, 0 };
+	static TaskParams_t parametersToTask2 = { 500 / portTICK_RATE_MS, 1 };
+#endif
+
+
 
 volatile bool mADS7843ScreenTouched = false;
 
@@ -101,10 +141,11 @@ int main(void) {
 	 }
 	 */
 	//----------------------- SPFD5408 first working tests -----------------------
+#if !FREE_RTOS_ENABLED
 	SPFD5408Init();
 	BSP_LedsInit();
 	BSP_LedSet(0);
-	BSP_LedClear(1);
+	BSP_LedSet(1);
 	SegmentLCD_Init(false);
 	SegmentLCD_AllOff();
 	SPFD5408SetOrientation(0); //vertical
@@ -113,10 +154,23 @@ int main(void) {
 	SegmentLCD_Number(100);
 	ADS7843Init();
 
+//********************************RTOS****************************************
+#else
+	/* Initialize SLEEP driver, no calbacks are used */
+	SLEEP_Init(NULL, NULL );
+	/*Create two task for blinking leds*/
+	xTaskCreate(ledBlinkTask, (const char * const ) "Led1",
+			STACK_SIZE_FOR_TASK, &parametersToTask1, TASK_PRIORITY, NULL);
+	xTaskCreate(ledBlinkTask, (const char * const ) "Led2",
+			STACK_SIZE_FOR_TASK, &parametersToTask2, TASK_PRIORITY, NULL);
+
+	/*Start FreeRTOS Scheduler*/
+	vTaskStartScheduler();
+#endif
+
 	uint16_t i = 0;
 	uint16_t counter = 0;
 	char buf[10];
-
 	while (1) {
 		i++;
 		if (mADS7843ScreenTouched) {

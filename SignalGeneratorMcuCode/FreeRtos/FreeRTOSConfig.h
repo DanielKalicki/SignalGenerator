@@ -66,6 +66,8 @@
 
     1 tab == 4 spaces!
 */
+
+
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
@@ -110,18 +112,31 @@ extern "C" {
  * so we reduce Tick rate to 100 Hz and 40 Hz, which give more clock cycles between ticks*/
 #define configTICK_RATE_HZ    ( 100 )
 #elif (  ( configSLEEP_MODE == 3 ) && ( configUSE_TICKLESS_IDLE == 1 || configUSE_SLEEP_MODE_IN_IDLE == 1 ) )
-#define configTICK_RATE_HZ    ( 40 )
+#define configTICK_RATE_HZ    (( TickType_t ) 40 )
 #else
-#define configTICK_RATE_HZ    ( 1000 )
+#define configTICK_RATE_HZ    ( ( TickType_t )1000 )
 #endif
 
+
+//#############################################################################
+/*-----------------------------------------------------------
+ * Application specific definitions.
+ *
+ * These definitions should be adjusted for your particular hardware and
+ * application requirements.
+ *
+ * THESE PARAMETERS ARE DESCRIBED WITHIN THE 'CONFIGURATION' SECTION OF THE
+ * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE.
+ *
+ * See http://www.freertos.org/a00110.html.
+ *----------------------------------------------------------*/
 /* Definition used by Keil to replace default system clock source when we use EM2 or EM3 mode. */
 #if ( ( configSLEEP_MODE == 2 || configSLEEP_MODE == 3 ) && ( configUSE_TICKLESS_IDLE == 1 || configUSE_SLEEP_MODE_IN_IDLE == 1 ) )
 #define configOVERRIDE_DEFAULT_TICK_CONFIGURATION ( 1 )
 #endif
 /* Main functions*/
-#define configMAX_PRIORITIES                      (( unsigned portBASE_TYPE ) 3)
-#define configMINIMAL_STACK_SIZE                  (( unsigned short ) 140)
+#define configMAX_PRIORITIES                      (3)
+#define configMINIMAL_STACK_SIZE                  (100)
 #define configTOTAL_HEAP_SIZE                     (( size_t )(9000))
 #define configMAX_TASK_NAME_LEN                   ( 10 )
 #define configUSE_TRACE_FACILITY                  ( 0 )
@@ -199,61 +214,6 @@ extern "C" {
 #define vPortSVCHandler        SVC_Handler
 #define xPortPendSVHandler     PendSV_Handler
 #define xPortSysTickHandler    SysTick_Handler
-
-
-//#############################################################################
-/*-----------------------------------------------------------
- * Application specific definitions.
- *
- * These definitions should be adjusted for your particular hardware and
- * application requirements.
- *
- * THESE PARAMETERS ARE DESCRIBED WITHIN THE 'CONFIGURATION' SECTION OF THE
- * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE.
- *
- * See http://www.freertos.org/a00110.html.
- *----------------------------------------------------------*/
-
-#define configUSE_PREEMPTION			1
-#define configUSE_IDLE_HOOK				1
-#define configUSE_TICK_HOOK				0
-#define configCPU_CLOCK_HZ				( 14000000UL )
-#define configTICK_RATE_HZ				( ( TickType_t ) 100 )
-#define configMINIMAL_STACK_SIZE		( ( unsigned short ) 70 )
-#define configTOTAL_HEAP_SIZE			( ( size_t ) ( 10 * 1024 ) )
-#define configMAX_TASK_NAME_LEN			( 10 )
-#define configUSE_TRACE_FACILITY		0
-#define configUSE_16_BIT_TICKS			0
-#define configIDLE_SHOULD_YIELD			0
-#define configUSE_CO_ROUTINES 			1
-#define configUSE_MUTEXES				1
-
-#define configMAX_PRIORITIES			( 4 )
-#define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
-
-#define configUSE_COUNTING_SEMAPHORES 	0
-#define configUSE_ALTERNATIVE_API 		0
-#define configCHECK_FOR_STACK_OVERFLOW	2
-#define configUSE_RECURSIVE_MUTEXES		1
-#define configQUEUE_REGISTRY_SIZE		0
-#define configGENERATE_RUN_TIME_STATS	0
-
-/* Set the following definitions to 1 to include the API function, or zero
-to exclude the API function. */
-#define INCLUDE_vTaskPrioritySet		1
-#define INCLUDE_uxTaskPriorityGet		1
-#define INCLUDE_vTaskDelete				0
-
-#define INCLUDE_vTaskSuspend			1
-#define INCLUDE_vTaskDelayUntil			1
-#define INCLUDE_vTaskDelay				1
-
-
-#define configKERNEL_INTERRUPT_PRIORITY 		255
-/* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
-See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY 	191 /* equivalent to 0xa0, or priority 5. */
-
 
 #ifdef __cplusplus
 }
