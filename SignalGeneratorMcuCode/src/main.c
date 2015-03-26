@@ -12,6 +12,7 @@
 #include "em_device.h"
 #include "em_chip.h"
 #include "em_cmu.h"
+#include "em_timer.h"
 #include "AD9106.h"
 #include "em_emu.h"
 #include "bsp.h"
@@ -28,7 +29,7 @@
 #include "../FreeRtos/FreeRTOSConfig.h"
 #include "../drivers/sleep.h"
 
-#define FREE_RTOS_ENABLED 1
+#define FREE_RTOS_ENABLED 0
 
 #if !FREE_RTOS_ENABLED
  #include "utils.h"
@@ -107,9 +108,10 @@ void AD9106_test(void) {
 int main(void) {
 
 	CHIP_Init();
-
+	CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
+	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO); //32MHZ
 	BSP_TraceProfilerSetup();
-
+	//CMU_OscillatorEnable(cmuOsc_HFXO, true, false);
 	if (SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000))
 		while (1)
 			;
@@ -142,18 +144,22 @@ int main(void) {
 	 */
 	//----------------------- SPFD5408 first working tests -----------------------
 #if !FREE_RTOS_ENABLED
-	SPFD5408Init();
+
+
 	BSP_LedsInit();
 	BSP_LedSet(0);
 	BSP_LedSet(1);
+	initUtils();
 	SegmentLCD_Init(false);
 	SegmentLCD_AllOff();
+	SegmentLCD_Number(100);
+	/*
+	SPFD5408Init();
 	SPFD5408SetOrientation(0); //vertical
 	//SPFD5408DrawString(100, 100, "AES", 4, BLACK);
 	//SPFD5408DrawString(10, 200, "KOL", 3, BLUE);
-	SegmentLCD_Number(100);
 	ADS7843Init();
-
+	*/
 //********************************RTOS****************************************
 #else
 	/* Initialize SLEEP driver, no calbacks are used */
@@ -173,6 +179,7 @@ int main(void) {
 	char buf[10];
 	while (1) {
 		i++;
+		/*
 		if (mADS7843ScreenTouched) {
 			SegmentLCD_Number((int) (getCoordinates().x));
 			SPFD5408SetPixel(getCoordinates().x, getCoordinates().y, BLACK);
@@ -182,10 +189,30 @@ int main(void) {
 			mADS7843ScreenTouched = false;
 		} else
 			SegmentLCD_Number(i);
+		Delay(100);
+		*/
 		/*
 		 counter = snprintf ( buf, 10, "Num %d", i );
 		 if(counter!=-1)
 		 SPFD5408DrawString(0, 0, buf, 3, BLACK);*/
-		Delay(100);
+
 	}
+}
+
+void TIMER0_IRQHandler(void)
+{
+  static uint32_t compareValue;
+  //SegmentLCD_Number(compareValue++);
+
+  /* Clear flag for TIMER0 overflow interrupt */
+  TIMER_IntClear(TIMER0, TIMER_IF_OF);
+  BSP_LedToggle(1);
+/*
+  compareValue = TIMER_CaptureGet(TIMER0, 0);
+  // increment duty-cycle or reset if reached TOP value
+  if( compareValue == TIMER_TopGet(TIMER0))
+    TIMER_CompareBufSet(TIMER0, 0, 0);
+  else
+    TIMER_CompareBufSet(TIMER0, 0, ++compareValue);
+    */
 }

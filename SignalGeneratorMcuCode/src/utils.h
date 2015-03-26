@@ -12,9 +12,10 @@
 #include <stdint.h>
 
 /**************************************************************************//**
- * @brief Delays number of msTick Systicks (typically 1 ms)
+ * @brief Delays number of msTick Systicks ( 1 ms)
  * @param dlyTicks Number of ticks to delay
  *****************************************************************************/
+void initUtils(void);
 void Delay(uint32_t dlyTicks);
 
 
