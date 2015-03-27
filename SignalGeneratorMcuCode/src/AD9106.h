@@ -370,5 +370,5 @@ bool setConfig(void);
 bool writeReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t data);
 
 bool readReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t *data);
-
+void AD9106_test(void);
 #endif /* AD9106_H_ */

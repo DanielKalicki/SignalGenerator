@@ -34,7 +34,7 @@
 extern const USBD_Init_TypeDef initstruct; //defined in descriptors.c
 
 #define FREE_RTOS_ENABLED 0
-
+#define USB_TEST_ENABLED 1
 #if !FREE_RTOS_ENABLED
 #include "utils.h"
 #endif
@@ -66,49 +66,9 @@ static TaskParams_t parametersToTask2 = {500 / portTICK_RATE_MS, 1};
 
 volatile bool mADS7843ScreenTouched = false;
 
-void AD9106_test(void) {
-	static uint16_t counter = 0;
-	counter += 1000;
-	if (counter >= 30000)
-		counter = 0;
-	uint16_t i = 0;
-	spiWriteWordSoftware((uint16_t) PAT_TYPE, 0);
-	Delay(1);
-
-	//spiWriteWordSoftware((uint16_t)WAV4_3CONFIG,0x2121);Delay(1);//noise output test
-	spiWriteWordSoftware((uint16_t) WAV4_3CONFIG, 0x1111);
-	Delay(1); //sawtooth test
-
-	spiWriteWordSoftware((uint16_t) DAC4_CST, 0xA200);
-	Delay(1);
-	spiWriteWordSoftware((uint16_t) DAC4_DGAIN, 0xA000);
-	Delay(1);
-	spiWriteWordSoftware((uint16_t) DAC4RSET, 0x8002);
-	Delay(1);
-	spiWriteWordSoftware((uint16_t) DACxRANGE, 0x00A0);
-	Delay(1);
-	spiWriteWordSoftware((uint16_t) PAT_TIMEBASE, 0x0000);
-	Delay(1);
-	spiWriteWordSoftware((uint16_t) PAT_PERIOD, 0x0100);
-	Delay(1);
-	spiWriteWordSoftware((uint16_t) PAT_STATUS, 0x0001);
-	Delay(1);
-	spiWriteWordSoftware((uint16_t) RAMUPDATE, 0x0001);
-	Delay(1);
-
-	//sawtooth configuration
-	spiWriteWordSoftware((uint16_t) SAW4_3CONFIG, 0x0808);
-	Delay(1);
-
-	Delay(500);
-	i = spiReadWordSoftware((uint16_t) CFG_ERROR);
-	i = spiReadWordSoftware((uint16_t) PAT_STATUS);
-	SegmentLCD_Number(i);
-
-}
 
 int main(void) {
-
+#if !USB_TEST_ENABLED
 	CHIP_Init();
 	CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
 	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO); //32MHZ
@@ -117,7 +77,7 @@ int main(void) {
 		while (1)
 			;
 	CMU_ClockEnable(cmuClock_HFPER, true);
-
+#endif
 	//----------------------- AD9106 first working tests -----------------------
 	/*
 	 BSP_LedsInit();
@@ -145,7 +105,7 @@ int main(void) {
 	 */
 	//----------------------- SPFD5408 first working tests -----------------------
 #if !FREE_RTOS_ENABLED
-
+    /*
 	BSP_LedsInit();
 	BSP_LedSet(0);
 	BSP_LedSet(1);
@@ -154,21 +114,48 @@ int main(void) {
 	//SegmentLCD_AllOff();
 	//SegmentLCD_Number(100);
 
-
-	if (USBD_Init(&initstruct) == USB_STATUS_OK) { /* Start USB. */
-		 //SegmentLCD_Write("done");
-	}
-	else{
-		//SegmentLCD_Write("fail");
-		while(1);
-	}
-	/*
 	 SPFD5408Init();
 	 SPFD5408SetOrientation(0); //vertical
 	 //SPFD5408DrawString(100, 100, "AES", 4, BLACK);
 	 //SPFD5408DrawString(10, 200, "KOL", 3, BLUE);
 	 ADS7843Init();
 	 */
+
+#if USB_TEST_ENABLED
+	BSP_TraceProfilerSetup();
+
+	  CMU_ClockSelectSet( cmuClock_HF, cmuSelect_HFXO );
+	  CMU_OscillatorEnable(cmuOsc_LFXO, true, false);
+
+	  /* Initialize LCD driver */
+	  SegmentLCD_Init(false);
+	  SegmentLCD_Write("usbcomp");
+	  SegmentLCD_Symbol(LCD_SYMBOL_GECKO, true);
+
+	  /* Initialize LED driver */
+	  BSP_LedsInit();
+
+	  CDC_Init();                   /* Initialize the communication class device. */
+
+
+		if (USBD_Init(&initstruct) == USB_STATUS_OK) { /* Start USB. */
+			 SegmentLCD_Write("donea");
+		}
+		else{
+			SegmentLCD_Write("fail");
+			while(1);
+		}
+	  /*
+	   * When using a debugger it is practical to uncomment the following three
+	   * lines to force host to re-enumerate the device.
+	   */
+	  /* USBD_Disconnect(); */
+	  /* USBTIMER_DelayMs( 1000 ); */
+	  /* USBD_Connect(); */
+	  for (;;)
+	  {
+	  }
+#endif
 //********************************RTOS****************************************
 #else
 	/* Initialize SLEEP driver, no calbacks are used */
