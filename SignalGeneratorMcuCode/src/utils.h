@@ -1,7 +1,7 @@
 /*
  * utils.h
  *
- *  Created on: 01-02-2015
+ *  Created on: 01-03-2015
  *      Author: lukasz
  */
 
@@ -15,7 +15,7 @@
  * @brief Delays number of msTick Systicks ( 1 ms)
  * @param dlyTicks Number of ticks to delay
  *****************************************************************************/
-void initUtils(void);
+void utilsInit(void);
 void Delay(uint32_t dlyTicks);
 void USB_DEBUG_PUTS(char *s);
 

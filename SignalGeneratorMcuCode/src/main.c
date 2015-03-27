@@ -28,12 +28,11 @@
 #include "../FreeRtos/croutine.h"
 #include "../FreeRtos/FreeRTOSConfig.h"
 #include "../drivers/sleep.h"
-#include "../drivers/usb/usbconfig.h"
 #include "../drivers/usb/cdc.h"
 
 #define AD9106_DEMO_ENABLED 0
-#define LCD_DEMO_ENABLED 0
-#define USB_DEMO_ENABLED 1
+#define LCD_DEMO_ENABLED 1
+#define USB_DEMO_ENABLED 0
 #define FREE_RTOS_DEMO_ENABLED 0
 #define MAIN_APP 0
 
@@ -112,19 +111,16 @@ int main(void) {
 	CHIP_Init();
 	CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
 	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO); //32MHZ
-	BSP_TraceProfilerSetup();
-	if (SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000))
-	while (1)
-	;
+	//BSP_TraceProfilerSetup();
 	CMU_ClockEnable(cmuClock_HFPER, true);
 	//----------------------- SPFD5408 first working tests -----------------------
 	BSP_LedsInit();
 	BSP_LedSet(0);
 	BSP_LedSet(1);
-	//initUtils();
-	///SegmentLCD_Init(false);
-	//SegmentLCD_AllOff();
-	//SegmentLCD_Number(100);
+	utilsInit();
+	SegmentLCD_Init(false);
+	SegmentLCD_AllOff();
+	SegmentLCD_Number(100);
 	SPFD5408Init();
 	SPFD5408SetOrientation(0);//vertical
 	//SPFD5408DrawString(100, 100, "AES", 4, BLACK);
@@ -145,11 +141,12 @@ int main(void) {
 			mADS7843ScreenTouched = false;
 		} else
 		SegmentLCD_Number(i);
-		Delay(100);
+		Delay(1000);
 		counter = snprintf(buf, 10, "Num %d", i);
 		if (counter != -1)
 		SPFD5408DrawString(0, 0, buf, 3, BLACK);
 	}
+
 #elif USB_DEMO_ENABLED
 	BSP_TraceProfilerSetup();
 	CHIP_Init();
