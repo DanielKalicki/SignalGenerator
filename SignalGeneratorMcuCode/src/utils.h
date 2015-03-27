@@ -17,7 +17,6 @@
  *****************************************************************************/
 void initUtils(void);
 void Delay(uint32_t dlyTicks);
-
-
+void USB_DEBUG_PUTS(char *s);
 
 #endif /* UTILS_H_ */

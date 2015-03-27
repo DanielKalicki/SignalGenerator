@@ -1,6 +1,6 @@
 /**************************************************************************//**
  * @file cdc.c
- * @brief USB CDC (Communication Device Class) driver.
+ * @brief USB CDC (Communication Device Class) driver.  modified by Lukasz Uszko
  * @version 3.20.5
  ******************************************************************************
  * @section License
@@ -21,15 +21,10 @@
 #include "cdc.h"
 
 /**************************************************************************//**
- *
- * This example shows how a CDC based USB to Serial port adapter can be
- * implemented.
- *
- * Use the file EFM32-Cdc.inf to install a USB serial port device driver
+
+ * Use the file LuktechCDC.inf to install a USB serial port device driver
  * on the host PC.
  *
- * This implementation uses DMA to transfer data between USART1 and memory
- * buffers.
  *
  *****************************************************************************/
 
@@ -60,8 +55,6 @@ static int usbDataReceived(USB_Status_TypeDef status, uint32_t xferred,
 static int LineCodingReceived(USB_Status_TypeDef status, uint32_t xferred,
 		uint32_t remaining);
 
-static void UartRxTimeout(void);
-
 /*** Variables ***/
 
 /*
@@ -77,15 +70,26 @@ STATIC_UBUF(usbRxBuffer, CDC_USB_RX_BUF_SIZE);
 
 static volatile bool usbRxTransferActive = false;
 static volatile bool usbTxTransferActive = false;
+static bool usbCdcConfigured= false;
 
 static uint32_t usbBytesReceived;
 
 /**************************************************************************//**
  * @brief CDC device initialization.
+ * waits until CDC Class is configured correctly.
  *****************************************************************************/
-void CDC_Init(void) {
-	//SerialPortInit();
-	//DmaSetup();
+extern const USBD_Init_TypeDef initstruct; //defined in descriptors.c
+
+bool CDC_Init(void) {
+	if (USBD_Init(&initstruct) == USB_STATUS_OK) { /* Start USB. */
+		int msElapsed =0;
+	    while (msElapsed<100&&!usbCdcConfigured){ //wait 10s
+	    	USBTIMER_DelayMs( 100 );
+	    	msElapsed++;
+	    }
+	}
+    if(usbCdcConfigured)return true;
+    return false;
 }
 
 /**************************************************************************//**
@@ -160,24 +164,22 @@ void CDC_StateChangeEvent(USBD_State_TypeDef oldState,
 		if (oldState == USBD_STATE_SUSPENDED) /* Resume ?   */
 		{
 		}
+		usbCdcConfigured=true;
 
-		/* Start receiving data from USB host. */
-
-		USBD_Read(CDC_EP_DATA_OUT, (void*) usbTxBuffer, CDC_USB_RX_BUF_SIZE,
-				usbDataReceived);
-		//USBTIMER_Start(CDC_TIMER_ID, CDC_RX_TIMEOUT, UartRxTimeout);
 	}
 
 	else if ((oldState == USBD_STATE_CONFIGURED)
 			&& (newState != USBD_STATE_SUSPENDED)) {
 		/* We have been de-configured, stop CDC functionality */
-		USBTIMER_Stop(CDC_TIMER_ID);
+		//USBTIMER_Stop(CDC_TIMER_ID);
+		usbCdcConfigured=false;
 	}
 
 	else if (newState == USBD_STATE_SUSPENDED) {
 		/* We have been suspended, stop CDC functionality */
 		/* Reduce current consumption to below 2.5 mA.    */
-		USBTIMER_Stop(CDC_TIMER_ID);
+		//USBTIMER_Stop(CDC_TIMER_ID);
+		usbCdcConfigured=false;
 	}
 }
 
@@ -194,23 +196,10 @@ void CDC_StateChangeEvent(USBD_State_TypeDef oldState,
 static int usbDataReceived(USB_Status_TypeDef status, uint32_t xferred,
 		uint32_t remaining) {
 	(void) remaining; /* Unused parameter */
-
 	if ((status == USB_STATUS_OK) && (xferred > 0)) {
 		usbRxTransferActive = false;
 		usbBytesReceived = xferred;
 		BSP_LedToggle(0);
-		/*
-		 if (!usbTxTransferActive) {
-		 BSP_LedClear(0);
-		 // Start a new USB receive transfer.
-		 USBD_Read(CDC_EP_DATA_OUT, (void*) usbRxBuffer, CDC_USB_RX_BUF_SIZ,
-		 usbDataReceived);
-		 } else {
-		 // The UART transmit DMA callback function will start a new DMA.
-		 usbRxTransferActive = false;
-		 usbBytesReceived = xferred;
-		 }
-		 */
 	}
 	return USB_STATUS_OK;
 }
@@ -229,9 +218,9 @@ static int usbDataTransmitted(USB_Status_TypeDef status, uint32_t xferred,
 		uint32_t remaining) {
 	(void) xferred; /* Unused parameter */
 	(void) remaining; /* Unused parameter */
-	BSP_LedToggle(1);
 	if (status == USB_STATUS_OK) {
 		usbTxTransferActive = false;
+		BSP_LedToggle(1);
 	}
 	return USB_STATUS_OK;
 }
@@ -240,29 +229,30 @@ static int usbDataTransmitted(USB_Status_TypeDef status, uint32_t xferred,
  * @brief Get an packet from USB with optional timeout.
  *
  * @param[in] buf
- *   Pointer to data storage space.
+ *   Pointer to data storage space. Memory space pointed is ended with '\0'
  *
- * @param[in] timeout
+ * @param[in] msTimeout
  *   Transmission timeout in milliseconds, no timeout if zero.
  *
  * @return
  *   True if a transmission took place.
  *****************************************************************************/
 
-bool usbReadData(uint8_t *buf, int timeout_ms) {
+bool usbReadData(uint8_t *buf, int msTimeout) {
 
-	if (!buf)
+	if (!buf||usbRxTransferActive)
 		return false;
 	usbRxTransferActive = true;
-	USBD_Read(CDC_EP_DATA_OUT, (void*) usbRxBuffer, CDC_USB_RX_BUF_SIZE,
+	USBD_Read(CDC_EP_DATA_OUT, (void*) usbRxBuffer,CDC_USB_RX_BUF_SIZE,
 			usbDataReceived);
-	if (timeout_ms > 0) {
+	if (msTimeout > 0) {
 
-		while (usbRxTransferActive && --timeout_ms) {
+		while (usbRxTransferActive && msTimeout>0) {
 			USBTIMER_DelayMs(1);
+			msTimeout--;
 		}
 
-		if (timeout_ms <= 0) {
+		if (msTimeout <= 0) {
 			USBD_AbortTransfer(CDC_EP_DATA_OUT);
 			return false;
 		}
@@ -270,11 +260,11 @@ bool usbReadData(uint8_t *buf, int timeout_ms) {
 
 	else {
 		while (usbRxTransferActive)
-			; //eait for data without timer
+			; //wait for data without timer
 
 	}
-
-	memcpy(buf, usbRxBuffer, usbBytesReceived);
+	usbRxBuffer[usbBytesReceived]='\0';
+	memcpy(buf, usbRxBuffer, usbBytesReceived+1);
 	return true;
 }
 
@@ -293,7 +283,7 @@ bool usbReadData(uint8_t *buf, int timeout_ms) {
 
 bool usbWriteData(uint8_t *data, uint8_t len) {
 
-	if (!data)
+	if (!data||!len||usbTxTransferActive)
 		return false;
 	if (len > CDC_USB_TX_BUF_SIZE) {
 		len = CDC_USB_TX_BUF_SIZE;
@@ -376,11 +366,6 @@ static int LineCodingReceived(USB_Status_TypeDef status, uint32_t xferred,
 		else
 			return USB_STATUS_REQ_ERR;
 
-		/* Program new USART baudrate etc. */
-		//
-		/*USART1 ->FRAME = frame;
-		USART_BaudrateAsyncSet(USART1, 0, cdcLineCoding.dwDTERate, usartOVS16);
-*/
 		return USB_STATUS_OK;
 	}
 	return USB_STATUS_REQ_ERR;

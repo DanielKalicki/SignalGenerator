@@ -99,4 +99,33 @@ void initUtils(void){
  * @brief TIMER0_IRQHandler
  * Interrupt Service Routine TIMER0 Interrupt Line
  *****************************************************************************/
+void TIMER0_IRQHandler(void) {
+	static uint32_t compareValue;
+	//SegmentLCD_Number(compareValue++);
 
+	/* Clear flag for TIMER0 overflow interrupt */
+	TIMER_IntClear(TIMER0, TIMER_IF_OF);
+	BSP_LedToggle(1);
+	/*
+	 compareValue = TIMER_CaptureGet(TIMER0, 0);
+	 // increment duty-cycle or reset if reached TOP value
+	 if( compareValue == TIMER_TopGet(TIMER0))
+	 TIMER_CompareBufSet(TIMER0, 0, 0);
+	 else
+	 TIMER_CompareBufSet(TIMER0, 0, ++compareValue);
+	 */
+}
+
+
+
+/**************************************************************************//**
+ * @brief USB_DEBUG_PUTS(char *s); -string should be a NULL terminated string
+ * sends string onto usb port
+ *****************************************************************************/
+
+void USB_DEBUG_PUTS(char *s){
+	if(!s)
+		return;
+    usbWriteData(s, strlen((const char *) s));
+
+}

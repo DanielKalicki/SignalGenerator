@@ -22,7 +22,7 @@ extern "C" {
 #include "emusb/em_usb.h"
 #define CDC_BULK_EP_SIZE  USB_MAX_EP_SIZE  /* This is the max. ep size. */
 
-void CDC_Init( void );
+bool CDC_Init( void );
 int  CDC_SetupCmd(const USB_Setup_TypeDef *setup);
 void CDC_StateChangeEvent( USBD_State_TypeDef oldState,
                            USBD_State_TypeDef newState);
