@@ -2,10 +2,10 @@
 #include "utils.h"
 #include "font.h"
 
-static uint8_t DisplayDirect = LEFT2RIGHT;
+static uint8_t DisplayDirect = UP2DOWN;
 static void exitStandBy(void);
 
-/*hardware dependent methods*/
+/*hardware dependent functions */
 static void pinWrite(GPIO_Port_TypeDef port, uint8_t pin, uint8_t mask) {
 
 	if (!mask) {
@@ -19,48 +19,47 @@ static uint16_t pinRead(GPIO_Port_TypeDef port, uint8_t pin) {
 	return GPIO_PinOutGet(port, pin);
 }
 
-/*hardware dependent methods - end*/
+/*hardware dependent functions - end*/
 
 static void allDataPinsInput(void) {
-	TFT_PIN_D15_INPUT()
-	TFT_PIN_D14_INPUT()
-	TFT_PIN_D13_INPUT()
-	TFT_PIN_D12_INPUT()
-	TFT_PIN_D11_INPUT()
-	TFT_PIN_D10_INPUT()
-	TFT_PIN_D9_INPUT()
-	TFT_PIN_D8_INPUT()
+	TFT_PIN_D15_INPUT();
+	TFT_PIN_D14_INPUT();
+	TFT_PIN_D13_INPUT();
+	TFT_PIN_D12_INPUT();
+	TFT_PIN_D11_INPUT();
+	TFT_PIN_D10_INPUT();
+	TFT_PIN_D9_INPUT();
+	TFT_PIN_D8_INPUT();
 #ifdef _16_BIT_MODE
-	TFT_PIN_D7_INPUT()
-	TFT_PIN_D6_INPUT()
-	TFT_PIN_D5_INPUT()
-	TFT_PIN_D4_INPUT()
-	TFT_PIN_D3_INPUT()
-	TFT_PIN_D2_INPUT()
-	TFT_PIN_D1_INPUT()
-	TFT_PIN_D0_INPUT()
+	TFT_PIN_D7_INPUT();
+	TFT_PIN_D6_INPUT();
+	TFT_PIN_D5_INPUT();
+	TFT_PIN_D4_INPUT();
+	TFT_PIN_D3_INPUT();
+	TFT_PIN_D2_INPUT();
+	TFT_PIN_D1_INPUT();
+	TFT_PIN_D0_INPUT();
 #endif
-
 }
 
 static void allDataPinsOutput(void) {
-	TFT_PIN_D15_OUTPUT()
-	TFT_PIN_D14_OUTPUT()
-	TFT_PIN_D13_OUTPUT()
-	TFT_PIN_D12_OUTPUT()
-	TFT_PIN_D11_OUTPUT()
-	TFT_PIN_D10_OUTPUT()
-	TFT_PIN_D9_OUTPUT()
-	TFT_PIN_D8_OUTPUT()
+	TFT_PIN_D15_OUTPUT();
+	TFT_PIN_D14_OUTPUT();
+	TFT_PIN_D13_OUTPUT();
+	TFT_PIN_D12_OUTPUT();
+	TFT_PIN_D11_OUTPUT();
+	TFT_PIN_D10_OUTPUT();
+	TFT_PIN_D9_OUTPUT();
+	TFT_PIN_D8_OUTPUT();
 #ifdef _16_BIT_MODE
-	TFT_PIN_D7_OUTPUT()
-	TFT_PIN_D6_OUTPUT()
-	TFT_PIN_D5_OUTPUT()
-	TFT_PIN_D4_OUTPUT()
-	TFT_PIN_D3_OUTPUT()
-	TFT_PIN_D2_OUTPUT()
-	TFT_PIN_D1_OUTPUT()
-	TFT_PIN_D0_OUTPUT()
+	TFT_PIN_D7_OUTPUT();
+	TFT_PIN_D6_OUTPUT();
+	TFT_PIN_D5_OUTPUT();
+	TFT_PIN_D4_OUTPUT();
+	TFT_PIN_D3_OUTPUT();
+	TFT_PIN_D2_OUTPUT();
+	TFT_PIN_D1_OUTPUT();
+	TFT_PIN_D0_OUTPUT();
 #endif
 }
 
@@ -157,10 +156,10 @@ static uint16_t getData(void) {
 
 static void SPFD5408SendCommand(uint16_t index) {
 	//CS_LOW()
-	RS_LOW()
-	RD_HIGH()
-	WR_HIGH()
-	WR_LOW()
+	RS_LOW();
+	RD_HIGH();
+	WR_HIGH();
+	WR_LOW();
 #ifdef _8_BIT_MODE
 	pushData(0);
 	WR_HIGH()
@@ -172,16 +171,16 @@ static void SPFD5408SendCommand(uint16_t index) {
 #else
 	pushData(index);
 #endif
-	WR_HIGH()
+	WR_HIGH();
 	//CS_HIGH()
 
 }
 
 static void SPFD5408SendData(uint16_t data) {
 	//CS_LOW()
-	RS_HIGH()
-	RD_HIGH()
-	WR_LOW()
+	RS_HIGH();
+	RD_HIGH();
+	WR_LOW();
 #ifdef _8_BIT_MODE
 	pushData((data & 0xff00) >> 8);
 	WR_HIGH()
@@ -193,20 +192,20 @@ static void SPFD5408SendData(uint16_t data) {
 #else
 	pushData(data);
 #endif
-	WR_HIGH()
+	WR_HIGH();
 	//CS_HIGH()
 }
 
 static void SPFD5408WriteData(uint16_t data) {
-	CS_LOW()
+	CS_LOW();
 	SPFD5408SendData(data);
-	CS_HIGH()
+	CS_HIGH();
 }
 
 static void SPFD5408WriteCommand(uint16_t data) {
-	CS_LOW()
+	CS_LOW();
 	SPFD5408SendCommand(data);
-	CS_HIGH()
+	CS_HIGH();
 }
 
 /************************************************************************
@@ -220,10 +219,10 @@ static void SPFD5408WriteCommand(uint16_t data) {
  **                                                                    **
  ************************************************************************/
 static void SPFD5408WriteRegister(uint16_t index, uint16_t data) {
-	CS_LOW()
+	CS_LOW();
 	SPFD5408SendCommand(index);
 	SPFD5408SendData(data);
-	CS_HIGH()
+	CS_HIGH();
 
 }
 /***********************************************************************
@@ -239,13 +238,10 @@ static void SPFD5408WriteRegister(uint16_t index, uint16_t data) {
 static uint16_t SPFD5408ReadRegister(uint16_t index) {
 	uint16_t data = 0;
 
-	CS_LOW()
-	;
-	RS_LOW()
-	;
+	CS_LOW();
+	RS_LOW();
 
-	WR_LOW()
-	;
+	WR_LOW();
 #ifdef _8_BIT_MODE
 	pushData(0);
 	WR_HIGH()
@@ -257,18 +253,14 @@ static uint16_t SPFD5408ReadRegister(uint16_t index) {
 #else
 	pushData(index);
 #endif
-	WR_HIGH()
-	;
+	WR_HIGH();
 
 	allDataPinsInput();
 	allDataPinsLow();
-	RS_HIGH()
-	;
+	RS_HIGH();
 
-	RD_LOW()
-	;
-	RD_HIGH()
-	;
+	RD_LOW();
+	RD_HIGH();
 #ifdef _8_BIT_MODE
 	data |= getData() << 8;
 
@@ -281,143 +273,165 @@ static uint16_t SPFD5408ReadRegister(uint16_t index) {
 	data = getData();
 #endif
 
-	CS_HIGH()
-	;
+	CS_HIGH();
 	allDataPinsOutput();
 	return data;
 }
 
 void SPFD5408Init(void) {
-	CLOCKS_ENABLE()
-	;
-	CS_OUTPUT()
-	;
-	RD_OUTPUT()
-	;
-	WR_OUTPUT()
-	;
-	RS_OUTPUT()
-	;
+	CLOCKS_ENABLE();
+	Delay(1);
+	CS_OUTPUT();
+	Delay(1);
+	RD_OUTPUT();
+	Delay(1);
+	WR_OUTPUT();
+	Delay(1);
+	RS_OUTPUT();
+	Delay(1);
 	allDataPinsOutput();
 	allDataPinsLow();
-/*
-	Delay(200);
-	 //SPFD5408WriteRegister(0x0000,0x0000);
-	 SPFD5408WriteRegister(0x0001,0x0100);
-	 SPFD5408WriteRegister(0x0002,0x0700);
-	 SPFD5408WriteRegister(0x0003,0x1018);
-	// SPFD5408WriteRegister(0x0003,0x1030);
-	 SPFD5408WriteRegister(0x0004,0x0000);
-	 SPFD5408WriteRegister(0x0008,0x0302);
-	 SPFD5408WriteRegister(0x0009,0x0000); //////////
-	 SPFD5408WriteRegister(0x000A,0x0000);
-	 SPFD5408WriteRegister(0x000C,0x0000);
-	 SPFD5408WriteRegister(0x000D,0x0000);
-	 SPFD5408WriteRegister(0x000F,0x0000);
-
-	 Delay(200);
-	 //-----Power On sequence-----------------------
-	 SPFD5408WriteRegister(0x0030,0x0000);
-	 SPFD5408WriteRegister(0x0031,0x0405);
-	 SPFD5408WriteRegister(0x0032,0x0203);
-	 SPFD5408WriteRegister(0x0035,0x0004);
-	 SPFD5408WriteRegister(0x0036,0x0B07);
-	 SPFD5408WriteRegister(0x0037,0x0000);
-	 SPFD5408WriteRegister(0x0038,0x0405);
-	 SPFD5408WriteRegister(0x0039,0x0203);
-	 SPFD5408WriteRegister(0x003c,0x0004);
-	 SPFD5408WriteRegister(0x003d,0x0B07);
-	 SPFD5408WriteRegister(0x0020,0x0000);
-	 SPFD5408WriteRegister(0x0021,0x0000);
-	 SPFD5408WriteRegister(0x0050,0x0000);
-	 SPFD5408WriteRegister(0x0051,0x00ef);
-	 SPFD5408WriteRegister(0x0052,0x0000);
-	 SPFD5408WriteRegister(0x0053,0x013f);
-
-	 Delay(200);
-
-	 SPFD5408WriteRegister(0x0060,0xa700);
-	 SPFD5408WriteRegister(0x0061,0x0001);
-	 SPFD5408WriteRegister(0x0090,0x003A);
-	 SPFD5408WriteRegister(0x0095,0x021E);
-	 SPFD5408WriteRegister(0x0080,0x0000);
-	 SPFD5408WriteRegister(0x0081,0x0000);
-	 SPFD5408WriteRegister(0x0082,0x0000);
-	 SPFD5408WriteRegister(0x0083,0x0000);
-	 SPFD5408WriteRegister(0x0084,0x0000);
-	 SPFD5408WriteRegister(0x0085,0x0000);
-	 SPFD5408WriteRegister(0x00FF,0x0001);
-	 SPFD5408WriteRegister(0x00B0,0x140D);
-	 SPFD5408WriteRegister(0x00FF,0x0000);
-	 Delay(200);
-	 SPFD5408WriteRegister(0x0007,0x0133);
-	 Delay(100);
-     exitStandBy();
-	 SPFD5408WriteCommand(0x0022);
-
-*/
-	SPFD5408WriteRegister(0x0000,0x0001);
+	Delay(1);
+	// NEW SETUP
+	SPFD5408WriteRegister(0xe5, 0x8000);
 	Delay(500);
-	SPFD5408WriteRegister(0x00,0x0000);
-	SPFD5408WriteRegister(0x01,0x0100);	//Driver Output Contral.
-	SPFD5408WriteRegister(0x02,0x0700);	//LCD Driver Waveform Contral.
-	SPFD5408WriteRegister(0x03,0x1018);	//Entry Mode Set.
+	SPFD5408WriteRegister(0x00, 0x0001);
+	SPFD5408WriteRegister(0x01, 0x0100);	//Driver Output Contral.
+	SPFD5408WriteRegister(0x02, 0x0700);	//LCD Driver Waveform Contral.
+	SPFD5408WriteRegister(0x03, 0x1030);	//Entry Mode Set.
 
-	SPFD5408WriteRegister(0x04,0x0000);	//Scalling Control.
-	SPFD5408WriteRegister(0x08,0x0202);	//Display Control 2.(0x0207)
-	SPFD5408WriteRegister(0x09,0x0000);	//Display Control 3.(0x0000)
-	SPFD5408WriteRegister(0x0a,0x0000);	//Frame Cycle Contal.(0x0000)
-	SPFD5408WriteRegister(0x0c,(1<<0));	//Extern Display Interface Control 1.(0x0000)
-	SPFD5408WriteRegister(0x0d,0x0000);	//Frame Maker Position.
-	SPFD5408WriteRegister(0x0f,0x0000);	//Extern Display Interface Control 2.
-
+	SPFD5408WriteRegister(0x04, 0x0000);	//Scalling Control.
+	SPFD5408WriteRegister(0x08, 0x0202);	//Display Control 2.(0x0207)
+	SPFD5408WriteRegister(0x09, 0x0000);	//Display Control 3.(0x0000)
+	SPFD5408WriteRegister(0x0a, 0x0000);	//Frame Cycle Contal.(0x0000)
+	SPFD5408WriteRegister(0x0c, 0x0000); //Extern Display Interface Control 1.(0x0000)
+	SPFD5408WriteRegister(0x0d, 0x0000);	//Frame Maker Position.
+	SPFD5408WriteRegister(0x0f, 0x0000);   //Extern Display Interface Control 2.
 	Delay(200);
-	SPFD5408WriteRegister(0x07,0x0101);	//Display Control.
-	Delay(200);
-	SPFD5408WriteRegister(0x10,(1<<12)|(0<<8)|(1<<7)|(1<<6)|(0<<4));	//Power Control 1.(0x16b0)
-	SPFD5408WriteRegister(0x11,0x0007);								//Power Control 2.(0x0001)
-	SPFD5408WriteRegister(0x12,(1<<8)|(1<<4)|(0<<0));					//Power Control 3.(0x0138)
-	SPFD5408WriteRegister(0x13,0x0b00);								//Power Control 4.
-	SPFD5408WriteRegister(0x29,0x0000);								//Power Control 7.
+	//********Power On sequence*******************
+	SPFD5408WriteRegister(0x10, 0x0000);   //Power Control 1
+	SPFD5408WriteRegister(0x11, 0x0007);   //Power Control 2
+	SPFD5408WriteRegister(0x12, 0x0000);   //Power Control 3
+	SPFD5408WriteRegister(0x13, 0x0000);   //Power Control 4
+	Delay(50);
+	SPFD5408WriteRegister(0x10, 0x17B0);
+	SPFD5408WriteRegister(0x11, 0x0007);
+	Delay(10);
+	SPFD5408WriteRegister(0x12, 0x013A);
+	Delay(10);
+	SPFD5408WriteRegister(0x13, 0x1A00);
+	SPFD5408WriteRegister(0x29, 0x000c);   //Power Control 7
+	Delay(10);
 
-	SPFD5408WriteRegister(0x2b,(1<<14)|(1<<4));
+	//********Gamma control***********************
+	SPFD5408WriteRegister(0x30, 0x0000);
+	SPFD5408WriteRegister(0x31, 0x0505);
+	SPFD5408WriteRegister(0x32, 0x0004);
+	SPFD5408WriteRegister(0x35, 0x0006);
+	SPFD5408WriteRegister(0x36, 0x0707);
+	SPFD5408WriteRegister(0x37, 0x0105);
+	SPFD5408WriteRegister(0x38, 0x0002);
+	SPFD5408WriteRegister(0x39, 0x0707);
+	SPFD5408WriteRegister(0x3C, 0x0704);
+	SPFD5408WriteRegister(0x3D, 0x0807);
 
-	SPFD5408WriteRegister(0x50,0);		//Set X Start.
-	SPFD5408WriteRegister(0x51,239);	//Set X End.
-	SPFD5408WriteRegister(0x52,0);		//Set Y Start.
-	SPFD5408WriteRegister(0x53,319);	//Set Y End.
-
-	SPFD5408WriteRegister(0x60,0x2700);	//Driver Output Control.
-	SPFD5408WriteRegister(0x61,0x0001);	//Driver Output Control.
-	SPFD5408WriteRegister(0x6a,0x0000);	//Vertical Srcoll Control.
-
-	SPFD5408WriteRegister(0x80,0x0000);	//Display Position? Partial Display 1.
-	SPFD5408WriteRegister(0x81,0x0000);	//RAM Address Start? Partial Display 1.
-	SPFD5408WriteRegister(0x82,0x0000);	//RAM Address End-Partial Display 1.
-	SPFD5408WriteRegister(0x83,0x0000);	//Displsy Position? Partial Display 2.
-	SPFD5408WriteRegister(0x84,0x0000);	//RAM Address Start? Partial Display 2.
-	SPFD5408WriteRegister(0x85,0x0000);	//RAM Address End? Partial Display 2.
-
-	SPFD5408WriteRegister(0x90,(0<<7)|(16<<0));	//Frame Cycle Contral.(0x0013)
-	SPFD5408WriteRegister(0x92,0x0000);	//Panel Interface Contral 2.(0x0000)
-	SPFD5408WriteRegister(0x93,0x0001);	//Panel Interface Contral 3.
-	SPFD5408WriteRegister(0x95,0x0110);	//Frame Cycle Contral.(0x0110)
-	SPFD5408WriteRegister(0x97,(0<<8));	//
-	SPFD5408WriteRegister(0x98,0x0000);	//Frame Cycle Contral.
-
+	//********Set RAM area************************
+	SPFD5408WriteRegister(0x50, 0x0000);   //Set X Start.
+	SPFD5408WriteRegister(0x51, 0x00EF);   //Set X End. (239)
+	SPFD5408WriteRegister(0x52, 0x0000);   //Set Y Start.
+	SPFD5408WriteRegister(0x53, 0x013F);   //Set Y End. (319)
+	SPFD5408WriteRegister(0x60, 0x2700);   //Driver Output Control.
+	SPFD5408WriteRegister(0x61, 0x0001);   //Driver Output Control.
+	SPFD5408WriteRegister(0x6A, 0x0000);   //Vertical Srcoll Control.
+	SPFD5408WriteRegister(0x21, 0x0000);
+	SPFD5408WriteRegister(0x20, 0x0000);
+	//********Partial Display Control*********
+	SPFD5408WriteRegister(0x80, 0x0000);  //Display Position? Partial Display 1.
+	SPFD5408WriteRegister(0x81, 0x0000); //RAM Address Start? Partial Display 1.
+	SPFD5408WriteRegister(0x82, 0x0000);	//RAM Address End-Partial Display 1.
+	SPFD5408WriteRegister(0x83, 0x0000);//Displsy Position? Partial Display 2.
+	SPFD5408WriteRegister(0x84, 0x0000);//RAM Address Start? Partial Display 2.
+	SPFD5408WriteRegister(0x85, 0x0000);//RAM Address End? Partial Display 2.
+	//********Panel Control******************
+	SPFD5408WriteRegister(0x90, 0x0010);	//Frame Cycle Contral.(0x0013)
+	SPFD5408WriteRegister(0x92, 0x0000);	//Panel Interface Contral 2.(0x0000)
+	SPFD5408WriteRegister(0x93, 0x0003);	//Panel Interface Contral 3.
+	SPFD5408WriteRegister(0x95, 0x0110);	//Frame Cycle Contral.(0x0110)
+	SPFD5408WriteRegister(0x97, 0x0000);	//
+	SPFD5408WriteRegister(0x98, 0x0000);	//Frame Cycle Contral.
+	//********Display On******************
 	Delay(100);
-    exitStandBy();
+	//exitStandBy();
+	SPFD5408WriteRegister(0x07, 0x0173);
+	Delay(100);
 	SPFD5408WriteCommand(0x0022);
+	SPFD5408PaintScreenBackground(BLACK);
+	// NEW SETUP _ END
 
-	SPFD5408PaintScreenBlack();
+	/*//OLD SETUP
+	 SPFD5408WriteRegister(0x0000, 0x0001);
+	 Delay(500);
+	 SPFD5408WriteRegister(0x00, 0x0000);
+	 SPFD5408WriteRegister(0x01, 0x0100);	//Driver Output Contral.
+	 SPFD5408WriteRegister(0x02, 0x0700);	//LCD Driver Waveform Contral.
+	 SPFD5408WriteRegister(0x03, 0x1018);	//Entry Mode Set.
 
+	 SPFD5408WriteRegister(0x04, 0x0000);	//Scalling Control.
+	 SPFD5408WriteRegister(0x08, 0x0202);	//Display Control 2.(0x0207)
+	 SPFD5408WriteRegister(0x09, 0x0000);	//Display Control 3.(0x0000)
+	 SPFD5408WriteRegister(0x0a, 0x0000);	//Frame Cycle Contal.(0x0000)
+	 SPFD5408WriteRegister(0x0c, (1 << 0));//Extern Display Interface Control 1.(0x0000)
+	 SPFD5408WriteRegister(0x0d, 0x0000);	//Frame Maker Position.
+	 SPFD5408WriteRegister(0x0f, 0x0000);//Extern Display Interface Control 2.
+
+	 Delay(200);
+	 SPFD5408WriteRegister(0x07, 0x0101);	//Display Control.
+	 Delay(200);
+	 SPFD5408WriteRegister(0x10,
+	 (1 << 12) | (0 << 8) | (1 << 7) | (1 << 6) | (0 << 4));	//Power Control 1.(0x16b0)
+	 SPFD5408WriteRegister(0x11, 0x0007);			//Power Control 2.(0x0001)
+	 SPFD5408WriteRegister(0x12, (1 << 8) | (1 << 4) | (0 << 0));//Power Control 3.(0x0138)
+	 SPFD5408WriteRegister(0x13, 0x0b00);					//Power Control 4.
+	 SPFD5408WriteRegister(0x29, 0x0000);					//Power Control 7.
+
+	 SPFD5408WriteRegister(0x2b, (1 << 14) | (1 << 4));
+
+	 SPFD5408WriteRegister(0x50, 0);		//Set X Start.
+	 SPFD5408WriteRegister(0x51, 239);	//Set X End.
+	 SPFD5408WriteRegister(0x52, 0);		//Set Y Start.
+	 SPFD5408WriteRegister(0x53, 319);	//Set Y End.
+
+	 SPFD5408WriteRegister(0x60, 0x2700);	//Driver Output Control.
+	 SPFD5408WriteRegister(0x61, 0x0001);	//Driver Output Control.
+	 SPFD5408WriteRegister(0x6a, 0x0000);	//Vertical Srcoll Control.
+
+	 SPFD5408WriteRegister(0x80, 0x0000);//Display Position? Partial Display 1.
+	 SPFD5408WriteRegister(0x81, 0x0000);//RAM Address Start? Partial Display 1.
+	 SPFD5408WriteRegister(0x82, 0x0000);	//RAM Address End-Partial Display 1.
+	 SPFD5408WriteRegister(0x83, 0x0000);//Displsy Position? Partial Display 2.
+	 SPFD5408WriteRegister(0x84, 0x0000);//RAM Address Start? Partial Display 2.
+	 SPFD5408WriteRegister(0x85, 0x0000);//RAM Address End? Partial Display 2.
+
+	 SPFD5408WriteRegister(0x90, (0 << 7) | (16 << 0));//Frame Cycle Contral.(0x0013)
+	 SPFD5408WriteRegister(0x92, 0x0000);	//Panel Interface Contral 2.(0x0000)
+	 SPFD5408WriteRegister(0x93, 0x0001);	//Panel Interface Contral 3.
+	 SPFD5408WriteRegister(0x95, 0x0110);	//Frame Cycle Contral.(0x0110)
+	 SPFD5408WriteRegister(0x97, (0 << 8));	//
+	 SPFD5408WriteRegister(0x98, 0x0000);	//Frame Cycle Contral.
+
+	 Delay(100);
+	 exitStandBy();
+	 SPFD5408WriteCommand(0x0022);
+	 SPFD5408PaintScreenBlack();
+	 //OLD SETUP _ END
+	 */
 }
 
-void SPFD5408PaintScreenBlack(void) {
+void SPFD5408PaintScreenBackground(uint16_t color) {
 	uint16_t i, f;
 	for (i = 0; i < 320; i++) {
 		for (f = 0; f < 240; f++) {
-			SPFD5408WriteData(YELLOW );
+			SPFD5408WriteData(color);
 		}
 	}
 }
@@ -432,10 +446,10 @@ void SPFD5408SetOrientation(uint16_t HV) //horizontal or vertical
 {
 	if (HV == 1) //vertical
 			{
-		SPFD5408WriteRegister(0x03, 0x5038);
+		SPFD5408WriteRegister(0x03, 0x1038);
 	} else //horizontal
 	{
-		SPFD5408WriteRegister(0x03, 0x5030);
+		SPFD5408WriteRegister(0x03, 0x1030);
 	}
 	SPFD5408WriteCommand(0x0022); //Start to write to display RAM
 }
@@ -445,9 +459,17 @@ void SPFD5408SetDisplayDirect(unsigned char Direction) {
 }
 
 void SPFD5408SetXY(uint16_t poX, uint16_t poY) {
+	if (poX >= MAX_X)
+		poX = MAX_X;
+	if (poY >= MAX_Y)
+		poY = MAX_Y;
+	if (poX <= 0)
+		poX = 0;
+	if (poY <= 0)
+		poY = 0;
 	SPFD5408WriteRegister(0x0020, poX); //X
 	SPFD5408WriteRegister(0x0021, poY);
-	SPFD5408WriteCommand(0x0022); //Start to write to display RAM
+	//SPFD5408WriteCommand(0x0022); //Start to write to display RAM
 }
 
 void SPFD5408SetPixel(uint16_t poX, uint16_t poY, uint16_t color) {
@@ -566,15 +588,14 @@ void SPFD5408FillRectangle(uint16_t poX, uint16_t poY, uint16_t length,
 			SPFD5408DrawHorizontalLine(poX, poY - i, length, color);
 		else if (DisplayDirect == UP2DOWN)
 			SPFD5408DrawHorizontalLine(poX, poY + i, length, color);
-
 	}
 }
 
 void SPFD5408DrawChar(uint16_t poX, uint16_t poY, unsigned char ascii,
 		uint16_t size, uint16_t fgcolor) {
 	unsigned char i, f, temp = 0;
-
-	SPFD5408SetXY(poX, poY);
+	uint8_t tempPoX, tempPoY;
+		SPFD5408SetXY(poX, poY);
 
 	if ((ascii < 0x20) || (ascii > 0x7e)) //Unsupported char.
 			{
@@ -584,18 +605,22 @@ void SPFD5408DrawChar(uint16_t poX, uint16_t poY, unsigned char ascii,
 		temp = simpleFont[ascii - 0x20][i];
 		for (f = 0; f < 8; f++) {
 			if ((temp >> f) & 0x01) {
-				if (DisplayDirect == LEFT2RIGHT)
-					SPFD5408FillRectangle(poX + i * size, poY + f * size, size,
-							size, fgcolor);
-				else if (DisplayDirect == DOWN2UP)
-					SPFD5408FillRectangle(poX + f * size, poY - i * size, size,
-							size, fgcolor);
-				else if (DisplayDirect == RIGHT2LEFT)
-					SPFD5408FillRectangle(poX - i * size, poY - f * size, size,
-							size, fgcolor);
-				else if (DisplayDirect == UP2DOWN)
-					SPFD5408FillRectangle(poX - f * size, poY + i * size, size,
-							size, fgcolor);
+				if (DisplayDirect == LEFT2RIGHT) {
+					tempPoX = poX + i * size;
+					tempPoY = poY + f * size;
+				} else if (DisplayDirect == DOWN2UP) {
+					tempPoX = poX + f * size;
+					tempPoY = poY - i * size;
+				} else if (DisplayDirect == RIGHT2LEFT) {
+					tempPoX = poX - i * size;
+					tempPoY = poY - f * size;
+				} else if (DisplayDirect == UP2DOWN) {
+					tempPoX = poX - f * size;
+					tempPoY = poY + i * size;
+				} else
+					return;
+					SPFD5408FillRectangle(tempPoX, tempPoY, size, size,
+							fgcolor);
 			}
 		}
 	}
@@ -603,14 +628,10 @@ void SPFD5408DrawChar(uint16_t poX, uint16_t poY, unsigned char ascii,
 
 void SPFD5408DrawString(uint16_t poX, uint16_t poY, char *string, uint16_t size,
 		uint16_t fgcolor) {
-	//unsigned char i;
+	USB_DEBUG_PUTS(string);
+	do {
+		SPFD5408DrawChar(poX, poY, *string, size, fgcolor);
 
-	while (*string++) {
-		//for(i=0;i<8;i++)
-		{
-			SPFD5408DrawChar(poX, poY, *string, size, fgcolor);
-		}
-		//*string++;
 		if (DisplayDirect == LEFT2RIGHT) {
 			if (poX < MAX_X) {
 				poX += 8 * size; // Move cursor right
@@ -628,7 +649,7 @@ void SPFD5408DrawString(uint16_t poX, uint16_t poY, char *string, uint16_t size,
 				poY += 8 * size; // Move cursor right
 			}
 		}
-	}
+	} while (*string++);
 }
 
 void SPFD5408DrawBmp(unsigned short ulXs, unsigned short ulYs,

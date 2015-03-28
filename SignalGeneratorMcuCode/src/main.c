@@ -122,11 +122,17 @@ int main(void) {
 	SegmentLCD_AllOff();
 	SegmentLCD_Number(100);
 	SPFD5408Init();
-	SPFD5408SetOrientation(0);//vertical
-	//SPFD5408DrawString(100, 100, "AES", 4, BLACK);
-	//SPFD5408DrawString(10, 200, "KOL", 3, BLUE);
 	ADS7843Init();
+  //USB for Debug
+	if (CDC_Init()) { /* Initialize the communication class device. */
+		SegmentLCD_Write("donea");
+	}
 
+	else {
+		SegmentLCD_Write("fail");
+		while (1)
+		;
+	}
 	uint16_t i = 0;
 	uint16_t counter = 0;
 	char buf[10] = {0};
@@ -142,9 +148,10 @@ int main(void) {
 		} else
 		SegmentLCD_Number(i);
 		Delay(1000);
-		counter = snprintf(buf, 10, "Num %d", i);
+		SPFD5408PaintScreenBackground(colors[i%10]);
+		counter = snprintf(buf, 10, "N %d", i);
 		if (counter != -1)
-		SPFD5408DrawString(0, 0, buf, 3, BLACK);
+		SPFD5408DrawString(100, 100, buf, 3, BLACK);
 	}
 
 #elif USB_DEMO_ENABLED

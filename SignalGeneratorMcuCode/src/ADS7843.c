@@ -121,7 +121,6 @@ void ADS7843Init(void) {
 	ADS7843_INT_INPUT();
 
 	GPIOINT_CallbackRegister(ADS7843_PIN_INT, ADS7843PenIRQCallback);
-	//GPIO_IntConfig(ADS7843_PORT_INT, ADS7843_PIN_INT, true, false, true);
 	ADS7843_INT_IRQ_CONFIG_FALLING(true); //falling edge
 
 
