@@ -365,7 +365,7 @@ void SPFD5408Init(void) {
 	SPFD5408WriteRegister(0x07, 0x0173);
 	Delay(100);
 	SPFD5408WriteCommand(0x0022);
-	SPFD5408PaintScreenBackground(BLACK);
+	SPFD5408PaintScreenBackground(YELLOW);
 	// NEW SETUP _ END
 
 	/*//OLD SETUP
@@ -628,7 +628,7 @@ void SPFD5408DrawChar(uint16_t poX, uint16_t poY, unsigned char ascii,
 
 void SPFD5408DrawString(uint16_t poX, uint16_t poY, char *string, uint16_t size,
 		uint16_t fgcolor) {
-	USB_DEBUG_PUTS(string);
+	//USB_DEBUG_PUTS(string);
 	do {
 		SPFD5408DrawChar(poX, poY, *string, size, fgcolor);
 
