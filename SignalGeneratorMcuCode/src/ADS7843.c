@@ -151,28 +151,19 @@ static void ADS7843SpiWriteByteSoftware(uint8_t data) {
 
 static uint8_t ADS7843SpiReadByteSoftware(void) {
 	uint8_t data = 0;
-	ADS7843_CLK_HIGH();
-	///////////////////////////////////////////////////////////////	Delay(1);
 
 	for (int i = 0; i < 8; i++) {
-		//ADS7843_CLK_HIGH();
-		ADS7843_CLK_LOW();
+	    ADS7843_CLK_HIGH();
+
 		for (int i = 0; i < 100; i++)
 			;
-		///////////////////////////////////////////////////////////////		Delay(1);
-		ADS7843_CLK_HIGH();
+
 		data |=
 				((GPIO_PinInGet(ADS7843_PORT_MISO, ADS7843_PIN_MISO) << (7 - i)));
-		//ADS7843_CLK_LOW();
-		//data |=((GPIO_PinInGet(ADS7843_PORT_MISO, ADS7843_PIN_MISO) << (7 - i)));
-
-		///////////////////////////////////////////////////////////////		Delay(1);
-
+		ADS7843_CLK_LOW();
 	}
-	ADS7843_CLK_LOW();
-	for (int i = 0; i < 100; i++)
-		;
-	ADS7843_MOSI_LOW();
+
+	//ADS7843_MOSI_LOW();
 	for (int i = 0; i < 100; i++)
 		;
 	return data;
@@ -248,12 +239,12 @@ void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 	*x <<= 4;
 // Read the low 4bit of the 12bit conversion result
 	*x |= (uint16_t) ADS7843SpiReadByteSoftware() >> 4;
-	ADS7843_CS_HIGH();
+	//ADS7843_CS_HIGH();
 	for (int x = 0; x < 10000; x++)
 		;
 // Send read y command
 
-	ADS7843_CS_LOW();
+	//ADS7843_CS_LOW();
 	ADS7843SpiWriteByteSoftware(ADS7843_READ_Y); //read y command
 #ifdef ADS7843_USE_PIN_BUSY
 
