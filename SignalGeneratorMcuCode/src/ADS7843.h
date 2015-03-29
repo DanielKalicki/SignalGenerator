@@ -23,11 +23,11 @@ extern "C"
 /*********************************Hardware dependent part*****************************************/
 
 //==================CS=====================
-#define ADS7843_PIN_CS      0
-#define ADS7843_PORT_CS     gpioPortE
-#define ADS7843_CS_OUTPUT() GPIO_PinModeSet(ADS7843_PORT_CS, ADS7843_PIN_CS, gpioModePushPull, 1);
-#define ADS7843_CS_HIGH()   GPIO_PinOutSet(ADS7843_PORT_CS , ADS7843_PIN_CS );
-#define ADS7843_CS_LOW()    GPIO_PinOutClear(ADS7843_PORT_CS , ADS7843_PIN_CS );
+#define ADS7843_PIN_CS      3//0
+#define ADS7843_PORT_CS     gpioPortD//gpioPortE
+#define ADS7843_CS_OUTPUT() GPIO_PinModeSet(ADS7843_PORT_CS, ADS7843_PIN_CS, gpioModePushPull, 1)
+#define ADS7843_CS_HIGH()   GPIO_PinOutSet(ADS7843_PORT_CS , ADS7843_PIN_CS )
+#define ADS7843_CS_LOW()    GPIO_PinOutClear(ADS7843_PORT_CS , ADS7843_PIN_CS )
 //------------------INT_IRQ----------------------
 
 #define ADS7843_PIN_INT      13//10
@@ -43,24 +43,24 @@ extern "C"
 
 //------------------CLK----------------------
 
-#define ADS7843_PIN_CLK      1
-#define ADS7843_PORT_CLK     gpioPortE
+#define ADS7843_PIN_CLK      2//1
+#define ADS7843_PORT_CLK     gpioPortD//gpioPortE
 #define ADS7843_CLK_OUTPUT() GPIO_PinModeSet(ADS7843_PORT_CLK, ADS7843_PIN_CLK, gpioModePushPull, 1)
 #define ADS7843_CLK_HIGH()   GPIO_PinOutSet(ADS7843_PORT_CLK , ADS7843_PIN_CLK )
 #define ADS7843_CLK_LOW()    GPIO_PinOutClear(ADS7843_PORT_CLK , ADS7843_PIN_CLK )
 
 //------------------MOSI---------------------
 
-#define ADS7843_PIN_MOSI      2
-#define ADS7843_PORT_MOSI     gpioPortE
+#define ADS7843_PIN_MOSI      0//2
+#define ADS7843_PORT_MOSI     gpioPortD//gpioPortE
 #define ADS7843_MOSI_OUTPUT() GPIO_PinModeSet(ADS7843_PORT_MOSI, ADS7843_PIN_MOSI, gpioModePushPull, 1)
 #define ADS7843_MOSI_HIGH()   GPIO_PinOutSet(ADS7843_PORT_MOSI, ADS7843_PIN_MOSI )
 #define ADS7843_MOSI_LOW()    GPIO_PinOutClear(ADS7843_PORT_MOSI , ADS7843_PIN_MOSI )
 
 //------------------MIS0---------------------
 
-#define ADS7843_PIN_MISO      3
-#define ADS7843_PORT_MISO     gpioPortE
+#define ADS7843_PIN_MISO      1//3
+#define ADS7843_PORT_MISO     gpioPortD//gpioPortE
 #define ADS7843_MISO_OUTPUT() GPIO_PinModeSet(ADS7843_PORT_MISO, ADS7843_PIN_MISO, gpioModePushPull, 1)
 #define ADS7843_MISO_HIGH()   GPIO_PinOutSet(ADS7843_PORT_MISO , ADS7843_PIN_MISO )
 #define ADS7843_MISO_LOW()    GPIO_PinOutClear(ADS7843_PORT_MISO , ADS7843_PIN_MISO )
