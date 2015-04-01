@@ -17,7 +17,7 @@
 /* USART used for SPI access */
 #define USART_USED        USART1
 #define USART_CLK         cmuClock_USART1
-#define SPI_SW_ENABLED 1
+#define SPI_SW_ENABLED 0
 static const USART_InitSync_TypeDef initSpi = { usartEnable, /* Enable RX/TX when init completed. */
 16000000, /* Use 48MHz reference clock */
 1000000, /* 1 Mbits/s. */
@@ -130,6 +130,8 @@ static uint16_t ADS7843SpiReadData(uint8_t reg) {
 static void ADS7843SpiWriteByteSoftware(uint8_t data) {
 	///////////////////////////////////////////////////////////////	Delay(1);
 
+	for (int i = 0; i < 100; i++);
+
 	for (int i = 0; i < 8; i++) {
 
 		if (data & 0x80) {
@@ -143,6 +145,7 @@ static void ADS7843SpiWriteByteSoftware(uint8_t data) {
 		///////////////////////////////////////////////////////////////		Delay(1);
 		ADS7843_CLK_LOW();
 		data <<= 1;
+		for (int i = 0; i < 100; i++);
 		///////////////////////////////////////////////////////////////		Delay(1);
 
 	}
@@ -151,6 +154,9 @@ static void ADS7843SpiWriteByteSoftware(uint8_t data) {
 
 static uint8_t ADS7843SpiReadByteSoftware(void) {
 	uint8_t data = 0;
+
+	for (int i = 0; i < 100; i++)
+				;
 
 	for (int i = 0; i < 8; i++) {
 	    ADS7843_CLK_HIGH();
@@ -161,6 +167,9 @@ static uint8_t ADS7843SpiReadByteSoftware(void) {
 		data |=
 				((GPIO_PinInGet(ADS7843_PORT_MISO, ADS7843_PIN_MISO) << (7 - i)));
 		ADS7843_CLK_LOW();
+
+		for (int i = 0; i < 100; i++)
+					;
 	}
 
 	//ADS7843_MOSI_LOW();
@@ -216,55 +225,78 @@ uint16_t ADS7843PenInq(void) {
 void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 // Chip select
 
-	ADS7843_CS_LOW();
+	int counter = 0;
 
-	///////////////////////////////////////////////////////////////Delay(1);
+	*x=2047;
+	while (*x==2047){
+		counter++;
 
-// Send read x command
-	ADS7843SpiWriteByteSoftware(ADS7843_READ_X); //read x command
-#ifdef ADS7843_USE_PIN_BUSY
+		ADS7843_CS_LOW();
 
-			// wait for conversion complete
-			while(xGPIOSPinRead(ADS7843_PIN_BUSY));
-#else
+		///////////////////////////////////////////////////////////////Delay(1);
 
-// The conversion needs 8us to complete
-	////////////////////////////////////////////////////////////////Delay(1);
-	for (int x = 0; x < 0xFFFFF; x++)
-		;
-#endif
+	// Send read x command
+		ADS7843SpiWriteByteSoftware(ADS7843_READ_X); //read x command
+	#ifdef ADS7843_USE_PIN_BUSY
 
-// Read the high 8bit of the 12bit conversion result
-	*x = (uint16_t) ADS7843SpiReadByteSoftware() & 0xFF;
-	*x <<= 4;
-// Read the low 4bit of the 12bit conversion result
-	*x |= (uint16_t) ADS7843SpiReadByteSoftware() >> 4;
-	//ADS7843_CS_HIGH();
-	for (int x = 0; x < 10000; x++)
-		;
+				// wait for conversion complete
+				while(xGPIOSPinRead(ADS7843_PIN_BUSY));
+	#else
+
+	// The conversion needs 8us to complete
+		////////////////////////////////////////////////////////////////Delay(1);
+		for (int ii = 0; ii < 0x100; ii++)
+			;
+	#endif
+
+	// Read the high 8bit of the 12bit conversion result
+		*x = (uint16_t) ADS7843SpiReadByteSoftware() & 0xFF;
+		*x <<= 4;
+	// Read the low 4bit of the 12bit conversion result
+		*x |= (uint16_t) ADS7843SpiReadByteSoftware() >> 4;
+		ADS7843_CS_HIGH();
+
+		for (int ii = 0; ii < 1000; ii++);
+		if (counter==10) break;
+	}
+
+	counter = 0;
+
+
 // Send read y command
 
-	//ADS7843_CS_LOW();
-	ADS7843SpiWriteByteSoftware(ADS7843_READ_Y); //read y command
-#ifdef ADS7843_USE_PIN_BUSY
+	*y=2047;
+	while (*y==2047){
+			counter++;
+			ADS7843_CS_LOW();
+			//for (int x = 0; x < 0x100; x++);
+			ADS7843SpiWriteByteSoftware(ADS7843_READ_Y); //read y command
+		#ifdef ADS7843_USE_PIN_BUSY
 
-			// wait for conversion complete
-			while(xGPIOSPinRead(ADS7843_PIN_BUSY));
-#else
+					// wait for conversion complete
+					while(xGPIOSPinRead(ADS7843_PIN_BUSY));
+		#else
 
-// The conversion needs 8us to complete
-	////////////////////////////////////////////////////////////////Delay(1);
-			for (int x = 0; x < 0xFFFFF; x++)
-		;
-#endif
+		// The conversion needs 8us to complete
+			////////////////////////////////////////////////////////////////Delay(1);
+					for (int ii = 0; ii < 100; ii++)
+				;
+		#endif
 
-// Read the high 8bit of the 12bit conversion result
-	*y = (uint16_t) ADS7843SpiReadByteSoftware() & 0xFF;
-	*y <<= 4;
+		// Read the high 8bit of the 12bit conversion result
+			*y = (uint16_t) ADS7843SpiReadByteSoftware() & 0xFF;
+			*y <<= 4;
 
-// Read the low 4bit of the 12bit conversion result
-	*y |= (uint16_t) ADS7843SpiReadByteSoftware() >> 4;
-	ADS7843_CS_HIGH();
+		// Read the low 4bit of the 12bit conversion result
+		*y |= (uint16_t) ADS7843SpiReadByteSoftware() >> 4;
+		ADS7843_CS_HIGH();
+		for (int ii = 0; ii < 1000; ii++);
+		if (counter==10) break;
+	}
+	if (*y!=2047){
+		counter = 0;
+	}
+
 }
 #else
 // HW SPI
