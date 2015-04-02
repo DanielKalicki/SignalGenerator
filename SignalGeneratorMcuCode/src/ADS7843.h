@@ -79,7 +79,7 @@ extern "C"
 #define TOUCH_SCREEN_WIDTH         240
 #define TOUCH_SCREEN_HEIGHT        320
 
-#define TOUCH_SMAPLE_LEN           1
+#define TOUCH_SMAPLE_LEN           8
 //#define TOUCH_DISCARD_SAMPLES      1
 
 #define TOUCH_AD_X_MAX             1840

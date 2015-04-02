@@ -18,9 +18,10 @@
 #define USART_USED        USART1
 #define USART_CLK         cmuClock_USART1
 #define SPI_SW_ENABLED 0
+
 static const USART_InitSync_TypeDef initSpi = { usartEnable, /* Enable RX/TX when init completed. */
-16000000, /* Use 48MHz reference clock */
-1000000, /* 1 Mbits/s. */
+1000000, /* Use 48MHz reference clock */
+100, /* 1 Mbits/s. */
 usartDatabits8, /* 8 databits. */
 true, /* Master mode. */
 true, /* Send most significant bit first. */
@@ -82,7 +83,7 @@ static void ADS7843PenIRQCallback(uint8_t pin);
 //*****************************************************************************
 void ADS7843Init(void) {
 
-#ifdef SPI_SW_ENABLED
+#if SPI_SW_ENABLED
 
 	spiInitSoftware(ADS7843_PORT_MOSI, ADS7843_PIN_MOSI, ADS7843_PORT_MISO,
 			ADS7843_PIN_MISO, ADS7843_PORT_CLK, ADS7843_PIN_CLK,
@@ -184,12 +185,13 @@ static void ADS7843PenIRQCallback(uint8_t pin) {
 	if (pin == ADS7843_PIN_INT && !mADS7843ScreenTouched) {
 		uint16_t x, y;
 		ADS7843_INT_IRQ_CONFIG_PIN_DISABLE();
-		if (ADS7843_GET_INT_PIN()) {
+		/*if (ADS7843_GET_INT_PIN()) {
 			// Change to falling trigger edge when pen up
 			ADS7843_INT_IRQ_CONFIG_FALLING(true);
 			tTouchData.touch_status |= TOUCH_STATUS_PENUP;
 			tTouchData.touch_status &= ~TOUCH_STATUS_PENDOWN;
 		} else {
+		*/
 			// Modify status
 			tTouchData.touch_status |= TOUCH_STATUS_PENDOWN;
 			tTouchData.touch_status &= ~TOUCH_STATUS_PENUP;
@@ -197,10 +199,10 @@ static void ADS7843PenIRQCallback(uint8_t pin) {
 			ADS7843ReadPointXY(&x, &y);
 			mPointCoordinates.x = x;
 			mPointCoordinates.y = y;
-
-			ADS7843_INT_IRQ_CONFIG_RISING(true);
 			mADS7843ScreenTouched = true;
-		}
+			ADS7843_INT_IRQ_CONFIG_RISING(true);
+
+		//}
 
 	}
 
@@ -210,7 +212,7 @@ uint16_t ADS7843PenInq(void) {
 	return (uint16_t) ADS7843_GET_INT_PIN();
 }
 
-#ifdef SPI_SW_ENABLED
+
 //*****************************************************************************
 //
 //! \brief Read the x, y axis ADC convert value once from ADS7843
@@ -221,15 +223,15 @@ uint16_t ADS7843PenInq(void) {
 //! \return None.
 //
 //*****************************************************************************
-
+#if SPI_SW_ENABLED
 void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 // Chip select
 
-	int counter = 0;
+	//int counter = 0;
 
-	*x=2047;
-	while (*x==2047){
-		counter++;
+	//*x=2047;
+	//while (*x==2047){
+	//	counter++;
 
 		ADS7843_CS_LOW();
 
@@ -257,17 +259,17 @@ void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 		ADS7843_CS_HIGH();
 
 		for (int ii = 0; ii < 1000; ii++);
-		if (counter==10) break;
-	}
+		//if (counter==10) break;
+	//}
 
-	counter = 0;
+	//counter = 0;
 
 
 // Send read y command
 
-	*y=2047;
-	while (*y==2047){
-			counter++;
+	//*y=2047;
+	//while (*y==2047){
+	//		counter++;
 			ADS7843_CS_LOW();
 			//for (int x = 0; x < 0x100; x++);
 			ADS7843SpiWriteByteSoftware(ADS7843_READ_Y); //read y command
@@ -291,11 +293,11 @@ void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 		*y |= (uint16_t) ADS7843SpiReadByteSoftware() >> 4;
 		ADS7843_CS_HIGH();
 		for (int ii = 0; ii < 1000; ii++);
-		if (counter==10) break;
-	}
-	if (*y!=2047){
-		counter = 0;
-	}
+		//if (counter==10) break;
+	//}
+	//if (*y!=2047){
+	//	counter = 0;
+	//}
 
 }
 #else
@@ -307,11 +309,11 @@ void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 	;
 	///////////////////////////////////////////////////////////////Delay(1);
 	*x =ADS7843SpiReadData(ADS7843_READ_X);
-	ADS7843_CS_HIGH()
+	//ADS7843_CS_HIGH()
 	;
-	for (int x = 0; x < 10; x++)
+	for (int i = 0; i < 1000; i++)
 	;
-	ADS7843_CS_LOW()
+	//ADS7843_CS_LOW()
 	;
 	*y =ADS7843SpiReadData(ADS7843_READ_Y);
 	ADS7843_CS_HIGH()

@@ -389,8 +389,8 @@ StatusTypeDef spiTransmitReceive(SpiHandleTypeDef *hSpi, uint8_t *pTxData,
 					while (!(hSpi->spiInstance->STATUS & USART_STATUS_TXC))
 						//-------
 						;
-					while (!(hSpi->spiInstance->STATUS & USART_STATUS_RXFULL))
-						;
+					/*while (!(hSpi->spiInstance->STATUS & USART_STATUS_RXFULL))
+						;*/
 					*((uint16_t*) hSpi->pRxBuffPtr) =
 							hSpi->spiInstance->RXDOUBLE;
 					hSpi->pRxBuffPtr += 2;
@@ -408,9 +408,9 @@ StatusTypeDef spiTransmitReceive(SpiHandleTypeDef *hSpi, uint8_t *pTxData,
 
 						while (!(hSpi->spiInstance->STATUS & USART_STATUS_TXC))
 							;
-						while (!(hSpi->spiInstance->STATUS
+						/*while (!(hSpi->spiInstance->STATUS
 								& USART_STATUS_RXFULL))
-							;
+							;*/
 						*((uint16_t*) hSpi->pRxBuffPtr) =
 								hSpi->spiInstance->RXDOUBLE;
 						hSpi->pRxBuffPtr += 2;
@@ -420,8 +420,8 @@ StatusTypeDef spiTransmitReceive(SpiHandleTypeDef *hSpi, uint8_t *pTxData,
 				}
 
 			} else if (hSpi->init->databits == usartDatabits8) {
-				//while (!(hSpi->spiInstance->STATUS & USART_STATUS_TXBL))
-				//	;
+				while (!(hSpi->spiInstance->STATUS & USART_STATUS_TXBL))
+					;
 				hSpi->spiInstance->TXDATA = *(hSpi->pTxBuffPtr);
 				hSpi->pTxBuffPtr++;
 				hSpi->txXferCount--;
@@ -469,6 +469,7 @@ StatusTypeDef spiTransmitReceive(SpiHandleTypeDef *hSpi, uint8_t *pTxData,
 		}
 	} else
 		return STATUS_BUSY;
+	hSpi->spiState = SPI_STATE_READY;
 	return STATUS_OK;
 }
 
