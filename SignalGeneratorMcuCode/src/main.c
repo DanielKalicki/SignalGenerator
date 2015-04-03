@@ -124,7 +124,7 @@ int main(void) {
 	//SPFD5408Init();
 	ADS7843Init();
   //USB for Debug
-	/*
+
 	if (CDC_Init()) { // Initialize the communication class device.
 		SegmentLCD_Write("donea");
 	}
@@ -134,17 +134,17 @@ int main(void) {
 		while (1)
 		;
 	}
-	*/
+
 	uint16_t i = 0;
 	uint16_t counter = 0;
-	char buf[20] = {0};
+	char buf[25] = {0};
 	while (1) {
 		i++;
 		if (mADS7843ScreenTouched) {
 			SegmentLCD_Number((int) (getCoordinates().x));
 			//SPFD5408DrawString(getCoordinates().x, getCoordinates().y, "AA", 1, BLACK);
-			//sniprintf(buf, 15, "X:%d , Y:%d\n", getCoordinates().x, getCoordinates().y);
-			//USB_DEBUG_PUTS(buf);
+			sniprintf(buf, 25, "X:%d , Y:%d\r\n", getCoordinates().x, getCoordinates().y);
+			USB_DEBUG_PUTS(buf);
 			//SPFD5408SetPixel(getCoordinates().x, getCoordinates().y, BLACK);
 			BSP_LedToggle(0);
 			mADS7843ScreenTouched = false;

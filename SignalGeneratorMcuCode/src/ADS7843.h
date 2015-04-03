@@ -79,7 +79,7 @@ extern "C"
 #define TOUCH_SCREEN_WIDTH         240
 #define TOUCH_SCREEN_HEIGHT        320
 
-#define TOUCH_SMAPLE_LEN           8
+#define TOUCH_SMAPLE_LEN            8
 //#define TOUCH_DISCARD_SAMPLES      1
 
 #define TOUCH_AD_X_MAX             1840
@@ -115,15 +115,15 @@ typedef struct
 
 typedef struct
 {
-	uint16_t th_ad_left;
-	uint16_t th_ad_right;
-	uint16_t th_ad_up;
-	uint16_t th_ad_down;
-	uint16_t last_x;
-	uint16_t last_y;
-	uint16_t cur_x;
-	uint16_t cur_y;
-	uint8_t touch_status;
+	uint16_t thAdLeft;
+	uint16_t thAdRight;
+	uint16_t thAdUp;
+	uint16_t thAdDown;
+	uint16_t lastX;
+	uint16_t lastY;
+	uint16_t curX;
+	uint16_t curY;
+	uint8_t touchStatus;
 }TouchInfo;
 
 extern TouchInfo tTouchData;
