@@ -121,7 +121,7 @@ int main(void) {
 	SegmentLCD_Init(false);
 	SegmentLCD_AllOff();
 	SegmentLCD_Number(100);
-	//SPFD5408Init();
+	SPFD5408Init();
 	ADS7843Init();
   //USB for Debug
 
@@ -151,7 +151,7 @@ int main(void) {
 		} else
 		SegmentLCD_Number(i);
 		Delay(1000);
-		//SPFD5408PaintScreenBackground(colors[i%10]);
+		SPFD5408PaintScreenBackground(colors[i%10]);
 		//counter = snprintf(buf, 10, "N %d", i);
 		//if (counter != -1)
 		//SPFD5408DrawString(100, 100, buf, 3, BLACK);

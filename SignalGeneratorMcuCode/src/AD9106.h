@@ -12,51 +12,65 @@
 #include "em_usart.h"
 #include "spi.h"
 
+/*********************************Hardware dependent part*****************************************/
+/*********************************Hardware dependent part*****************************************/
+
 /* USART used for SPI access */
-#define USART_USED        USART1
-#define USART_CLK         cmuClock_USART1
+#define USART_USED        USART2
+#define USART_CLK         cmuClock_USART2
 
 /* GPIO pins used for SPI communication. */
-/*DEFAULT PINOUT USED FOR HARDWARE SPI (USART 1, Location #1) */
-#define SPI_PIN_MOSI        0
-#define SPI_PORT_MOSI       gpioPortD
-#define SPI_PIN_MISO        1
-#define SPI_PORT_MISO       gpioPortD
-#define SPI_PIN_CLK       	2
-#define SPI_PORT_CLK     	gpioPortD
-#define SPI_PIN_CS        	3
-#define SPI_PORT_CS      	gpioPortD
-#define SPI_PIN_RESET     	4
-#define SPI_PORT_RESET    	gpioPortD
+/*DEFAULT PINOUT USED FOR HARDWARE SPI (USART 2, Location #0)
+ *
+ US2_CLK-- PC4
+ US2_CS -- PC5
+ US2_RX -- PC3
+ US2_TX -- PC2
+ *
+ *  */
+//------------------CS----------------------
+#define AD9106_PIN_CS           5
+#define AD9106_PORT_CS          gpioPortC
+#define AD9106_CS_OUTPUT() 		GPIO_PinModeSet(AD9106_PORT_CS, AD9106_PIN_CS, gpioModePushPull, 1)
+#define AD91063_CS_HIGH()   	GPIO_PinOutSet(AD9106_PORT_CS , AD9106_PIN_CS )
+#define AD9106_CS_LOW()    		GPIO_PinOutClear(AD9106_PORT_CS , AD9106_PIN_CS )
+#define AD9106_CS_DISABLED()    GPIO_PinModeSet(AD9106_PORT_CS, AD9106_PIN_CS, gpioModeDisabled, 0)
 
-#define USART_READ     1
-#define USART_WRITE    0
+//------------------CLK----------------------
+#define AD9106_PIN_CLK         	4
+#define AD9106_PORT_CLK        	gpioPortC
+#define AD9106_CLK_OUTPUT() 	GPIO_PinModeSet(AD9106_PORT_CLK, AD9106_PIN_CLK, gpioModePushPull, 1)
+#define AD9106_CLK_HIGH()   	GPIO_PinOutSet(AD9106_PORT_CLK , AD9106_PIN_CLK )
+#define AD9106_CLK_LOW()    	GPIO_PinOutClear(AD9106_PORT_CLK , AD9106_PIN_CLK )
+#define AD9106_CLK_DISABLED()    GPIO_PinModeSet(AD9106_PORT_CLK, AD9106_PIN_CLK, gpioModeDisabled, 0)
+//------------------MOSI---------------------
+#define AD9106_PIN_MOSI        	2
+#define AD9106_PORT_MOSI       	gpioPortC
+#define AD9106_MOSI_OUTPUT() 	GPIO_PinModeSet(AD9106_PORT_MOSI,AD9106_PIN_MOSI,gpioModePushPull, 1)
+#define AD9106_MOSI_HIGH()   	GPIO_PinOutSet(AD9106_PORT_MOSI, AD9106_PIN_MOSI )
+#define AD9106_MOSI_LOW()    	GPIO_PinOutClear(AD9106_PORT_MOSI , AD9106_PIN_MOSI )
+#define AD9106_MOSI_DISABLED()    GPIO_PinModeSet(AD9106_PORT_MOSI, AD9106_PIN_MOSI, gpioModeDisabled, 0)
+
+//------------------MIS0---------------------
+#define AD9106_PIN_MISO        	3
+#define AD9106_PORT_MISO      	gpioPortC
+#define AD9106_MISO_INPUT() 	GPIO_PinModeSet(AD9106_PORT_MISO, AD9106_PIN_MISO, gpioModeInput, 0)
+#define AD9106_MISO_HIGH()   	GPIO_PinOutSet(AD9106_PORT_MISO , AD9106_PIN_MISO )
+#define AD9106_MISO_LOW()    	GPIO_PinOutClear(AD9106_PORT_MISO , AD9106_PIN_MISO )
+#define AD9106_IN_GET_PIN()     GPIO_PinInGet(AD9106_PORT_MISO, AD9106_PIN_MISO)
+#define AD9106_MISO_DISABLED()  GPIO_PinModeSet(AD9106_PORT_MISO, AD9106_PIN_MISO, gpioModeDisabled, 0)
+/*********************************Hardware dependent part - END*****************************************/
 
 /*hardware SPI*/
-void spiInitt(void);
-void spiDisable(void);
-uint16_t spiTransfer(uint8_t spiaddr, uint8_t spidata);
-uint16_t spiReadWord(uint16_t spiaddr);
-void spiSendByte(uint8_t spidata);
-void spiSendWord(uint16_t spidata);
-uint8_t spiGetByte(uint8_t addr);
+
 
 /*Software SPI*/
-void spiInitSoftware(GPIO_Port_TypeDef spiPortMOSI, uint8_t spiPinMOSI,
-		GPIO_Port_TypeDef spiPortMISO, uint8_t spiPinMISO,
-		GPIO_Port_TypeDef spiPortCLK, uint8_t spiPinCLK,
-		GPIO_Port_TypeDef spiPortCS, uint8_t spiPinCS);
+void spiInitSoftware(void);
 uint16_t spiWriteWordSoftware(uint16_t addr, uint16_t data);
 uint16_t spiReadWordSoftware(uint16_t addr); //
 
-
-
-
-
-
-
 typedef enum {
-	SPICONFIG_ADDR=0x00,
+	SPICONFIG_ADDR = 0x00,
 	POWERCONFIG,
 	CLOCKCONFIG,
 	REFADJ,
@@ -70,19 +84,19 @@ typedef enum {
 	DAC2RSET,
 	DAC1RSET,
 	CALCONFIG,
-	COMPOFFSET=0x000E,
-	RAMUPDATE=0x001D,
+	COMPOFFSET = 0x000E,
+	RAMUPDATE = 0x001D,
 	PAT_STATUS,
 	PAT_TYPE,
-	PATTERN_DLY=0x0020,
-	DAC4DOF=0x0022,
+	PATTERN_DLY = 0x0020,
+	DAC4DOF = 0x0022,
 	DAC3DOF,
 	DAC2DOF,
 	DAC1DOF,
 	WAV4_3CONFIG,
 	WAV2_1CONFIG,
 	PAT_TIMEBASE,
-	PAT_PERIOD=0x0029,
+	PAT_PERIOD = 0x0029,
 	DAC4_3PATx,
 	DAC2_1PATx,
 	DOUT_START_DLY,
@@ -151,10 +165,10 @@ typedef enum {
 	CLK_LDO_STAT = 0x0800,  //Read only flag indicating CLKVDD_1P8 LDO is on.
 	DIG1_LDO_STAT = 0x0400, //Read only flag indicating DVDD1 LDO is on.
 	DIG2_LDO_STAT = 0x0200, //Read only flag indicating DVDD2 LDO is on.
-	PDN_LDO_CLK = 0x0100,   //Disables the CLKVDD_1P8 LDO. An external supply is required.
-	PDN_LDO_DIG1 = 0x0080,  //Disables the DVDD1 LDO. An external supply is required.
-	PDN_LDO_DIG2 = 0x0040,  //Disables the DVDD2 LDO. An external supply is required.
-	REF_PDN = 0x0020,		//Disables 10 kOm resistor that creates REFIO voltage. User can drive with external voltage or provide external BG resistor.
+	PDN_LDO_CLK = 0x0100, //Disables the CLKVDD_1P8 LDO. An external supply is required.
+	PDN_LDO_DIG1 = 0x0080, //Disables the DVDD1 LDO. An external supply is required.
+	PDN_LDO_DIG2 = 0x0040, //Disables the DVDD2 LDO. An external supply is required.
+	REF_PDN = 0x0020, //Disables 10 kOm resistor that creates REFIO voltage. User can drive with external voltage or provide external BG resistor.
 	REF_EXT = 0x0010,		//Power down main BG reference including DAC bias.
 	DAC1_SLEEP = 0x0008,	//Disables DAC1 output current.
 	DAC2_SLEEP = 0x0004,	//Disables DAC2 output current.
@@ -322,10 +336,10 @@ typedef enum {
 
 typedef enum {
 	TRIG_DELAY_EN = 0x0002 //Enable start delay as trigger delay for all four channels.
-	/* Settings
-	 0 Delay repeats for all patterns.
-	 1 Delay is only at the start of first pattern.
-	 */
+/* Settings
+ 0 Delay repeats for all patterns.
+ 1 Delay is only at the start of first pattern.
+ */
 } TRIG_TW_SEL_Reg;
 
 typedef enum {
@@ -343,26 +357,26 @@ typedef enum {
 typedef enum {
 	TW_MEM_SHIFT = 0x000F
 //settings NOTE! TW_MEM_EN1 must be set = 1 to use this bit field.
-	/*
-	 0x00   DDS1TW = {RAM[11:0],12'b0}
-	 0x01   DDS1TW = {DDS1TW[23],RAM[11:0],11'b0}
-	 0x02	DDS1TW = {DDS1TW[23:22],RAM[11:0],10'b0}
-	 0x03	DDS1TW = {DDS1TW[23:21],RAM[11:0],9'b0}
-	 0x04	DDS1TW = {DDS1TW[23:20],RAM[11:0],8'b0}
-	 0x05	DDS1TW = {DDS1TW[23:19],RAM[11:0],7'b0}
-	 0x06	DDS1TW = {DDS1TW[23:18],RAM[11:0],6'b0}
-	 0x07	DDS1TW = {DDS1TW[23:17],RAM[11:0],5'b0}
-	 0x08	DDS1TW = {DDS1TW[23:16],RAM[11:0],3'b0}
-	 0x09	DDS1TW = {DDS1TW[23:15],RAM[11:0],4'b0}
-	 0x0A	DDS1TW = {DDS1TW[23:14],RAM[11:0],2’b0}
-	 0x0B	DDS1TW = {DDS1TW[23:13],RAM[11:0],1’b0}
-	 0x0C	DDS1TW = {DDS1TW[23:12],RAM[11:0]}
-	 0x0D	DDS1TW = {DDS1TW[23:11],RAM[11:1]}
-	 0x0E	DDS1TW = {DDS1TW[23:10],RAM[11:2]}
-	 0x0F	DDS1TW = {DDS1TW[23:9],RAM[11:3]}
-	 0x10	DDS1TW = {DDS1TW[23:8],RAM[11:4]}
-	 x Reserved
-	 */
+/*
+ 0x00   DDS1TW = {RAM[11:0],12'b0}
+ 0x01   DDS1TW = {DDS1TW[23],RAM[11:0],11'b0}
+ 0x02	DDS1TW = {DDS1TW[23:22],RAM[11:0],10'b0}
+ 0x03	DDS1TW = {DDS1TW[23:21],RAM[11:0],9'b0}
+ 0x04	DDS1TW = {DDS1TW[23:20],RAM[11:0],8'b0}
+ 0x05	DDS1TW = {DDS1TW[23:19],RAM[11:0],7'b0}
+ 0x06	DDS1TW = {DDS1TW[23:18],RAM[11:0],6'b0}
+ 0x07	DDS1TW = {DDS1TW[23:17],RAM[11:0],5'b0}
+ 0x08	DDS1TW = {DDS1TW[23:16],RAM[11:0],3'b0}
+ 0x09	DDS1TW = {DDS1TW[23:15],RAM[11:0],4'b0}
+ 0x0A	DDS1TW = {DDS1TW[23:14],RAM[11:0],2’b0}
+ 0x0B	DDS1TW = {DDS1TW[23:13],RAM[11:0],1’b0}
+ 0x0C	DDS1TW = {DDS1TW[23:12],RAM[11:0]}
+ 0x0D	DDS1TW = {DDS1TW[23:11],RAM[11:1]}
+ 0x0E	DDS1TW = {DDS1TW[23:10],RAM[11:2]}
+ 0x0F	DDS1TW = {DDS1TW[23:9],RAM[11:3]}
+ 0x10	DDS1TW = {DDS1TW[23:8],RAM[11:4]}
+ x Reserved
+ */
 } TW_RAM_CONFIG_Reg;
 
 typedef enum {
