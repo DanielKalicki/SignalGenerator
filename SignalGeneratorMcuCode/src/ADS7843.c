@@ -18,9 +18,10 @@
 #define USART_USED        USART1
 #define USART_CLK         cmuClock_USART1
 #define SPI_SW_ENABLED 0
+
 static const USART_InitSync_TypeDef initSpi = { usartEnable, /* Enable RX/TX when init completed. */
-16000000, /* Use 48MHz reference clock */
-1000000, /* 1 Mbits/s. */
+1000000, /* Use 1MHz reference clock */
+1000, /* 1 Mbits/s. */
 usartDatabits8, /* 8 databits. */
 true, /* Master mode. */
 true, /* Send most significant bit first. */
@@ -57,8 +58,6 @@ static StatusTypeDef spiPeripheralsConfig(void) {
 	GPIO_PinModeSet(ADS7843_PORT_CLK, ADS7843_PIN_CLK, gpioModePushPull, 0);
 	// Keep CS high to not activate slave
 	GPIO_PinModeSet(ADS7843_PORT_CS, ADS7843_PIN_CS, gpioModePushPull, 1);
-	//Reset
-	//GPIO_PinModeSet(SPI_PORT_RESET, SPI_PIN_RESET, gpioModePushPull, 0);
 	return STATUS_OK;
 }
 
@@ -82,7 +81,7 @@ static void ADS7843PenIRQCallback(uint8_t pin);
 //*****************************************************************************
 void ADS7843Init(void) {
 
-#ifdef SPI_SW_ENABLED
+#if SPI_SW_ENABLED
 
 	spiInitSoftware(ADS7843_PORT_MOSI, ADS7843_PIN_MOSI, ADS7843_PORT_MISO,
 			ADS7843_PIN_MISO, ADS7843_PORT_CLK, ADS7843_PIN_CLK,
@@ -107,11 +106,11 @@ void ADS7843Init(void) {
 #endif
 
 	// assign default values
-	tTouchData.th_ad_left = TOUCH_AD_X_MIN;
-	tTouchData.th_ad_right = TOUCH_AD_X_MAX;
-	tTouchData.th_ad_up = TOUCH_AD_Y_MAX;
-	tTouchData.th_ad_down = TOUCH_AD_Y_MIN;
-	tTouchData.touch_status = 0;
+	tTouchData.thAdLeft = TOUCH_AD_X_MIN;
+	tTouchData.thAdRight = TOUCH_AD_X_MAX;
+	tTouchData.thAdUp = TOUCH_AD_Y_MAX;
+	tTouchData.thAdDown = TOUCH_AD_Y_MIN;
+	tTouchData.touchStatus = 0;
 }
 
 static uint16_t ADS7843SpiReadData(uint8_t reg) {
@@ -121,16 +120,17 @@ static uint16_t ADS7843SpiReadData(uint8_t reg) {
 
 	if (spiTransmitReceive(&spiHandle, txBuf, rxBuf, 3, 0) == STATUS_OK) {
 
-		uint16_t retVal = (rxBuf[1] << 4) | (rxBuf[2] >> 4);
+		uint16_t retVal = ((rxBuf[1] << 4) | (rxBuf[2] >> 4)) & 0x0FFF;
 		return retVal;
 	} else
-		return 999;
+		return 0xffff;
 }
 
 static void ADS7843SpiWriteByteSoftware(uint8_t data) {
 	///////////////////////////////////////////////////////////////	Delay(1);
 
-	for (int i = 0; i < 100; i++);
+	for (int i = 0; i < 100; i++)
+		;
 
 	for (int i = 0; i < 8; i++) {
 
@@ -145,7 +145,8 @@ static void ADS7843SpiWriteByteSoftware(uint8_t data) {
 		///////////////////////////////////////////////////////////////		Delay(1);
 		ADS7843_CLK_LOW();
 		data <<= 1;
-		for (int i = 0; i < 100; i++);
+		for (int i = 0; i < 100; i++)
+			;
 		///////////////////////////////////////////////////////////////		Delay(1);
 
 	}
@@ -156,10 +157,10 @@ static uint8_t ADS7843SpiReadByteSoftware(void) {
 	uint8_t data = 0;
 
 	for (int i = 0; i < 100; i++)
-				;
+		;
 
 	for (int i = 0; i < 8; i++) {
-	    ADS7843_CLK_HIGH();
+		ADS7843_CLK_HIGH();
 
 		for (int i = 0; i < 100; i++)
 			;
@@ -169,7 +170,7 @@ static uint8_t ADS7843SpiReadByteSoftware(void) {
 		ADS7843_CLK_LOW();
 
 		for (int i = 0; i < 100; i++)
-					;
+			;
 	}
 
 	//ADS7843_MOSI_LOW();
@@ -187,19 +188,21 @@ static void ADS7843PenIRQCallback(uint8_t pin) {
 		if (ADS7843_GET_INT_PIN()) {
 			// Change to falling trigger edge when pen up
 			ADS7843_INT_IRQ_CONFIG_FALLING(true);
-			tTouchData.touch_status |= TOUCH_STATUS_PENUP;
-			tTouchData.touch_status &= ~TOUCH_STATUS_PENDOWN;
+			tTouchData.touchStatus |= TOUCH_STATUS_PENUP;
+			tTouchData.touchStatus &= ~TOUCH_STATUS_PENDOWN;
 		} else {
+
 			// Modify status
-			tTouchData.touch_status |= TOUCH_STATUS_PENDOWN;
-			tTouchData.touch_status &= ~TOUCH_STATUS_PENUP;
+			tTouchData.touchStatus |= TOUCH_STATUS_PENDOWN;
+			tTouchData.touchStatus &= ~TOUCH_STATUS_PENUP;
 			// Read x,y coordinate
 			ADS7843ReadPointXY(&x, &y);
 			mPointCoordinates.x = x;
 			mPointCoordinates.y = y;
-
-			ADS7843_INT_IRQ_CONFIG_RISING(true);
 			mADS7843ScreenTouched = true;
+			ADS7843_INT_IRQ_CONFIG_FALLING(true);
+			//ADS7843_INT_IRQ_CONFIG_RISING(true);
+
 		}
 
 	}
@@ -210,7 +213,6 @@ uint16_t ADS7843PenInq(void) {
 	return (uint16_t) ADS7843_GET_INT_PIN();
 }
 
-#ifdef SPI_SW_ENABLED
 //*****************************************************************************
 //
 //! \brief Read the x, y axis ADC convert value once from ADS7843
@@ -221,104 +223,72 @@ uint16_t ADS7843PenInq(void) {
 //! \return None.
 //
 //*****************************************************************************
-
+#if SPI_SW_ENABLED
 void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 // Chip select
 
-	int counter = 0;
-
-	*x=2047;
-	while (*x==2047){
-		counter++;
-
-		ADS7843_CS_LOW();
-
-		///////////////////////////////////////////////////////////////Delay(1);
-
+	ADS7843_CS_LOW();
 	// Send read x command
-		ADS7843SpiWriteByteSoftware(ADS7843_READ_X); //read x command
-	#ifdef ADS7843_USE_PIN_BUSY
-
-				// wait for conversion complete
-				while(xGPIOSPinRead(ADS7843_PIN_BUSY));
-	#else
+	ADS7843SpiWriteByteSoftware(ADS7843_READ_X);//read x command
+#ifdef ADS7843_USE_PIN_BUSY
+	// wait for conversion complete
+	while(xGPIOSPinRead(ADS7843_PIN_BUSY));
+#else
 
 	// The conversion needs 8us to complete
-		////////////////////////////////////////////////////////////////Delay(1);
-		for (int ii = 0; ii < 0x100; ii++)
-			;
-	#endif
+	for (int ii = 0; ii < 0x100; ii++)
+	;
+#endif
 
 	// Read the high 8bit of the 12bit conversion result
-		*x = (uint16_t) ADS7843SpiReadByteSoftware() & 0xFF;
-		*x <<= 4;
+	*x = (uint16_t) ADS7843SpiReadByteSoftware() & 0xFF;
+	*x <<= 4;
 	// Read the low 4bit of the 12bit conversion result
-		*x |= (uint16_t) ADS7843SpiReadByteSoftware() >> 4;
-		ADS7843_CS_HIGH();
+	*x |= (uint16_t) ADS7843SpiReadByteSoftware() >> 4;
+	ADS7843_CS_HIGH();
 
-		for (int ii = 0; ii < 1000; ii++);
-		if (counter==10) break;
-	}
-
-	counter = 0;
-
+	for (int ii = 0; ii < 1000; ii++);
 
 // Send read y command
+	ADS7843_CS_LOW();
+	//for (int x = 0; x < 0x100; x++);
+	ADS7843SpiWriteByteSoftware(ADS7843_READ_Y);//read y command
+#ifdef ADS7843_USE_PIN_BUSY
 
-	*y=2047;
-	while (*y==2047){
-			counter++;
-			ADS7843_CS_LOW();
-			//for (int x = 0; x < 0x100; x++);
-			ADS7843SpiWriteByteSoftware(ADS7843_READ_Y); //read y command
-		#ifdef ADS7843_USE_PIN_BUSY
+	// wait for conversion complete
+	while(xGPIOSPinRead(ADS7843_PIN_BUSY));
+#else
 
-					// wait for conversion complete
-					while(xGPIOSPinRead(ADS7843_PIN_BUSY));
-		#else
+	// The conversion needs 8us to complete
+	for (int ii = 0; ii < 100; ii++)
+	;
+#endif
 
-		// The conversion needs 8us to complete
-			////////////////////////////////////////////////////////////////Delay(1);
-					for (int ii = 0; ii < 100; ii++)
-				;
-		#endif
+	// Read the high 8bit of the 12bit conversion result
+	*y = (uint16_t) ADS7843SpiReadByteSoftware() & 0xFF;
+	*y <<= 4;
 
-		// Read the high 8bit of the 12bit conversion result
-			*y = (uint16_t) ADS7843SpiReadByteSoftware() & 0xFF;
-			*y <<= 4;
-
-		// Read the low 4bit of the 12bit conversion result
-		*y |= (uint16_t) ADS7843SpiReadByteSoftware() >> 4;
-		ADS7843_CS_HIGH();
-		for (int ii = 0; ii < 1000; ii++);
-		if (counter==10) break;
-	}
-	if (*y!=2047){
-		counter = 0;
-	}
+	// Read the low 4bit of the 12bit conversion result
+	*y |= (uint16_t) ADS7843SpiReadByteSoftware() >> 4;
+	ADS7843_CS_HIGH();
+	for (int ii = 0; ii < 1000; ii++);
 
 }
 #else
 // HW SPI
 void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 // Chip select
+	for (int i = 0; i < 10000; i++)
+		;
+	ADS7843_CS_LOW();
+	for (int i = 0; i < 1000; i++)
+		;
+	*x = ADS7843SpiReadData(ADS7843_READ_X);
+	//ADS7843_CS_HIGH();
+	//ADS7843_CS_LOW();
+	*y = ADS7843SpiReadData(ADS7843_READ_Y);
+	ADS7843_CS_HIGH();
 
-	ADS7843_CS_LOW()
-	;
-	///////////////////////////////////////////////////////////////Delay(1);
-	*x =ADS7843SpiReadData(ADS7843_READ_X);
-	ADS7843_CS_HIGH()
-	;
-	for (int x = 0; x < 10; x++)
-	;
-	ADS7843_CS_LOW()
-	;
-	*y =ADS7843SpiReadData(ADS7843_READ_Y);
-	ADS7843_CS_HIGH()
-	;
-	//char buf[15];
-	//sniprintf(buf, 15, "X:%d , Y:%d\r\n", *x, *y);
-	//USB_DEBUG_PUTS(buf);
 }
 
 #endif
@@ -347,7 +317,6 @@ void ADS7843ReadADXY(uint16_t *x, uint16_t *y) {
 	for (i = 0; i < TOUCH_SMAPLE_LEN; i++) {
 		ADS7843ReadADXYRaw(&usXYArray[0][i], &usXYArray[1][i]);
 	}
-
 // Discard the first and the last one of the data and sort remained data
 	for (i = 1; i < TOUCH_SMAPLE_LEN - 2; i++) {
 		for (j = i + 1; j < TOUCH_SMAPLE_LEN - 1; j++) {
@@ -377,6 +346,78 @@ void ADS7843ReadADXY(uint16_t *x, uint16_t *y) {
 	}
 	*x = usXYArray[0][0] / (TOUCH_SMAPLE_LEN - 4);
 	*y = usXYArray[1][0] / (TOUCH_SMAPLE_LEN - 4);
+
+}
+
+//*****************************************************************************
+//
+//! \brief Read the XY coordinate of touch point.
+//!
+//! \param x To save the x coordinate
+//! \param y To save the y coordinate
+//!
+//! This function is to read current touch point. The x,y coordinates will be
+//! read out from the input parameters. If the screen is not touched, it will
+//! return last value, after the last value is read out, additional read will
+//! return fail information and nothing will be read out.
+//!
+//! \return None.
+//
+//*****************************************************************************
+uint8_t ADS7843ReadPointXY(uint16_t *x, uint16_t *y) {
+	uint16_t usADX;
+	uint16_t usADY;
+	uint32_t temp = 0;
+
+	if (!ADS7843_GET_INT_PIN()) {
+		//  If pen down
+		ADS7843ReadADXY(&usADX, &usADY);
+		*x = usADX;
+		*y = usADY;
+		return 0;
+		//  calculate the difference
+		temp = usADX - tTouchData.thAdLeft;
+
+		//  limit the left edge
+		if (temp > tTouchData.thAdRight)
+			temp = 0;
+
+		//  calculate the x coordinate
+		*x = temp * TOUCH_SCREEN_WIDTH
+				/ (tTouchData.thAdRight - tTouchData.thAdLeft);
+		tTouchData.lastX = tTouchData.curX;
+		tTouchData.curX = *x;
+
+		temp = tTouchData.thAdUp - usADY;
+
+		//  limit the top edge
+		if (temp > tTouchData.thAdUp)
+			temp = 0;
+
+		//  calculate the y coordinate
+		*y = temp * TOUCH_SCREEN_HEIGHT
+				/ (tTouchData.thAdUp - tTouchData.thAdDown);
+		tTouchData.lastY = tTouchData.curY;
+		tTouchData.curY = *y;
+		return 0;
+	} else {
+		//  if pen up
+		if (tTouchData.touchStatus & TOUCH_STATUS_PENUP) {
+			tTouchData.lastX = tTouchData.curX;
+			*x = tTouchData.curX;
+			tTouchData.lastY = tTouchData.curY;
+			*y = tTouchData.curY;
+			tTouchData.touchStatus = 0;
+			return 0;
+		}
+
+		return 1;
+	}
+}
+
+TouchPoint getCoordinates(void) {
+
+	return mPointCoordinates;
 }
 
 uint16_t ADS7843ReadInputChannel(unsigned char ucChannel) {
@@ -477,8 +518,8 @@ uint8_t ADS7843Calibration(void) {
 #ifdef __DEBUG_PRINT__
 				printf("x coordinate calibrate over\n\r");
 #endif
-				tTouchData.th_ad_left = adxmin;
-				tTouchData.th_ad_right = adxmax;
+				tTouchData.thAdLeft = adxmin;
+				tTouchData.thAdRight = adxmax;
 				calibrationFlag |= 1;
 			}
 		}
@@ -493,8 +534,8 @@ uint8_t ADS7843Calibration(void) {
 #ifdef __DEBUG_PRINT__
 				printf("y coordinate calibrate over\n\r");
 #endif
-				tTouchData.th_ad_up = adymax;
-				tTouchData.th_ad_down = adymin;
+				tTouchData.thAdUp = adymax;
+				tTouchData.thAdDown = adymin;
 				calibrationFlag |= 2;
 			}
 		}
@@ -508,73 +549,5 @@ uint8_t ADS7843Calibration(void) {
 		}
 		Delay(1000);
 	}
-}
-
-//*****************************************************************************
-//
-//! \brief Read the XY coordinate of touch point.
-//!
-//! \param x To save the x coordinate
-//! \param y To save the y coordinate
-//!
-//! This function is to read current touch point. The x,y coordinates will be
-//! read out from the input parameters. If the screen is not touched, it will
-//! return last value, after the last value is read out, additional read will
-//! return fail information and nothing will be read out.
-//!
-//! \return None.
-//
-//*****************************************************************************
-uint8_t ADS7843ReadPointXY(uint16_t *x, uint16_t *y) {
-	uint16_t usADX;
-	uint16_t usADY;
-	uint32_t temp = 0;
-
-	if (!ADS7843_GET_INT_PIN()) {
-		//  If pen down
-		ADS7843ReadADXY(&usADX, &usADY);
-
-		//  calculate the difference
-		temp = usADX - tTouchData.th_ad_left;
-
-		//  limit the left edge
-		if (temp > tTouchData.th_ad_right)
-			temp = 0;
-
-		//  calculate the x coordinate
-		*x = temp * TOUCH_SCREEN_WIDTH
-				/ (tTouchData.th_ad_right - tTouchData.th_ad_left);
-		tTouchData.last_x = tTouchData.cur_x;
-		tTouchData.cur_x = *x;
-
-		temp = tTouchData.th_ad_up - usADY;
-
-		//  limit the top edge
-		if (temp > tTouchData.th_ad_up)
-			temp = 0;
-
-		//  calculate the y coordinate
-		*y = temp * TOUCH_SCREEN_HEIGHT
-				/ (tTouchData.th_ad_up - tTouchData.th_ad_down);
-		tTouchData.last_y = tTouchData.cur_y;
-		tTouchData.cur_y = *y;
-		return 0;
-	} else {
-		//  if pen up
-		if (tTouchData.touch_status & TOUCH_STATUS_PENUP) {
-			tTouchData.last_x = tTouchData.cur_x;
-			*x = tTouchData.cur_x;
-			tTouchData.last_y = tTouchData.cur_y;
-			*y = tTouchData.cur_y;
-			tTouchData.touch_status = 0;
-			return 0;
-		}
-		return 1;
-	}
-}
-
-TouchPoint getCoordinates(void) {
-
-	return mPointCoordinates;
 }
 

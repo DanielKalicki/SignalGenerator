@@ -103,22 +103,22 @@ static const uint16_t colors[] = { 0xf800, 0x07e0, 0x001f, 0x0000, 0xffe0, 0xfff
 #define TFT_PIN_D12_INPUT()  GPIO_PinModeSet(TFT_PORT_D12,TFT_PIN_D12, gpioModeInput, 0)
 
 #define TFT_PORT_D11 gpioPortD
-#define TFT_PIN_D11 3
+#define TFT_PIN_D11 14//3
 #define TFT_PIN_D11_OUTPUT() GPIO_PinModeSet(TFT_PORT_D11,TFT_PIN_D11, gpioModePushPull, 1)
 #define TFT_PIN_D11_INPUT()  GPIO_PinModeSet(TFT_PORT_D11,TFT_PIN_D11, gpioModeInput, 0)
 
 #define TFT_PORT_D10 gpioPortD
-#define TFT_PIN_D10 2
+#define TFT_PIN_D10 13//2
 #define TFT_PIN_D10_OUTPUT() GPIO_PinModeSet(TFT_PORT_D10,TFT_PIN_D10, gpioModePushPull, 1)
 #define TFT_PIN_D10_INPUT()  GPIO_PinModeSet(TFT_PORT_D10,TFT_PIN_D10, gpioModeInput, 0)
 
 #define TFT_PORT_D9 gpioPortD
-#define TFT_PIN_D9  1
+#define TFT_PIN_D9  8//1
 #define TFT_PIN_D9_OUTPUT() GPIO_PinModeSet(TFT_PORT_D9,TFT_PIN_D9, gpioModePushPull, 1)
 #define TFT_PIN_D9_INPUT()  GPIO_PinModeSet(TFT_PORT_D9,TFT_PIN_D9, gpioModeInput, 0)
 
 #define TFT_PORT_D8 gpioPortD
-#define TFT_PIN_D8  0  // spi here!!!!!!!!!!!!!!!
+#define TFT_PIN_D8  15//0  // spi here!!!!!!!!!!!!!!!
 #define TFT_PIN_D8_OUTPUT() GPIO_PinModeSet(TFT_PORT_D8,TFT_PIN_D8, gpioModePushPull, 1)
 #define TFT_PIN_D8_INPUT()  GPIO_PinModeSet(TFT_PORT_D8,TFT_PIN_D8, gpioModeInput, 0)
 
@@ -134,23 +134,23 @@ static const uint16_t colors[] = { 0xf800, 0x07e0, 0x001f, 0x0000, 0xffe0, 0xfff
 #define TFT_PIN_D6_OUTPUT() GPIO_PinModeSet(TFT_PORT_D6,TFT_PIN_D6, gpioModePushPull, 1)
 #define TFT_PIN_D6_INPUT()  GPIO_PinModeSet(TFT_PORT_D6,TFT_PIN_D6, gpioModeInput, 0)
 
-#define TFT_PORT_D5 gpioPortC
-#define TFT_PIN_D5 5
+#define TFT_PORT_D5 gpioPortE
+#define TFT_PIN_D5 3
 #define TFT_PIN_D5_OUTPUT() GPIO_PinModeSet(TFT_PORT_D5,TFT_PIN_D5, gpioModePushPull, 1)
 #define TFT_PIN_D5_INPUT()  GPIO_PinModeSet(TFT_PORT_D5,TFT_PIN_D5, gpioModeInput, 0)
 
-#define TFT_PORT_D4 gpioPortC
-#define TFT_PIN_D4 4
+#define TFT_PORT_D4 gpioPortE
+#define TFT_PIN_D4 2
 #define TFT_PIN_D4_OUTPUT() GPIO_PinModeSet(TFT_PORT_D4,TFT_PIN_D4, gpioModePushPull, 1)
 #define TFT_PIN_D4_INPUT()  GPIO_PinModeSet(TFT_PORT_D4,TFT_PIN_D4, gpioModeInput, 0)
 
-#define TFT_PORT_D3 gpioPortC
-#define TFT_PIN_D3 3
+#define TFT_PORT_D3 gpioPortE
+#define TFT_PIN_D3 1
 #define TFT_PIN_D3_OUTPUT() GPIO_PinModeSet(TFT_PORT_D3,TFT_PIN_D3, gpioModePushPull, 1)
 #define TFT_PIN_D3_INPUT()  GPIO_PinModeSet(TFT_PORT_D3,TFT_PIN_D3, gpioModeInput, 0)
 
-#define TFT_PORT_D2 gpioPortC
-#define TFT_PIN_D2 2
+#define TFT_PORT_D2 gpioPortE  //was gpioPortC 2 and so on
+#define TFT_PIN_D2 0
 #define TFT_PIN_D2_OUTPUT() GPIO_PinModeSet(TFT_PORT_D2,TFT_PIN_D2, gpioModePushPull, 1)
 #define TFT_PIN_D2_INPUT()  GPIO_PinModeSet(TFT_PORT_D2,TFT_PIN_D2, gpioModeInput, 0)
 
