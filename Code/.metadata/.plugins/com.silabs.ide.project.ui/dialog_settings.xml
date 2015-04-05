@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="com.silabs.ide.project.core.cdtMbsProjectType">
+		<item value="LINK_LIBRARIES" key="settingImportModeOption"/>
+		<item value="com.silabs.ide.project.ui.emptyProjectWizard" key="projectTypeId"/>
+	</section>
+</section>

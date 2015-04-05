@@ -1,0 +1,4 @@
+//org.eclipse.ui.commands/state/com.silabs.ide.debug.ui.command.reset/org.eclipse.ui.commands.radioState=default
+//org.eclipse.ui.commands/state/org.eclipse.cdt.debug.edc.ui.snapshotCreation/org.eclipse.ui.commands.radioState=manual
+UIActivities.org.eclipse.debug.ui.contextualMenuProfile=true
+eclipse.preferences.version=1
