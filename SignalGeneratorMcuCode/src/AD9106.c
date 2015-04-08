@@ -9,7 +9,7 @@
 #include "em_cmu.h"
 #include "utils.h"
 //privates
-#define SPI_SW_ENABLED 0
+#define SPI_SW_ENABLED 1
 static const USART_InitSync_TypeDef initSpi = { usartEnable, /* Enable RX/TX when init completed. */
 1000000, /* Use 1MHz reference clock */
 1000, /* 1 Mbits/s. */
@@ -64,13 +64,11 @@ static SpiHandleTypeDef spiHandle;
 //! \return None.
 //
 //*****************************************************************************
-void ADS9106Init(void) {
+void AD9106Init(void) {
 
 #if SPI_SW_ENABLED
 
-	spiInitSoftware(ADS7843_PORT_MOSI, ADS7843_PIN_MOSI, ADS7843_PORT_MISO,
-			ADS7843_PIN_MISO, ADS7843_PORT_CLK, ADS7843_PIN_CLK,
-			ADS7843_PORT_CS, ADS7843_PIN_CS);
+	spiInitSoftware();
 
 #else
 	spiHandle.spiInstance = USART_USED;
@@ -290,12 +288,15 @@ bool readReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t *data) {
 	return true;
 }
 
-void AD9106_test(void) {
+void AD9106Test(void) {
 	static uint16_t counter = 0;
 	counter += 1000;
 	if (counter >= 30000)
 		counter = 0;
 	uint16_t i = 0;
+	i = spiReadWordSoftware((uint16_t) PATTERN_DLY);
+		SegmentLCD_Number(i);
+		Delay(5000);
 	spiWriteWordSoftware((uint16_t) PAT_TYPE, 0);
 	Delay(1);
 
@@ -327,7 +328,7 @@ void AD9106_test(void) {
 	Delay(500);
 	i = spiReadWordSoftware((uint16_t) CFG_ERROR);
 	i = spiReadWordSoftware((uint16_t) PAT_STATUS);
-	//SegmentLCD_Number(i);
-
+	SegmentLCD_Number(i);
+	Delay(2000);
 }
 

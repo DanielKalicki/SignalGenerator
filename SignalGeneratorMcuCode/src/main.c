@@ -30,8 +30,8 @@
 #include "../drivers/sleep.h"
 #include "../drivers/usb/cdc.h"
 
-#define AD9106_DEMO_ENABLED 0
-#define LCD_DEMO_ENABLED 1
+#define AD9106_DEMO_ENABLED 1
+#define LCD_DEMO_ENABLED 0
 #define USB_DEMO_ENABLED 0
 #define FREE_RTOS_DEMO_ENABLED 0
 #define MAIN_APP 0
@@ -76,36 +76,29 @@ volatile bool mADS7843ScreenTouched = false;
 int main(void) {
 
 #if AD9106_DEMO_ENABLED
+
+//----------------------- AD9106  working tests -----------------------
 	CHIP_Init();
 	CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
 	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO); //32MHZ
-	BSP_TraceProfilerSetup();
-	if (SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000))
-		while (1)
-			;
+	//BSP_TraceProfilerSetup();
 	CMU_ClockEnable(cmuClock_HFPER, true);
-//----------------------- AD9106  working tests -----------------------
 	BSP_LedsInit();
 	BSP_LedSet(0);
+	BSP_LedSet(1);
+	utilsInit();
 	SegmentLCD_Init(false);
 	SegmentLCD_AllOff();
 	SegmentLCD_Number(100);
-	//    SegmentLCD_Write(string);
-	//spiInit();
-	//TESTS !!!!!! software SPIS
-	CMU_ClockEnable(cmuClock_GPIO, true);
-	CMU_ClockEnable(cmuClock_HFPER, true);
-	GPIO_PinModeSet(SPI_PORT_MOSI, SPI_PIN_MOSI, gpioModePushPull, 1);
-	GPIO_PinModeSet(SPI_PORT_MISO, SPI_PIN_MISO, gpioModeInput, 0);
-	GPIO_PinModeSet(SPI_PORT_CLK, SPI_PIN_CLK, gpioModePushPull, 1);
-	// Keep CS high to not activate slave
-	GPIO_PinModeSet(SPI_PORT_CS, SPI_PIN_CS, gpioModePushPull, 1);
+	//SPFD5408Init();
+	//ADS7843Init();
+	AD9106Init();
 	uint16_t i = 0;
 	uint16_t counter = 0;
 	while (1) {
 		BSP_LedToggle(0);
 		BSP_LedToggle(1);
-		AD9106_test();
+		AD9106Test();
 	}
 #elif LCD_DEMO_ENABLED
 	CHIP_Init();

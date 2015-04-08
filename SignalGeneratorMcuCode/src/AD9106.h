@@ -49,7 +49,7 @@
 #define AD9106_MOSI_OUTPUT() 	GPIO_PinModeSet(AD9106_PORT_MOSI,AD9106_PIN_MOSI,gpioModePushPull, 1)
 #define AD9106_MOSI_HIGH()   	GPIO_PinOutSet(AD9106_PORT_MOSI, AD9106_PIN_MOSI )
 #define AD9106_MOSI_LOW()    	GPIO_PinOutClear(AD9106_PORT_MOSI , AD9106_PIN_MOSI )
-#define AD9106_MOSI_DISABLED()    GPIO_PinModeSet(AD9106_PORT_MOSI, AD9106_PIN_MOSI, gpioModeDisabled, 0)
+#define AD9106_MOSI_DISABLED()  GPIO_PinModeSet(AD9106_PORT_MOSI, AD9106_PIN_MOSI, gpioModeDisabled, 0)
 
 //------------------MIS0---------------------
 #define AD9106_PIN_MISO        	3
@@ -427,5 +427,6 @@ bool setConfig(void);
 bool writeReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t data);
 
 bool readReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t *data);
-void AD9106_test(void);
+void AD9106Test(void);
+void AD9106Init(void);
 #endif /* AD9106_H_ */
