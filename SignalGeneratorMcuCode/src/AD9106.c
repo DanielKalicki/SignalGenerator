@@ -10,6 +10,7 @@
 #include "utils.h"
 //privates
 #define SPI_SW_ENABLED 1
+
 static const USART_InitSync_TypeDef initSpi = { usartEnable, /* Enable RX/TX when init completed. */
 1000000, /* Use 1MHz reference clock */
 1000, /* 1 Mbits/s. */
@@ -21,7 +22,7 @@ usartClockMode0, false, usartPrsRxCh0, false };
 static StatusTypeDef spiPeripheralsConfig(void) {
 
 	CMU_ClockEnable(cmuClock_HFPER, true);
-	// Enable clock for USART1
+	// Enable clock for USART2
 	CMU_ClockEnable(USART_CLK, true);
 	CMU_ClockEnable(cmuClock_GPIO, true);
 
@@ -74,8 +75,11 @@ void AD9106Init(void) {
 	spiHandle.spiInstance = USART_USED;
 	spiHandle.init = &initSpi;
 	spiHandle.spiModeHwSw = false;
+	//spiHandle.spiSwTransfer=(struct _SpiHandleTypeDef* hspi);
 	spiHandle.spiGpioClockInit = spiPeripheralsConfig;
-	spiInit(&spiHandle);
+	if (spiInit(&spiHandle) != STATUS_OK)
+		while (1)
+			;
 #endif
 }
 
@@ -86,8 +90,7 @@ void spiDisable(void) {
 	USART_Reset(USART_USED );
 	USART_USED ->ROUTE = _USART_ROUTE_RESETVALUE;
 
-	/* Disable SPI pins */
-	AD9106_MOSI_DISABLED();
+	/* Disable SPI pins */AD9106_MOSI_DISABLED();
 	AD9106_MISO_DISABLED();
 	AD9106_CLK_DISABLED();
 	AD9106_CS_DISABLED();
@@ -99,80 +102,38 @@ void spiDisable(void) {
 
 /* @brief  Perform SPI Transfer*/
 
+static uint16_t ADS7843SpiReadReg(AD9106RegAddress regAddress) {
 
-static uint16_t ADS7843SpiReadReg(uint16_t reg) {
-
-	uint8_t txBuf[2] = { (reg>>8)|0x8000, reg };
+	uint8_t txBuf[4] = { regAddress, ((regAddress >> 8) & 0xFF) | 0x80 };
 	uint8_t rxBuf[4] = { 0 };
-
+	AD9106_CS_LOW();
 	if (spiTransmitReceive(&spiHandle, txBuf, rxBuf, 2, 0) == STATUS_OK) {
 
-		uint16_t retVal = ((rxBuf[2] << 8) | (rxBuf[3])) & 0xFFFF;
+		uint16_t retVal = ((rxBuf[3] << 8) | (rxBuf[2])) & 0xFFFF;
+		AD91063_CS_HIGH();
 		return retVal;
-	} else
+	} else {
+		AD91063_CS_HIGH();
 		return 0xffff;
+	}
 }
 
+static bool ADS7843SpiWriteReg(AD9106RegAddress regAddress,
+		uint16_t dataBitMask, uint16_t data) {
 
-
-
-
-uint16_t spiTransfer(uint8_t spiaddr, uint8_t spidata) {
-	uint16_t readData;
-
-	/* Write SPI address */
-	USART_Tx(USART_USED, spiaddr);
-
-	/* Wait for transmission to finish */
-	while (!(USART_USED ->STATUS & USART_STATUS_TXC))
-		;
-
-	/* Just ignore data read back */
-	readData = USART_Rx(USART_USED );
-	readData <<= 8;
-
-	/* Write SPI data */
-	USART_Tx(USART_USED, spidata);
-
-	/* Wait for transmission to finished */
-	while (!(USART_USED ->STATUS & USART_STATUS_TXC))
-		;
-
-	readData |= USART_Rx(USART_USED );
-
-	return (readData);
-}
-
-///
-
-void spiSendByte(uint8_t spidata) {
-	USART_Tx(USART_USED, spidata);
-	while (!(USART_USED ->STATUS & USART_STATUS_TXC))
-		;
-	USART_Rx(USART_USED );
-}
-
-//
-uint8_t spiGetByte(uint8_t addr) {
-	USART_Tx(USART_USED, addr);
-	while (!(USART_USED ->STATUS & USART_STATUS_TXC))
-		;
-	return (USART_Rx(USART_USED ));
-}
-
-uint16_t spiReadWord(uint16_t addr) {
-	uint16_t data = 0;
-
+	uint8_t txBuf[4] = { regAddress, ((regAddress >> 8) & 0xFF) & (~0x80), data,
+			data >> 8 };
+	uint8_t rxBuf[4] = { 0 };
 	AD9106_CS_LOW();
+	if (spiTransmitReceive(&spiHandle, txBuf, rxBuf, 2, 0) == STATUS_OK) {
 
-	USART_TxDouble(USART_USED, addr | 0x8000);
-	while (!(USART_USED ->STATUS & USART_STATUS_TXC))
-		;
-
-	data = USART_RxDouble(USART_USED );
-	AD91063_CS_HIGH();
-	return data;
-
+		uint16_t retVal = ((rxBuf[3] << 8) | (rxBuf[2])) & 0xFFFF;
+		AD91063_CS_HIGH();
+		return true;
+	} else {
+		AD91063_CS_HIGH();
+		return false;
+	}
 }
 
 //software SPI
@@ -197,9 +158,9 @@ uint16_t spiWriteWordSoftware(uint16_t addr, uint16_t data) {
 	for (int i = 0; i < 16; i++) {
 
 		if (addr & 0x8000)
-		AD9106_MOSI_HIGH();
+			AD9106_MOSI_HIGH();
 		else
-		AD9106_MOSI_LOW();
+			AD9106_MOSI_LOW();
 		AD9106_CLK_LOW();
 		Delay(1);
 		AD9106_CLK_HIGH();
@@ -211,9 +172,9 @@ uint16_t spiWriteWordSoftware(uint16_t addr, uint16_t data) {
 	for (int i = 0; i < 16; i++) {
 
 		if (data & (1 << (15 - i)))
-		AD9106_MOSI_HIGH();
+			AD9106_MOSI_HIGH();
 		else
-		AD9106_MOSI_LOW();
+			AD9106_MOSI_LOW();
 		AD9106_CLK_LOW();
 		Delay(1);
 		AD9106_CLK_HIGH();
@@ -237,9 +198,9 @@ uint16_t spiReadWordSoftware(uint16_t addr) {
 	for (int i = 0; i < 16; i++) {
 
 		if (addr & 0x8000)
-		AD9106_MOSI_HIGH();
+			AD9106_MOSI_HIGH();
 		else
-		AD9106_MOSI_LOW();
+			AD9106_MOSI_LOW();
 		AD9106_CLK_LOW();
 		Delay(1);
 		AD9106_CLK_HIGH();
@@ -252,7 +213,7 @@ uint16_t spiReadWordSoftware(uint16_t addr) {
 		AD9106_CLK_LOW();
 		Delay(1);
 		AD9106_CLK_HIGH();
-		data |= ((AD9106_IN_GET_PIN()) << (15 - i));
+		data |= ((AD9106_MISO_GET_PIN()) << (15 - i));
 
 		Delay(1);
 
@@ -260,11 +221,6 @@ uint16_t spiReadWordSoftware(uint16_t addr) {
 	AD91063_CS_HIGH();
 	return data;
 
-}
-
-bool setConfig(void) {
-
-	return true;
 }
 
 bool writeReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t data) {
@@ -294,41 +250,57 @@ void AD9106Test(void) {
 	if (counter >= 30000)
 		counter = 0;
 	uint16_t i = 0;
-	i = spiReadWordSoftware((uint16_t) PATTERN_DLY);
-		SegmentLCD_Number(i);
-		Delay(5000);
-	spiWriteWordSoftware((uint16_t) PAT_TYPE, 0);
+#if !SPI_SW_ENABLED
+	i = ADS7843SpiReadReg(PATTERN_DLY);
+	SegmentLCD_Number(i);
+	Delay(3000);
+
+	i = ADS7843SpiReadReg(DAC1RSET);
+	SegmentLCD_Number(i);
+	Delay(3000);
+	//spiWriteWordSoftware((uint16_t) PAT_TYPE, 0);
 	Delay(1);
+	ADS7843SpiWriteReg(PATTERN_DLY, 0, counter / 1000);
+
+#else SPI_SW_ENABLED
+    i = spiReadWordSoftware((uint16_t) PATTERN_DLY);
+	SegmentLCD_Number(i);
+	Delay(3000);
+	 i = spiReadWordSoftware(DAC1RSET);
+	SegmentLCD_Number(i);
+	Delay(3000);
+
 
 	//spiWriteWordSoftware((uint16_t)WAV4_3CONFIG,0x2121);Delay(1);//noise output test
 	spiWriteWordSoftware((uint16_t) WAV4_3CONFIG, 0x1111);
-	Delay(1); //sawtooth test
+	 Delay(1); //sawtooth test
 
-	spiWriteWordSoftware((uint16_t) DAC4_CST, 0xA200);
-	Delay(1);
-	spiWriteWordSoftware((uint16_t) DAC4_DGAIN, 0xA000);
-	Delay(1);
-	spiWriteWordSoftware((uint16_t) DAC4RSET, 0x8002);
-	Delay(1);
-	spiWriteWordSoftware((uint16_t) DACxRANGE, 0x00A0);
-	Delay(1);
-	spiWriteWordSoftware((uint16_t) PAT_TIMEBASE, 0x0000);
-	Delay(1);
-	spiWriteWordSoftware((uint16_t) PAT_PERIOD, 0x0100);
-	Delay(1);
-	spiWriteWordSoftware((uint16_t) PAT_STATUS, 0x0001);
-	Delay(1);
-	spiWriteWordSoftware((uint16_t) RAMUPDATE, 0x0001);
-	Delay(1);
+	 spiWriteWordSoftware((uint16_t) DAC4_CST, 0xA200);
+	 Delay(1);
+	 spiWriteWordSoftware((uint16_t) DAC4_DGAIN, 0xA000);
+	 Delay(1);
+	 spiWriteWordSoftware((uint16_t) DAC4RSET, 0x8002);
+	 Delay(1);
+	 spiWriteWordSoftware((uint16_t) DACxRANGE, 0x00A0);
+	 Delay(1);
+	 spiWriteWordSoftware((uint16_t) PAT_TIMEBASE, 0x0000);
+	 Delay(1);
+	 spiWriteWordSoftware((uint16_t) PAT_PERIOD, 0x0100);
+	 Delay(1);
+	 spiWriteWordSoftware((uint16_t) PAT_STATUS, 0x0001);
+	 Delay(1);
+	 spiWriteWordSoftware((uint16_t) RAMUPDATE, 0x0001);
+	 Delay(1);
 
-	//sawtooth configuration
-	spiWriteWordSoftware((uint16_t) SAW4_3CONFIG, 0x0808);
-	Delay(1);
+	 //sawtooth configuration
+	 spiWriteWordSoftware((uint16_t) SAW4_3CONFIG, 0x0808);
+	 Delay(1);
 
-	Delay(500);
-	i = spiReadWordSoftware((uint16_t) CFG_ERROR);
-	i = spiReadWordSoftware((uint16_t) PAT_STATUS);
-	SegmentLCD_Number(i);
+	 Delay(500);
+	 i = spiReadWordSoftware((uint16_t) CFG_ERROR);
+	 i = spiReadWordSoftware((uint16_t) PAT_STATUS);
+	 SegmentLCD_Number(i);
 	Delay(2000);
+#endif
 }
 

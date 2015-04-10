@@ -57,7 +57,7 @@
 #define AD9106_MISO_INPUT() 	GPIO_PinModeSet(AD9106_PORT_MISO, AD9106_PIN_MISO, gpioModeInput, 0)
 #define AD9106_MISO_HIGH()   	GPIO_PinOutSet(AD9106_PORT_MISO , AD9106_PIN_MISO )
 #define AD9106_MISO_LOW()    	GPIO_PinOutClear(AD9106_PORT_MISO , AD9106_PIN_MISO )
-#define AD9106_IN_GET_PIN()     GPIO_PinInGet(AD9106_PORT_MISO, AD9106_PIN_MISO)
+#define AD9106_MISO_GET_PIN()     GPIO_PinInGet(AD9106_PORT_MISO, AD9106_PIN_MISO)
 #define AD9106_MISO_DISABLED()  GPIO_PinModeSet(AD9106_PORT_MISO, AD9106_PIN_MISO, gpioModeDisabled, 0)
 /*********************************Hardware dependent part - END*****************************************/
 

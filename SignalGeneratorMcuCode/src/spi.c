@@ -100,24 +100,20 @@ StatusTypeDef spiTransmitReceive(SpiHandleTypeDef *hSpi, uint8_t *pTxData,
 			hSpi->spiState = SPI_STATE_BUSY_TX_RX;
 			if (hSpi->init->databits == usartDatabits16) {
 				/* Check that transmit buffer is empty */
-				while (!(hSpi->spiInstance->STATUS & USART_STATUS_TXBL))
+				/*while (!(hSpi->spiInstance->STATUS & USART_STATUS_TXBL))
 					;
 				hSpi->spiInstance->TXDOUBLE = *((uint16_t*) hSpi->pTxBuffPtr);
 				hSpi->pTxBuffPtr += 2;
 				hSpi->txXferCount--;
 				if (hSpi->txXferCount == 0) {
-					while (!(hSpi->spiInstance->STATUS & USART_STATUS_TXC))
-						//-------
-						;
-					/*while (!(hSpi->spiInstance->STATUS & USART_STATUS_RXFULL))
-						;*/
+					while (!(hSpi->spiInstance->STATUS & USART_STATUS_TXC));
 					*((uint16_t*) hSpi->pRxBuffPtr) =
 							hSpi->spiInstance->RXDOUBLE;
 					hSpi->pRxBuffPtr += 2;
 					hSpi->rxXferCount--;
 
 				} else {
-
+*/
 					while (hSpi->txXferCount > 0) {
 						while (!(hSpi->spiInstance->STATUS & USART_STATUS_TXBL))
 							;
@@ -137,7 +133,7 @@ StatusTypeDef spiTransmitReceive(SpiHandleTypeDef *hSpi, uint8_t *pTxData,
 						hSpi->rxXferCount--;
 					}
 
-				}
+				//}
 
 			} else if (hSpi->init->databits == usartDatabits8) {
 				while (!(hSpi->spiInstance->STATUS & USART_STATUS_TXBL))
