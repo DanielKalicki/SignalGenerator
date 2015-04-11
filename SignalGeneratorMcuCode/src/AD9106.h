@@ -413,7 +413,7 @@ typedef enum {
  * @returns  ShiftValue
  */
 
-inline uint8_t getShiftValue(uint8_t dataBitMask) {
+inline uint8_t getShiftValue(uint16_t dataBitMask) {
 	uint8_t shiftVal = 0;
 	while (!(dataBitMask & 1)) {
 		dataBitMask >>= 1;
@@ -422,11 +422,7 @@ inline uint8_t getShiftValue(uint8_t dataBitMask) {
 	return shiftVal;
 }
 
-bool setConfig(void);
 
-bool writeReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t data);
-
-bool readReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t *data);
 void AD9106Test(void);
 void AD9106Init(void);
 #endif /* AD9106_H_ */

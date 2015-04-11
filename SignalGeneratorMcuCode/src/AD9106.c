@@ -9,7 +9,7 @@
 #include "em_cmu.h"
 #include "utils.h"
 //privates
-#define SPI_SW_ENABLED 1
+#define SPI_SW_ENABLED 0
 
 static const USART_InitSync_TypeDef initSpi = { usartEnable, /* Enable RX/TX when init completed. */
 1000000, /* Use 1MHz reference clock */
@@ -101,15 +101,18 @@ void spiDisable(void) {
 }
 
 /* @brief  Perform SPI Transfer*/
-
-static uint16_t ADS7843SpiReadReg(AD9106RegAddress regAddress) {
-
+static uint16_t ADS7843SpiReadReg(AD9106RegAddress regAddress,
+		uint16_t dataBitMask) {
 	uint8_t txBuf[4] = { regAddress, ((regAddress >> 8) & 0xFF) | 0x80 };
 	uint8_t rxBuf[4] = { 0 };
 	AD9106_CS_LOW();
 	if (spiTransmitReceive(&spiHandle, txBuf, rxBuf, 2, 0) == STATUS_OK) {
 
 		uint16_t retVal = ((rxBuf[3] << 8) | (rxBuf[2])) & 0xFFFF;
+		if (dataBitMask != 0) {
+			retVal &= dataBitMask;
+			retVal >>= getShiftValue(dataBitMask);
+		}
 		AD91063_CS_HIGH();
 		return retVal;
 	} else {
@@ -121,13 +124,20 @@ static uint16_t ADS7843SpiReadReg(AD9106RegAddress regAddress) {
 static bool ADS7843SpiWriteReg(AD9106RegAddress regAddress,
 		uint16_t dataBitMask, uint16_t data) {
 
+	if (dataBitMask != 0) {
+
+		uint16_t tempVal = ADS7843SpiReadReg(regAddress, 0);
+		tempVal &= ~(dataBitMask);
+		tempVal |= data << getShiftValue(dataBitMask);
+		data = tempVal;
+
+	}
 	uint8_t txBuf[4] = { regAddress, ((regAddress >> 8) & 0xFF) & (~0x80), data,
 			data >> 8 };
 	uint8_t rxBuf[4] = { 0 };
 	AD9106_CS_LOW();
-	if (spiTransmitReceive(&spiHandle, txBuf, rxBuf, 2, 0) == STATUS_OK) {
 
-		uint16_t retVal = ((rxBuf[3] << 8) | (rxBuf[2])) & 0xFFFF;
+	if (spiTransmitReceive(&spiHandle, txBuf, rxBuf, 2, 0) == STATUS_OK) {
 		AD91063_CS_HIGH();
 		return true;
 	} else {
@@ -135,6 +145,11 @@ static bool ADS7843SpiWriteReg(AD9106RegAddress regAddress,
 		return false;
 	}
 }
+
+
+
+
+
 
 //software SPI
 
@@ -223,7 +238,7 @@ uint16_t spiReadWordSoftware(uint16_t addr) {
 
 }
 
-bool writeReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t data) {
+static bool writeReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t data) {
 
 	uint16_t tempVal;
 	//if(!read(regAddress,&tempVal,1)) return false;   TODO , wrappers for SPI hardware implementation
@@ -234,16 +249,6 @@ bool writeReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t data) {
 
 }
 
-bool readReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t *data) {
-
-	uint16_t tempVal;
-	// if(!read(regAddress,&tempVal,1)) return false;
-	tempVal &= dataBitMask;
-	tempVal >>= getShiftValue(dataBitMask);
-	*data = tempVal;
-	return true;
-}
-
 void AD9106Test(void) {
 	static uint16_t counter = 0;
 	counter += 1000;
@@ -251,55 +256,66 @@ void AD9106Test(void) {
 		counter = 0;
 	uint16_t i = 0;
 #if !SPI_SW_ENABLED
-	i = ADS7843SpiReadReg(PATTERN_DLY);
+	/*i = ADS7843SpiReadReg(PATTERN_DLY, 0);
 	SegmentLCD_Number(i);
-	Delay(3000);
+	Delay(2000);
 
-	i = ADS7843SpiReadReg(DAC1RSET);
+	i = ADS7843SpiReadReg(DAC4_3PATx, 0);
 	SegmentLCD_Number(i);
-	Delay(3000);
-	//spiWriteWordSoftware((uint16_t) PAT_TYPE, 0);
-	Delay(1);
+	Delay(2000);
+	//Delay(1);
 	ADS7843SpiWriteReg(PATTERN_DLY, 0, counter / 1000);
+	*/
+	Delay(2000);
+	//Clock
+	//ADS7843SpiWriteReg(CLOCKCONFIG, 0, 0);
+	i = ADS7843SpiReadReg(CLOCKCONFIG, 0);
+		SegmentLCD_Number(i);
+	ADS7843SpiWriteReg(CLOCKCONFIG, DAC1_INV_CLK, 1);
 
+	/*Delay(2000);
+	//Clock
+	i = ADS7843SpiReadReg(POWERCONFIG, 0);
+		SegmentLCD_Number(i);
+	ADS7843SpiWriteReg(POWERCONFIG, DAC1_SLEEP, 1);
+	*/
 #else SPI_SW_ENABLED
-    i = spiReadWordSoftware((uint16_t) PATTERN_DLY);
+	i = spiReadWordSoftware((uint16_t) PATTERN_DLY);
 	SegmentLCD_Number(i);
 	Delay(3000);
-	 i = spiReadWordSoftware(DAC1RSET);
+	i = spiReadWordSoftware(DAC1RSET);
 	SegmentLCD_Number(i);
 	Delay(3000);
-
 
 	//spiWriteWordSoftware((uint16_t)WAV4_3CONFIG,0x2121);Delay(1);//noise output test
 	spiWriteWordSoftware((uint16_t) WAV4_3CONFIG, 0x1111);
-	 Delay(1); //sawtooth test
+	Delay(1);//sawtooth test
 
-	 spiWriteWordSoftware((uint16_t) DAC4_CST, 0xA200);
-	 Delay(1);
-	 spiWriteWordSoftware((uint16_t) DAC4_DGAIN, 0xA000);
-	 Delay(1);
-	 spiWriteWordSoftware((uint16_t) DAC4RSET, 0x8002);
-	 Delay(1);
-	 spiWriteWordSoftware((uint16_t) DACxRANGE, 0x00A0);
-	 Delay(1);
-	 spiWriteWordSoftware((uint16_t) PAT_TIMEBASE, 0x0000);
-	 Delay(1);
-	 spiWriteWordSoftware((uint16_t) PAT_PERIOD, 0x0100);
-	 Delay(1);
-	 spiWriteWordSoftware((uint16_t) PAT_STATUS, 0x0001);
-	 Delay(1);
-	 spiWriteWordSoftware((uint16_t) RAMUPDATE, 0x0001);
-	 Delay(1);
+	spiWriteWordSoftware((uint16_t) DAC4_CST, 0xA200);
+	Delay(1);
+	spiWriteWordSoftware((uint16_t) DAC4_DGAIN, 0xA000);
+	Delay(1);
+	spiWriteWordSoftware((uint16_t) DAC4RSET, 0x8002);
+	Delay(1);
+	spiWriteWordSoftware((uint16_t) DACxRANGE, 0x00A0);
+	Delay(1);
+	spiWriteWordSoftware((uint16_t) PAT_TIMEBASE, 0x0000);
+	Delay(1);
+	spiWriteWordSoftware((uint16_t) PAT_PERIOD, 0x0100);
+	Delay(1);
+	spiWriteWordSoftware((uint16_t) PAT_STATUS, 0x0001);
+	Delay(1);
+	spiWriteWordSoftware((uint16_t) RAMUPDATE, 0x0001);
+	Delay(1);
 
-	 //sawtooth configuration
-	 spiWriteWordSoftware((uint16_t) SAW4_3CONFIG, 0x0808);
-	 Delay(1);
+	//sawtooth configuration
+	spiWriteWordSoftware((uint16_t) SAW4_3CONFIG, 0x0808);
+	Delay(1);
 
-	 Delay(500);
-	 i = spiReadWordSoftware((uint16_t) CFG_ERROR);
-	 i = spiReadWordSoftware((uint16_t) PAT_STATUS);
-	 SegmentLCD_Number(i);
+	Delay(500);
+	i = spiReadWordSoftware((uint16_t) CFG_ERROR);
+	i = spiReadWordSoftware((uint16_t) PAT_STATUS);
+	SegmentLCD_Number(i);
 	Delay(2000);
 #endif
 }
