@@ -1,4 +1,4 @@
-16:13:38 **** Incremental Build of configuration GNU ARM v4.7.3 - Debug for project FrontPanel ****
+22:41:48 **** Build of configuration GNU ARM v4.7.3 - Debug for project FrontPanel ****
 make -j4 all 
 Building file: ../src/main.c
 Invoking: GNU ARM C Compiler
@@ -19,8 +19,8 @@ arm-none-eabi-objcopy -O binary "FrontPanel.axf" "FrontPanel.bin"
 Running size tool
 arm-none-eabi-size "FrontPanel.axf"
    text	   data	    bss	    dec	    hex	filename
-   6712	    120	    120	   6952	   1b28	FrontPanel.axf
+   1908	    108	    100	   2116	    844	FrontPanel.axf
  
 
-16:13:59 Build Finished (took 21s.491ms)
+22:43:08 Build Finished (took 1m:20s.678ms)
 

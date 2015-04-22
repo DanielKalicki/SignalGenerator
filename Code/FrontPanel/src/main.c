@@ -190,7 +190,7 @@ void delayF() {
 }
 
 void test(){
-	printButtons();
+	//printButtons();
 
 	static uint8_t counter=0;
 	counter++;
@@ -204,9 +204,9 @@ void test(){
 	}
 	updateLeds();
 
-	for (int i=0;i<10;i++){
+	/*for (int i=0;i<10;i++){
 		delayF();
-	}
+	}*/
 }
 
 //------MAIN------
@@ -215,12 +215,13 @@ int main(void) {
   CHIP_Init();
   initOscillators();
   initShiftRegisters();
-  initUART();
 
-  uart_sendText("Front pannel startup...");
-  uart_sendText("done\n");
+  //initUART();
+
+  //uart_sendText("Front pannel startup...");
+  //uart_sendText("done\n");
 
   while (1) {
-	  test();
+	  updateLeds();
   }
 }
