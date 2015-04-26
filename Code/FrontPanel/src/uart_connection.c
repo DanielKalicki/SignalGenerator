@@ -2,9 +2,13 @@
 #include "em_device.h"
 #include "em_chip.h"
 #include "em_cmu.h"
+#include "em_gpio.h"
 
 void initUART(void){
 	CMU_ClockEnable(cmuClock_USART1, true);   // enable USART1 peripheral clock
+
+	GPIO_PinModeSet(COM_PORT, TX_PIN, gpioModePushPull, 1); // set TX pin to push-pull output, initialize high (otherwise glitches can occur)
+	GPIO_PinModeSet(COM_PORT, RX_PIN, gpioModeInput, 0);    // set RX pin as input (no filter)
 
 	USART_InitAsync_TypeDef uartInit =
 	  {	//230400

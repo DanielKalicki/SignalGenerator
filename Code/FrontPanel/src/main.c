@@ -104,6 +104,23 @@ void updateLeds(){
 	LED_LOAD_HIGH();
 }
 
+void updateLedsToggle(){
+	LED_CLK_LOW();
+	for (int i=LED_SIZE-1;i>=0;i--){
+		LED_CLK_LOW();
+		if(leds[i])
+			LED_IN_HIGH();
+		else{
+			LED_IN_LOW();
+		}
+		LED_CLK_HIGH();
+	}
+	LED_CLK_LOW();
+
+	LED_LOAD_LOW();
+	LED_LOAD_HIGH();
+}
+
 //------BUTTONS------
 enum eButton{
 	SIN_BUTTON=0,
@@ -167,15 +184,15 @@ void readButtons(){
 }
 void printButtons(){
 	for (int i=0;i<BUT_SIZE;i++){
-		uart_sendText("Button number ");
 		char buff[30];
 		sprintf(buff,"%d",i);
 		uart_sendText(buff);
-		uart_sendText(": ");
-		if(buttons[i]) uart_sendText("ON");
-		else uart_sendText("OFF");
-		uart_sendChar('\n');
+		uart_sendText(":");
+		if(buttons[i]) uart_sendText("##");
+		else uart_sendText(" ");
+		uart_sendChar('\t');
 	}
+	uart_sendChar('\n');
 }
 
 //----TEST FUN----
@@ -190,7 +207,9 @@ void delayF() {
 }
 
 void test(){
-	//printButtons();
+	readButtons();
+
+	printButtons();
 
 	static uint8_t counter=0;
 	counter++;
@@ -202,11 +221,11 @@ void test(){
 		else
 			leds[i]=0;
 	}
-	updateLeds();
+	updateLedsToggle();
 
-	/*for (int i=0;i<10;i++){
+	for (int i=0;i<1;i++){
 		delayF();
-	}*/
+	}
 }
 
 //------MAIN------
@@ -216,12 +235,12 @@ int main(void) {
   initOscillators();
   initShiftRegisters();
 
-  //initUART();
+  initUART();
 
-  //uart_sendText("Front pannel startup...");
-  //uart_sendText("done\n");
+  uart_sendText("Front pannel startup...");
+  uart_sendText("done\n");
 
   while (1) {
-	  updateLeds();
+	  test();
   }
 }
