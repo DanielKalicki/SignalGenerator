@@ -66,8 +66,8 @@
 
 /*Software SPI*/
 void spiInitSoftware(void);
-uint16_t spiWriteWordSoftware(uint16_t addr, uint16_t data);
-uint16_t spiReadWordSoftware(uint16_t addr); //
+uint16_t ADS7843SpiWriteRegS(uint16_t addr, uint16_t data);
+uint16_t ADS7843SpiReadRegS(uint16_t addr); //
 
 typedef enum {
 	SPICONFIG_ADDR = 0x00,
@@ -425,4 +425,9 @@ inline uint8_t getShiftValue(uint16_t dataBitMask) {
 
 void AD9106Test(void);
 void AD9106Init(void);
+
+//SRAM methods
+bool writePatternToSram(uint8_t* dataBuf, uint16_t bufLength, uint16_t sramAddr);
+void playWaveformFromSram(uint8_t nrOfDac ,uint16_t startAddr, uint16_t stopAddr,uint16_t nrOfWaveCycles, uint16_t startDelay  );
+
 #endif /* AD9106_H_ */

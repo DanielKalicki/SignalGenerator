@@ -9,7 +9,7 @@
 #include "em_cmu.h"
 #include "utils.h"
 //privates
-#define SPI_SW_ENABLED 0
+#define SPI_SW_ENABLED 1
 
 static const USART_InitSync_TypeDef initSpi = { usartEnable, /* Enable RX/TX when init completed. */
 1000000, /* Use 1MHz reference clock */
@@ -121,8 +121,8 @@ static uint16_t ADS7843SpiReadReg(AD9106RegAddress regAddress,
 	}
 }
 
-static bool ADS7843SpiWriteReg(AD9106RegAddress regAddress,
-		uint16_t dataBitMask, uint16_t data) {
+static bool ADS7843SpiWriteReg(AD9106RegAddress regAddress, uint16_t data,
+		uint16_t dataBitMask) {
 
 	if (dataBitMask != 0) {
 
@@ -164,7 +164,7 @@ void spiInitSoftware(void) {
 	AD9106_MOSI_LOW();
 }
 
-uint16_t spiWriteWordSoftware(uint16_t addr, uint16_t data) {
+uint16_t ADS7843SpiWriteRegS(uint16_t addr, uint16_t data) {
 	AD9106_CLK_HIGH();
 	Delay(1);
 	addr &= ~0x8000; //writing
@@ -203,7 +203,7 @@ uint16_t spiWriteWordSoftware(uint16_t addr, uint16_t data) {
 
 }
 
-uint16_t spiReadWordSoftware(uint16_t addr) {
+uint16_t ADS7843SpiReadRegS(uint16_t addr) {
 	uint16_t data = 0;
 	AD9106_CLK_HIGH();
 	Delay(1);
@@ -249,6 +249,43 @@ static bool writeReg(uint16_t regAddress, uint16_t dataBitMask, uint16_t data) {
 
 }
 
+/*
+static inline uint16_t getRegAddrForGivenDac(uint8_t nrOfDac, uint16_t reg ){
+	 if(nrOfDac>4||nrOfDac<1)return 0;
+
+    #define GET_REG(reg,nrOfDac)    reg##nrOfDac
+
+	 return GET_REG(reg,nrOfDac) ;
+}
+*/
+
+
+
+bool writePatternToSram(uint8_t* dataBuf, uint16_t bufLength, uint16_t sramAddr){
+
+	ADS7843SpiWriteReg(PAT_STATUS, MEM_ACCESS,0 );
+
+
+
+}
+
+
+void playWaveformFromSram(uint8_t nrOfDac ,uint16_t startAddr, uint16_t stopAddr,uint16_t nrOfWaveCycles, uint16_t startDelay  ){
+   if(nrOfDac>4||nrOfDac<1)return;
+
+#define  GET_REG(reg,nrOfDac)    reg##nrOfDac
+#define  GET_NR_OF_DAC(nrOfDac)   4
+    ADS7843SpiWriteReg(PAT_STATUS, 0,RUN );
+    ADS7843SpiWriteReg(GET_REG(START_ADDR,4),START_ADDRx ,startAddr );  //TODO for now only 4 channel
+    ADS7843SpiWriteReg(GET_REG(STOP_ADDR,4),STOP_ADDRx ,stopAddr );
+    ADS7843SpiWriteReg(GET_REG(DDS_CYC,4),DDS_CYCx ,nrOfWaveCycles );
+    ADS7843SpiWriteReg(GET_REG(START_DLY,4),START_DELAYx  ,startDelay );
+    ADS7843SpiWriteReg(PAT_STATUS, RUN,0 );
+}
+
+
+
+
 void AD9106Test(void) {
 	static uint16_t counter = 0;
 	counter += 1000;
@@ -264,57 +301,57 @@ void AD9106Test(void) {
 	SegmentLCD_Number(i);
 	Delay(2000);
 	//Delay(1);
-	ADS7843SpiWriteReg(PATTERN_DLY, 0, counter / 1000);
+	ADS7843SpiWriteReg(PATTERN_DLY, counter / 1000, 0);
 	*/
 	Delay(2000);
 	//Clock
 	//ADS7843SpiWriteReg(CLOCKCONFIG, 0, 0);
 	i = ADS7843SpiReadReg(CLOCKCONFIG, 0);
 		SegmentLCD_Number(i);
-	ADS7843SpiWriteReg(CLOCKCONFIG, DAC1_INV_CLK, 1);
+	ADS7843SpiWriteReg(CLOCKCONFIG,1, DAC1_INV_CLK );
 
 	/*Delay(2000);
 	//Clock
 	i = ADS7843SpiReadReg(POWERCONFIG, 0);
 		SegmentLCD_Number(i);
-	ADS7843SpiWriteReg(POWERCONFIG, DAC1_SLEEP, 1);
+	ADS7843SpiWriteReg(POWERCONFIG, 1, DAC1_SLEEP);
 	*/
 #else SPI_SW_ENABLED
-	i = spiReadWordSoftware((uint16_t) PATTERN_DLY);
+	i = ADS7843SpiReadRegS((uint16_t) PATTERN_DLY);
 	SegmentLCD_Number(i);
 	Delay(3000);
-	i = spiReadWordSoftware(DAC1RSET);
+	i = ADS7843SpiReadRegS(DAC1RSET);
 	SegmentLCD_Number(i);
 	Delay(3000);
 
-	//spiWriteWordSoftware((uint16_t)WAV4_3CONFIG,0x2121);Delay(1);//noise output test
-	spiWriteWordSoftware((uint16_t) WAV4_3CONFIG, 0x1111);
+	//ADS7843SpiWriteRegS((uint16_t)WAV4_3CONFIG,0x2121);Delay(1);//noise output test
+	ADS7843SpiWriteRegS((uint16_t) WAV4_3CONFIG, 0x1111);
 	Delay(1);//sawtooth test
 
-	spiWriteWordSoftware((uint16_t) DAC4_CST, 0xA200);
+	ADS7843SpiWriteRegS((uint16_t) DAC4_CST, 0xA200);
 	Delay(1);
-	spiWriteWordSoftware((uint16_t) DAC4_DGAIN, 0xA000);
+	ADS7843SpiWriteRegS((uint16_t) DAC4_DGAIN, 0xA000);
 	Delay(1);
-	spiWriteWordSoftware((uint16_t) DAC4RSET, 0x8002);
+	ADS7843SpiWriteRegS((uint16_t) DAC4RSET, 0x8002);
 	Delay(1);
-	spiWriteWordSoftware((uint16_t) DACxRANGE, 0x00A0);
+	ADS7843SpiWriteRegS((uint16_t) DACxRANGE, 0x00A0);
 	Delay(1);
-	spiWriteWordSoftware((uint16_t) PAT_TIMEBASE, 0x0000);
+	ADS7843SpiWriteRegS((uint16_t) PAT_TIMEBASE, 0x0000);
 	Delay(1);
-	spiWriteWordSoftware((uint16_t) PAT_PERIOD, 0x0100);
+	ADS7843SpiWriteRegS((uint16_t) PAT_PERIOD, 0x0100);
 	Delay(1);
-	spiWriteWordSoftware((uint16_t) PAT_STATUS, 0x0001);
+	ADS7843SpiWriteRegS((uint16_t) PAT_STATUS, 0x0001);
 	Delay(1);
-	spiWriteWordSoftware((uint16_t) RAMUPDATE, 0x0001);
+	ADS7843SpiWriteRegS((uint16_t) RAMUPDATE, 0x0001);
 	Delay(1);
 
 	//sawtooth configuration
-	spiWriteWordSoftware((uint16_t) SAW4_3CONFIG, 0x0808);
+	ADS7843SpiWriteRegS((uint16_t) SAW4_3CONFIG, 0x0808);
 	Delay(1);
 
 	Delay(500);
-	i = spiReadWordSoftware((uint16_t) CFG_ERROR);
-	i = spiReadWordSoftware((uint16_t) PAT_STATUS);
+	i = ADS7843SpiReadRegS((uint16_t) CFG_ERROR);
+	i = ADS7843SpiReadRegS((uint16_t) PAT_STATUS);
 	SegmentLCD_Number(i);
 	Delay(2000);
 #endif
