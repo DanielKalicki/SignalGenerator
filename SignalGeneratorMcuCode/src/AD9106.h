@@ -413,21 +413,11 @@ typedef enum {
  * @returns  ShiftValue
  */
 
-inline uint8_t getShiftValue(uint16_t dataBitMask) {
-	uint8_t shiftVal = 0;
-	while (!(dataBitMask & 1)) {
-		dataBitMask >>= 1;
-		shiftVal++;
-	}
-	return shiftVal;
-}
-
-
 void AD9106Test(void);
 void AD9106Init(void);
 
 //SRAM methods
-bool writePatternToSram(uint8_t* dataBuf, uint16_t bufLength, uint16_t sramAddr);
+bool writePatternToSram(uint16_t* dataBuf, uint16_t bufLength, uint16_t sramAddr);
 void playWaveformFromSram(uint8_t nrOfDac ,uint16_t startAddr, uint16_t stopAddr,uint16_t nrOfWaveCycles, uint16_t startDelay  );
 
 #endif /* AD9106_H_ */
