@@ -1,13 +1,15 @@
-19:59:04 **** Incremental Build of configuration GNU ARM v4.7.3 - Debug for project FrontPanel ****
+22:48:27 **** Incremental Build of configuration GNU ARM v4.7.3 - Debug for project FrontPanel ****
 make -j4 all 
-Building file: ../src/main.c
+Building file: ../src/i2c_connection.c
 Invoking: GNU ARM C Compiler
-arm-none-eabi-gcc -g -gdwarf-2 -mcpu=cortex-m0plus -mthumb '-DEFM32ZG110F32=1' '-DDEBUG=1' -I"D:\SiliconLabs\SimplicityStudio\v2\developer\sdks\efm32\v2/CMSIS/Include" -I"D:\SiliconLabs\SimplicityStudio\v2\developer\sdks\efm32\v2/kits/common/bsp" -I"D:\SiliconLabs\SimplicityStudio\v2\developer\sdks\efm32\v2/emlib/inc" -I"D:\SiliconLabs\SimplicityStudio\v2\developer\sdks\efm32\v2/kits/common/drivers" -I"D:\SiliconLabs\SimplicityStudio\v2\developer\sdks\efm32\v2/Device/SiliconLabs/EFM32ZG/Include" -O0 -Wall -c -fmessage-length=0 -mno-sched-prolog -fno-builtin -ffunction-sections -fdata-sections -std=c99 -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
-Finished building: ../src/main.c
+arm-none-eabi-gcc -g -gdwarf-2 -mcpu=cortex-m0plus -mthumb '-DEFM32ZG110F32=1' '-DDEBUG=1' -I"D:\SiliconLabs\SimplicityStudio\v2\developer\sdks\efm32\v2/CMSIS/Include" -I"D:\SiliconLabs\SimplicityStudio\v2\developer\sdks\efm32\v2/kits/common/bsp" -I"D:\SiliconLabs\SimplicityStudio\v2\developer\sdks\efm32\v2/emlib/inc" -I"D:\SiliconLabs\SimplicityStudio\v2\developer\sdks\efm32\v2/kits/common/drivers" -I"D:\SiliconLabs\SimplicityStudio\v2\developer\sdks\efm32\v2/Device/SiliconLabs/EFM32ZG/Include" -O0 -Wall -c -fmessage-length=0 -mno-sched-prolog -fno-builtin -ffunction-sections -fdata-sections -std=c99 -MMD -MP -MF"src/i2c_connection.d" -MT"src/i2c_connection.o" -o "src/i2c_connection.o" "../src/i2c_connection.c"
+../src/i2c_connection.c: In function 'I2C0_IRQHandler':
+../src/i2c_connection.c:72:11: warning: unused variable 'tab_bit_addr' [-Wunused-variable]
+Finished building: ../src/i2c_connection.c
  
 Building target: FrontPanel.axf
 Invoking: GNU ARM C Linker
-arm-none-eabi-gcc -g -gdwarf-2 -mcpu=cortex-m0plus -mthumb -T "FrontPanel.ld" -Xlinker --gc-sections -Xlinker -Map="FrontPanel.map" --specs=nano.specs -o FrontPanel.axf "./src/main.o" "./src/uart_connection.o" "./emlib/em_cmu.o" "./emlib/em_emu.o" "./emlib/em_gpio.o" "./emlib/em_i2c.o" "./emlib/em_int.o" "./emlib/em_rmu.o" "./emlib/em_rtc.o" "./emlib/em_system.o" "./emlib/em_timer.o" "./emlib/em_usart.o" "./emlib/em_wdog.o" "./CMSIS/efm32zg/startup_efm32zg.o" "./CMSIS/efm32zg/system_efm32zg.o" -Wl,--start-group -lgcc -lc -lnosys -Wl,--end-group
+arm-none-eabi-gcc -g -gdwarf-2 -mcpu=cortex-m0plus -mthumb -T "FrontPanel.ld" -Xlinker --gc-sections -Xlinker -Map="FrontPanel.map" --specs=nano.specs -o FrontPanel.axf "./src/main.o" "./src/uart_connection.o" "./emlib/em_cmu.o" "./emlib/em_emu.o" "./emlib/em_gpio.o" "./emlib/em_i2c.o" "./emlib/em_int.o" "./emlib/em_rmu.o" "./emlib/em_rtc.o" "./emlib/em_system.o" "./emlib/em_timer.o" "./emlib/em_usart.o" "./emlib/em_wdog.o" "./CMSIS/efm32zg/startup_efm32zg.o" "./CMSIS/efm32zg/system_efm32zg.o" "./src/i2c_connection.o" -Wl,--start-group -lgcc -lc -lnosys -Wl,--end-group
 Finished building target: FrontPanel.axf
  
 Building hex file: FrontPanel.hex
@@ -19,5 +21,5 @@ arm-none-eabi-objcopy -O binary "FrontPanel.axf" "FrontPanel.bin"
 Running size tool
 arm-none-eabi-size "FrontPanel.axf"
    text	   data	    bss	    dec	    hex	filename
-   6884	    120	    120	   7124	   1bd4	FrontPanel.axf
+   2724	    108	    231	   3063	    bf7	FrontPanel.axf
  

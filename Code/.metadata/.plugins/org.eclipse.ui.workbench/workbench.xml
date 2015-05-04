@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workbench progressCount="35" version="2.0">
 <workbenchAdvisor/>
-<window height="738" width="683" x="683" y="0">
+<window height="738" width="683" x="0" y="0">
 <fastViewData fastViewLocation="1024"/>
 <perspectiveBar>
 <itemSize x="275"/>
 </perspectiveBar>
 <coolbarLayout>
-<coolItem id="com.silabs.simplicity.studio.internal.perspectives.homeToolbar" itemType="typeToolBarContribution" x="38" y="22"/>
+<coolItem id="com.silabs.simplicity.studio.internal.perspectives.homeToolbar" itemType="typeToolBarContribution" x="53" y="22"/>
 <coolItem id="group.file" itemType="typeGroupMarker"/>
-<coolItem id="org.eclipse.ui.workbench.file" itemType="typeToolBarContribution" x="122" y="22"/>
+<coolItem id="org.eclipse.ui.workbench.file" itemType="typeToolBarContribution" x="206" y="22"/>
 <coolItem id="additions" itemType="typeGroupMarker"/>
 <coolItem id="com.silabs.studio.energyprofiler.ui.toolbar" itemType="typeToolBarContribution" x="-1" y="-1"/>
-<coolItem id="org.eclipse.cdt.ui.editor.CEditor" itemType="typeToolBarContribution" x="-1" y="-1"/>
 <coolItem id="org.eclipse.debug.ui.launch.toolbar" itemType="typeToolBarContribution" x="-1" y="-1"/>
 <coolItem id="org.eclipse.debug.ui.launchActionSet" itemType="typeToolBarContribution" x="91" y="22"/>
 <coolItem id="org.eclipse.debug.ui.main.toolbar" itemType="typeToolBarContribution" x="-1" y="-1"/>
@@ -23,44 +22,54 @@
 <coolItem id="group.nav" itemType="typeGroupMarker"/>
 <coolItem id="org.eclipse.ui.workbench.navigate" itemType="typeToolBarContribution" x="91" y="22"/>
 <coolItem id="group.editor" itemType="typeGroupMarker"/>
+<coolItem id="org.eclipse.cdt.ui.editor.CEditor" itemType="typeToolBarContribution" x="-1" y="-1"/>
 <coolItem id="group.help" itemType="typeGroupMarker"/>
 <coolItem id="org.eclipse.ui.workbench.help" itemType="typeToolBarContribution" x="-1" y="-1"/>
 </coolbarLayout>
-<page aggregateWorkingSetId="Aggregate for window 1429726467237" focus="true" label="&lt;Unknown Label&gt; - Simplicity">
+<page focus="true" label="&lt;Unknown Label&gt; - Development">
 <editors>
 <editorArea activeWorkbook="DefaultEditorWorkbook">
 <info part="DefaultEditorWorkbook">
 <folder appearance="1" expanded="2">
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
 <part id="0"/>
-<part id="1"/>
-<part id="2"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
 <editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="C:/Users/terg/Projects/SignalGenerator/Code/FrontPanel/src/main.c" title="main.c" tooltip="FrontPanel/src/main.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FrontPanel/src/main.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="uart_connection.c" partName="uart_connection.c" path="C:/Users/terg/Projects/SignalGenerator/Code/FrontPanel/src/uart_connection.c" title="uart_connection.c" tooltip="FrontPanel/src/uart_connection.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FrontPanel/src/uart_connection.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="251" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="uart_connection.h" partName="uart_connection.h" path="C:/Users/terg/Projects/SignalGenerator/Code/FrontPanel/src/uart_connection.h" title="uart_connection.h" tooltip="FrontPanel/src/uart_connection.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FrontPanel/src/uart_connection.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="13" selectionOffset="279" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="4299" selectionTopPixel="1744"/>
 </editor>
 </editors>
 <views>
 <view id="org.eclipse.ui.navigator.ProjectExplorer" partName="Project Explorer">
-<viewState CommonNavigator.LINKING_ENABLED="0"/>
+<viewState CommonNavigator.LINKING_ENABLED="0" org.eclipse.cdt.ui.cview.groupincludes="false" org.eclipse.cdt.ui.cview.groupmacros="false" org.eclipse.cdt.ui.editor.CUChildren="true" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0"/>
 </view>
-<view id="com.silabs.studio.launcher.ui.view" partName="Simplicity Studio">
+<view id="org.eclipse.search.ui.views.SearchView" partName="Search"/>
+<view id="org.eclipse.cdt.ui.callHierarchy" partName="Call Hierarchy"/>
+<view id="org.eclipse.ui.views.ProblemView" partName="Problems">
+<viewState PRIMARY_SORT_FIELD="org.eclipse.ui.ide.severityAndDescriptionField" categoryGroup="org.eclipse.ui.ide.severity" markerContentGenerator="org.eclipse.ui.ide.problemsGenerator" partName="Problems">
+<expanded>
+<category IMemento.internal.id="Errors (1 item)"/>
+<category IMemento.internal.id="Errors"/>
+</expanded>
+<columnWidths org.eclipse.ui.ide.locationField="90" org.eclipse.ui.ide.markerType="90" org.eclipse.ui.ide.pathField="120" org.eclipse.ui.ide.resourceField="90" org.eclipse.ui.ide.severityAndDescriptionField="300"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.severityAndDescriptionField"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.resourceField"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.pathField"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.locationField"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.markerType"/>
+</viewState>
+</view>
+<view id="org.eclipse.ui.console.ConsoleView" partName="Console">
+<viewState/>
+</view>
+<view id="org.eclipse.ui.views.ContentOutline" partName="Outline">
 <viewState/>
 </view>
 </views>
-<perspectives activePart="com.silabs.studio.launcher.ui.view" activePerspective="com.silabs.studio.launcher.ui.application.perspective">
+<perspectives activePart="org.eclipse.cdt.ui.editor.CEditor" activePerspective="com.silabs.ide.ui.MCUDevelopmentPerspective">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="com.silabs.sls.internal.product.perspectives.SLSMCUDevelopmentPerspective" id="com.silabs.ide.ui.MCUDevelopmentPerspective" label="Development"/>
 <alwaysOnActionSet id="org.eclipse.ui.cheatsheets.actionSet"/>
@@ -95,122 +104,60 @@
 <perspective_action id="org.eclipse.cdt.ui.CPerspective"/>
 <perspective_action id="org.eclipse.debug.ui.DebugPerspective"/>
 <perspective_action id="com.silabs.ide.ui.MCUCompactDevelopmentPerspective"/>
-<hide_toolbar_item_id id="org.eclipse.ui.workbench.navigate"/>
 <hide_toolbar_item_id id="org.eclipse.debug.ui.commands.RunToLine"/>
 <hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
-<view id="org.eclipse.ui.navigator.ProjectExplorer"/>
-<fastViewBars>&#x0A;<fastViewBar fastViewLocation="16384" id="bottomLeft" orientation="256" selectedTabId="org.eclipse.ui.views.ContentOutline" style="0">&#x0A;<fastViews>&#x0A;<view id="org.eclipse.ui.views.ContentOutline" ratio="0.3"/>
+<hide_toolbar_item_id id="org.eclipse.ui.workbench.navigate"/>
+<fastViewBars>
+<fastViewBar fastViewLocation="16384" id="bottomLeft" orientation="512" selectedTabId="org.eclipse.ui.views.ContentOutline" style="0">
+<fastViews>
+<view id="org.eclipse.ui.views.ContentOutline" ratio="0.3"/>
 </fastViews>
 </fastViewBar>
-<fastViewBar fastViewLocation="1024" id="bottomRight" orientation="256" selectedTabId="org.eclipse.ui.console.ConsoleView" style="0">&#x0A;<fastViews>&#x0A;<view id="org.eclipse.ui.views.ProblemView" ratio="0.3"/>
+<fastViewBar fastViewLocation="1024" id="bottomRight" orientation="256" selectedTabId="org.eclipse.ui.console.ConsoleView" style="0">
+<fastViews>
+<view id="org.eclipse.ui.views.ProblemView" ratio="0.3"/>
 <view id="org.eclipse.search.ui.views.SearchView" ratio="0.3"/>
 <view id="org.eclipse.cdt.ui.callHierarchy" ratio="0.3"/>
-<view id="org.eclipse.ui.console.ConsoleView" ratio="0.29982364"/>
+<view id="org.eclipse.ui.console.ConsoleView" ratio="0.2985782"/>
+</fastViews>
+</fastViewBar>
+<fastViewBar fastViewLocation="16384" id="topLeft" orientation="512" selectedTabId="org.eclipse.ui.navigator.ProjectExplorer" style="0">
+<fastViews>
+<view id="org.eclipse.ui.navigator.ProjectExplorer" ratio="0.3"/>
 </fastViews>
 </fastViewBar>
 </fastViewBars>
-<layout>&#x0A;<mainWindow>&#x0A;<info folder="true" part="topLeft">&#x0A;<folder activePageID="org.eclipse.ui.navigator.ProjectExplorer" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.ui.navigator.ProjectExplorer" label="Project Explorer"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
-</presentation>
-</folder>
-</info>
-<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="750" ratioRight="250" relationship="2" relative="topLeft">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
-<page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
-<page content="org.eclipse.ui.cheatsheets.views.CheatSheetView" label="LabelNotFound"/>
-</folder>
-</info>
-<info part="org.eclipse.ui.editorss" ratio="0.24390244" ratioLeft="160" ratioRight="496" relationship="2" relative="topLeft"/>
-<info folder="true" part="bottomRight" ratio="0.74922603" ratioLeft="484" ratioRight="162" relationship="4" relative="org.eclipse.ui.editorss">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.ui.views.ProblemView" label="LabelNotFound"/>
-<page content="org.eclipse.search.ui.views.SearchView" label="LabelNotFound"/>
-<page content="org.eclipse.cdt.ui.callHierarchy" label="LabelNotFound"/>
-<page content="org.eclipse.ui.console.ConsoleView" label="LabelNotFound"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
-</folder>
-</info>
-<info folder="true" part="bottomLeft" ratio="0.74922603" ratioLeft="484" ratioRight="162" relationship="4" relative="topLeft">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.ui.views.ContentOutline" label="LabelNotFound"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
-</folder>
-</info>
-</mainWindow>
-</layout>
-</perspective>
-<perspective editorAreaTrimState="2" editorAreaVisible="0" fixed="1" version="0.016">
-<descriptor class="com.silabs.studio.internal.api.launcher.ui.LauncherPerspective" id="com.silabs.studio.launcher.ui.application.perspective" label="Simplicity"/>
-<alwaysOnActionSet id="org.eclipse.ui.cheatsheets.actionSet"/>
-<alwaysOnActionSet id="org.eclipse.search.searchActionSet"/>
-<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.annotationNavigation"/>
-<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.navigation"/>
-<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo"/>
-<alwaysOnActionSet id="org.eclipse.ui.externaltools.ExternalToolsSet"/>
-<alwaysOnActionSet id="org.eclipse.ui.actionSet.keyBindings"/>
-<alwaysOnActionSet id="org.eclipse.ui.actionSet.openFiles"/>
-<alwaysOnActionSet id="com.silabs.ide.debug.attachActionSet"/>
-<alwaysOnActionSet id="com.silabs.ide.ui.flashProgrammerActionSet"/>
-<alwaysOnActionSet id="org.eclipse.cdt.debug.edc.ui.snapshotDebuggingActionSet"/>
-<hide_menu_item_id id="org.eclipse.ui.file.closeAll"/>
-<hide_menu_item_id id="org.eclipse.ui.file.print"/>
-<hide_menu_item_id id="org.eclipse.ui.file.save"/>
-<hide_menu_item_id id="org.eclipse.jdt.ui.refactoring.menu"/>
-<hide_menu_item_id id="org.eclipse.ui.file.openWorkspace"/>
-<hide_menu_item_id id="org.eclipse.ui.edit.rename"/>
-<hide_menu_item_id id="org.eclipse.ui.file.properties"/>
-<hide_menu_item_id id="org.eclipse.ui.help.helpSearch"/>
-<hide_menu_item_id id="org.eclipse.ui.edit.text.openLocalFile"/>
-<hide_menu_item_id id="com.silabs.ui.common.SilabsMenu"/>
-<hide_menu_item_id id="additions"/>
-<hide_menu_item_id id="org.eclipse.ui.file.restartWorkbench"/>
-<hide_menu_item_id id="org.eclipse.ui.file.refresh"/>
-<hide_menu_item_id id="org.eclipse.ui.help.quickStartAction"/>
-<hide_menu_item_id id="com.silabs.studio.energyprofiler.ui.SaveProfilerDataCommand"/>
-<hide_menu_item_id id="converstLineDelimitersTo"/>
-<hide_menu_item_id id="org.eclipse.equinox.p2.ui.sdk.update"/>
-<hide_menu_item_id id="org.eclipse.search.menu"/>
-<hide_menu_item_id id="org.eclipse.ui.file.close"/>
-<hide_menu_item_id id="org.eclipse.ui.file.saveAll"/>
-<hide_menu_item_id id="com.silabs.studio.energyprofiler.ui.LoadProfilerDataCommand"/>
-<hide_menu_item_id id="com.silabs.studio.installer.addRemoveSoftware"/>
-<hide_menu_item_id id="org.eclipse.equinox.p2.ui.sdk.install"/>
-<hide_menu_item_id id="navigate"/>
-<hide_menu_item_id id="reopenEditors"/>
-<hide_menu_item_id id="edit"/>
-<hide_menu_item_id id="org.eclipse.ui.file.export"/>
-<hide_menu_item_id id="org.eclipse.ui.file.import"/>
-<hide_menu_item_id id="org.eclipse.ui.file.saveAs"/>
-<hide_menu_item_id id="org.eclipse.ui.file.revert"/>
-<hide_menu_item_id id="org.eclipse.ui.edit.move"/>
-<hide_menu_item_id id="org.eclipse.ui.cheatsheets.actions.CheatSheetHelpMenuAction"/>
-<hide_menu_item_id id="project"/>
-<hide_menu_item_id id="new"/>
-<hide_menu_item_id id="org.eclipse.update.ui.updateMenu"/>
-<hide_menu_item_id id="window"/>
-<hide_menu_item_id id="org.eclipse.ui.window.showKeyAssist"/>
-<hide_menu_item_id id="org.eclipse.ui.help.tipsAndTricksAction"/>
-<hide_menu_item_id id="org.eclipse.jdt.ui.source.menu"/>
-<hide_menu_item_id id="org.eclipse.ui.run"/>
-<hide_menu_item_id id="org.eclipse.ui.help.dynamicHelp"/>
-<hide_menu_item_id id="com.silabs.studio.installer.updateSoftware"/>
-<hide_toolbar_item_id id="org.eclipse.debug.ui.commands.RunToLine"/>
-<hide_toolbar_item_id id="org.eclipse.ui.workbench.navigate"/>
-<hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
-<view id="com.silabs.studio.launcher.ui.view"/>
-<fastViewBars/>
-<viewLayoutRec closeable="false" id="com.silabs.studio.launcher.ui.view" moveable="false" showTitle="false" standalone="true"/>
 <layout>
 <mainWindow>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@52cdcc">
-<folder activePageID="com.silabs.studio.launcher.ui.view" appearance="4" expanded="2">
-<page content="com.silabs.studio.launcher.ui.view" label="Simplicity Studio"/>
+<info folder="true" part="topLeft">
+<folder appearance="2" expanded="0">
+<page content="org.eclipse.ui.navigator.ProjectExplorer" label="LabelNotFound"/>
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
 </folder>
 </info>
-<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="474" ratioRight="158" relationship="2" relative="org.eclipse.ui.internal.ViewStack@52cdcc">
+<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="750" ratioRight="250" relationship="2" relative="topLeft">
 <folder appearance="2" expanded="2">
 <page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
 <page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
 <page content="org.eclipse.ui.cheatsheets.views.CheatSheetView" label="LabelNotFound"/>
 </folder>
 </info>
-<info part="org.eclipse.ui.editorss" ratio="0.5" ratioLeft="316" ratioRight="316" relationship="2" relative="org.eclipse.ui.internal.ViewStack@52cdcc"/>
+<info part="org.eclipse.ui.editorss" ratio="0.25" ratioLeft="250" ratioRight="750" relationship="2" relative="topLeft"/>
+<info folder="true" part="bottomRight" ratio="0.74922603" ratioLeft="484" ratioRight="162" relationship="4" relative="org.eclipse.ui.editorss">
+<folder appearance="2" expanded="0">
+<page content="org.eclipse.ui.views.ProblemView" label="LabelNotFound"/>
+<page content="org.eclipse.search.ui.views.SearchView" label="LabelNotFound"/>
+<page content="org.eclipse.cdt.ui.callHierarchy" label="LabelNotFound"/>
+<page content="org.eclipse.ui.console.ConsoleView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
+</folder>
+</info>
+<info folder="true" part="bottomLeft" ratio="0.74922603" ratioLeft="484" ratioRight="162" relationship="4" relative="topLeft">
+<folder appearance="2" expanded="0">
+<page content="org.eclipse.ui.views.ContentOutline" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
+</folder>
+</info>
 </mainWindow>
 </layout>
 </perspective>
@@ -219,178 +166,49 @@
 <navigationHistory>
 <editors>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FrontPanel/src/main.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FrontPanel/emlib/em_gpio.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FrontPanel/emlib/em_gpio.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FrontPanel/src/uart_connection.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FrontPanel/src/uart_connection.h"/>
 </editors>
 <item historyLabel="main.c" index="0">
 <position info="not_deleted" x="0" y="0"/>
 </item>
 <item historyLabel="main.c" index="0">
-<position info="not_deleted" x="1473" y="0"/>
+<position info="not_deleted" x="4613" y="16"/>
 </item>
 <item historyLabel="main.c" index="0">
-<position info="not_deleted" x="4462" y="0"/>
+<position info="not_deleted" x="2648" y="16"/>
 </item>
 <item historyLabel="main.c" index="0">
-<position info="not_deleted" x="179" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="2417" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="2574" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="1478" y="15"/>
-</item>
-<item historyLabel="em_gpio.c" index="1">
-<position info="not_deleted" x="7490" y="15"/>
-</item>
-<item historyLabel="em_gpio.h" index="2">
-<position info="not_deleted" x="5846" y="15"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="1478" y="15"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="846" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="850" y="14"/>
-</item>
-<item historyLabel="em_gpio.h" index="2">
-<position info="not_deleted" x="18783" y="14"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="825" y="0"/>
-</item>
-<item historyLabel="em_gpio.h" index="2">
-<position info="not_deleted" x="18783" y="14"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="825" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="2505" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="2557" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="2523" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="2550" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="3371" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="3354" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="1132" y="13"/>
-</item>
-<item historyLabel="em_gpio.h" index="2">
-<position info="not_deleted" x="16227" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="1132" y="13"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="3516" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="4493" y="8"/>
-</item>
-<item historyLabel="uart_connection.c" index="3">
-<position info="not_deleted" x="231" y="0"/>
-</item>
-<item historyLabel="uart_connection.h" index="4">
-<position info="not_deleted" x="279" y="13"/>
-</item>
-<item historyLabel="uart_connection.c" index="3">
-<position info="not_deleted" x="251" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="4493" y="8"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="4608" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="3657" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="3718" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="3911" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="3834" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="3911" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="3768" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="149" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position/>
-</item>
-<item historyLabel="main.c" index="0">
-<position/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="4606" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="4127" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="4238" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="4289" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="4278" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="4312" y="0"/>
+<position info="not_deleted" x="2750" y="0"/>
 </item>
 <item active="true" historyLabel="main.c" index="0">
-<position info="not_deleted" x="0" y="0"/>
+<position info="not_deleted" x="4374" y="0"/>
 </item>
 </navigationHistory>
 </page>
 <workbenchWindowAdvisor/>
 <actionBarAdvisor/>
 <trimLayout>
+<trimArea IMemento.internal.id="16384">
+<trimItem IMemento.internal.id="topLeft"/>
+<trimItem IMemento.internal.id="bottomLeft"/>
+</trimArea>
+<trimArea IMemento.internal.id="128">
+<trimItem IMemento.internal.id="org.eclipse.ui.internal.WorkbenchWindow.topBar"/>
+</trimArea>
 <trimArea IMemento.internal.id="1024">
-<trimItem IMemento.internal.id="org.eclipse.ui.internal.progress.ProgressRegion"/>
+<trimItem IMemento.internal.id="org.eclise.ui.internal.FastViewBar"/>
 <trimItem IMemento.internal.id="com.silabs.ide.tcf.ui.contributedTrim"/>
+<trimItem IMemento.internal.id="org.eclipse.jface.action.StatusLineManager"/>
+<trimItem IMemento.internal.id="org.eclipse.ui.internal.progress.ProgressRegion"/>
+<trimItem IMemento.internal.id="bottomRight"/>
 </trimArea>
 </trimLayout>
 </window>
 <mruList>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="uart_connection.c" tooltip="FrontPanel/src/uart_connection.c">
-<persistable path="/FrontPanel/src/uart_connection.c"/>
-</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" tooltip="FrontPanel/src/main.c">
 <persistable path="/FrontPanel/src/main.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="uart_connection.c" tooltip="FrontPanel/src/uart_connection.c">
+<persistable path="/FrontPanel/src/uart_connection.c"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="em_gpio.h" tooltip="FrontPanel/emlib/em_gpio.h">
 <persistable path="/FrontPanel/emlib/em_gpio.h"/>

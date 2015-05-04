@@ -6,6 +6,7 @@
 #include "em_emu.h"
 #include <stdio.h>
 #include "uart_connection.h"
+#include "i2c_connection.h"
 
 //------DEFINES-----
 #define LED_LOAD_PORT	gpioPortC
@@ -195,6 +196,13 @@ void printButtons(){
 	uart_sendChar('\n');
 }
 
+//----ENCODER----
+uint8_t encoder[4];
+
+void readEncoder(){
+
+}
+
 //----TEST FUN----
 void delayF() {
 	long int i=0;
@@ -235,12 +243,38 @@ int main(void) {
   initOscillators();
   initShiftRegisters();
 
-  initUART();
+  for (int i=0;i<10;i++) i2c_registers[i]=0;
 
+  /*initUART();
   uart_sendText("Front pannel startup...");
-  uart_sendText("done\n");
+  uart_sendText("done\n");*/
 
   while (1) {
-	  test();
+	  //registers 0-5 contains buttons status
+	  readButtons();
+	  for (int i=0;i<5;i++){
+		  uint8_t data=0;
+		  for (int ii=0;ii<8;ii++){
+			  data+=(buttons[i+ii]<<ii);
+		  }
+		  i2c_registers[i]=data;
+	  }
+	  //registers 6-10 reads led status and refresh the front panel
+	  for (int i=0;i<5;i++){
+		  for (int ii=0;ii<8;ii++){
+			  if(i2c_registers[i]&(1<<ii)){
+				  leds[i*8+ii]=1;
+			  }
+			  else {
+				  leds[i*8+ii]=0;
+			  }
+		  }
+	  }
+	  //registers 11-14 contain encoder number
+	  readEncoder();
+	  i2c_registers[11]=encoder[0];
+	  i2c_registers[12]=encoder[1];
+	  i2c_registers[13]=encoder[2];
+	  i2c_registers[14]=encoder[3];
   }
 }
