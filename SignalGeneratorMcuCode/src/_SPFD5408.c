@@ -9,6 +9,7 @@
 //#include "font.h"
 #include "_SPFD5408.h"
 
+uint8_t orient= PORTRAIT;
 /*hardware dependent functions */
 static void pinWrite(GPIO_Port_TypeDef port, uint8_t pin, uint8_t mask) {
 
@@ -432,15 +433,15 @@ void LCD_Write_COM_DATA(uint16_t com1, uint16_t dat1) {
 }
 
 void setXY(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
-	/*if (orient==LANDSCAPE)
+	if (orient==LANDSCAPE)
 	 {
-	 swap(word, x1, y1);
-	 swap(word, x2, y2);
-	 y1=disp_y_size-y1;
-	 y2=disp_y_size-y2;
-	 swap(word, y1, y2)
+	// swap(word, x1, y1);
+	 //swap(word, x2, y2);
+	 y1=MAX_Y-y1;
+	 y2=MAX_Y-y2;
+	// swap(word, y1, y2);
 	 }
-	 */
+
 
 	LCD_Write_COM_DATA(0x20, x1);
 	LCD_Write_COM_DATA(0x21, y1);
@@ -571,4 +572,7 @@ void drawLine(int x1, int y1, int x2, int y2, uint16_t color) {
 	}
 	clrXY();
 }
+
+
+
 

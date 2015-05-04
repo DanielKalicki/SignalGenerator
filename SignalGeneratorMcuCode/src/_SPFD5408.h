@@ -18,7 +18,7 @@ struct CurrentFont {
 	uint8_t offset;
 	uint8_t numchars;
 };
-void InitLCD(uint8_t orientation);
+void _SPFD5408Init(void);
 //void InitLCD(uint8_t orientation = LANDSCAPE);
 void clrScr();
 void drawPixel(int x, int y);
@@ -65,7 +65,7 @@ int getDisplayYSize();
  and I do not provide support on how to use them.
  */
 uint8_t fch, fcl, bch, bcl;
-uint8_t orient;
+
 long disp_x_size, disp_y_size;
 uint8_t display_model, display_transfer_mode, display_serial_mode;
 
