@@ -43,8 +43,8 @@ static const uint16_t colors[] = { 0xf800, 0x07e0, 0x001f, 0x0000, 0xffe0, 0xfff
 //TFT resolution 240*320
 #define MIN_X	    0
 #define MIN_Y	    0
-#define MAX_X	    240
-#define MAX_Y	    320
+#define MAX_X	    239
+#define MAX_Y	    319
 
 /*********************************Hardware dependent part*****************************************/
 /*********************************Hardware dependent part*****************************************/
@@ -165,7 +165,7 @@ static const uint16_t colors[] = { 0xf800, 0x07e0, 0x001f, 0x0000, 0xffe0, 0xfff
 #define TFT_PIN_D0_INPUT()  GPIO_PinModeSet(TFT_PORT_D0,TFT_PIN_D0, gpioModeInput, 0)
 
 #endif
-//========================================
+/*********************************Hardware dependent part - END*****************************************/
 
 /**Macro definitions for char display direction**/
 #define LEFT2RIGHT  0

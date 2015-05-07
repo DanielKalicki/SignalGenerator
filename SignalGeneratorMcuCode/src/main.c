@@ -8,7 +8,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
+#include <math.h>
 #include "em_device.h"
 #include "em_chip.h"
 #include "em_cmu.h"
@@ -20,6 +20,8 @@
 #include "../drivers/segmentlcd.h"
 #include "spi.h"
 #include "SPFD5408.h"
+#include "_SPFD5408.h"
+#include "bitmaps.h"
 #include "ADS7843.h"
 #include "../FreeRtos/FreeRTOS.h"
 #include "../FreeRtos/task.h"
@@ -30,8 +32,8 @@
 #include "../drivers/sleep.h"
 #include "../drivers/usb/cdc.h"
 
-#define AD9106_DEMO_ENABLED 1
-#define LCD_DEMO_ENABLED 0
+#define AD9106_DEMO_ENABLED 0
+#define LCD_DEMO_ENABLED 1
 #define USB_DEMO_ENABLED 0
 #define FREE_RTOS_DEMO_ENABLED 0
 #define MAIN_APP 0
@@ -80,7 +82,7 @@ int main(void) {
 //----------------------- AD9106  working tests -----------------------
 	CHIP_Init();
 	CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
-	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO); //32MHZ
+	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO);//32MHZ
 	//BSP_TraceProfilerSetup();
 	CMU_ClockEnable(cmuClock_HFPER, true);
 	BSP_LedsInit();
@@ -114,37 +116,67 @@ int main(void) {
 	SegmentLCD_Init(false);
 	SegmentLCD_AllOff();
 	SegmentLCD_Number(100);
-	SPFD5408Init();
+	//SPFD5408Init();
+	_SPFD5408Init();
 	ADS7843Init();
-  //USB for Debug
 
-	if (CDC_Init()) { // Initialize the communication class device.
-		SegmentLCD_Write("donea");
-	}
+	/*
+	 //USB for Debug
 
-	else {
-		SegmentLCD_Write("fail");
-		while (1)
-		;
-	}
+	 if (CDC_Init()) { // Initialize the communication class device.
+	 SegmentLCD_Write("donea");
+	 }
+
+	 else {
+	 SegmentLCD_Write("fail");
+	 while (1)
+	 ;
+	 }
+	 */
 
 	uint16_t i = 0;
 	uint16_t counter = 0;
-	char buf[25] = {0};
+	char buf[25] = { 0 };
+	print("* TFT Display Library *", CENTER, 1, 0, RED);
+	for (int i = 30; i < 318; i++) {
+		drawPixel(i, 119 + (sin(((i * 1.13) * 3.14) / 180) * 95), BLACK);
+
+	}
+	printChar('A', 120, 100, GREEN);
+
+	//drawBitmap(0, 0, 200, 200, thunder, 1);
+	SPFD5408DrawBmp(0, 0, 200, 200, thunder);
+
+	//  clrScr();
+	//   fillRect(30,15,200,200,BLACK);
+	//   clrScr();
+	//   fillRoundRect(190-(1*20), 30+(1*20), 250-(1*20), 90+(1*20),BLUE);
+	while (1) {
+		/*	i++;
+		 drawLine(i, 50, 200, 100,BLACK);
+		 drawLine(i, 200, 100, 200,RED);
+		 drawLine(150, i, 150, 200,BLUE);
+		 Delay(1000);
+		 //clrXY();
+		 * */
+
+	}
+
 	while (1) {
 		i++;
 		if (mADS7843ScreenTouched) {
 			SegmentLCD_Number((int) (getCoordinates().x));
 			//SPFD5408DrawString(getCoordinates().x, getCoordinates().y, "AA", 1, BLACK);
-			sniprintf(buf, 25, "X:%d , Y:%d\r\n", getCoordinates().x, getCoordinates().y);
+			sniprintf(buf, 25, "X:%d , Y:%d\r\n", getCoordinates().x,
+					getCoordinates().y);
 			USB_DEBUG_PUTS(buf);
 			//SPFD5408SetPixel(getCoordinates().x, getCoordinates().y, BLACK);
 			BSP_LedToggle(0);
 			mADS7843ScreenTouched = false;
 		} else
-		SegmentLCD_Number(i);
+			SegmentLCD_Number(i);
 		Delay(1000);
-		SPFD5408PaintScreenBackground(colors[i%10]);
+		SPFD5408PaintScreenBackground(colors[i % 10]);
 		//counter = snprintf(buf, 10, "N %d", i);
 		//if (counter != -1)
 		//SPFD5408DrawString(100, 100, buf, 3, BLACK);

@@ -675,3 +675,6 @@ void SPFD5408DrawBmp(unsigned short ulXs, unsigned short ulYs,
 	}
 }
 
+
+/////////////////////////////////////////////////////
+

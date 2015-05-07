@@ -8,8 +8,10 @@
 #include "utils.h"
 //#include "font.h"
 #include "_SPFD5408.h"
+#include "defaultFonts.h"
+#include <math.h>
 
-uint8_t orient= PORTRAIT;
+uint8_t orient = LANDSCAPE;
 /*hardware dependent functions */
 static void pinWrite(GPIO_Port_TypeDef port, uint8_t pin, uint8_t mask) {
 
@@ -373,6 +375,8 @@ void _SPFD5408Init(void) {
 	SPFD5408PaintScreenBackground(YELLOW);
 	// NEW SETUP _ END
 
+	setFont(SmallFont);
+
 }
 
 void LCD_Write_COM(uint16_t data) {
@@ -433,15 +437,21 @@ void LCD_Write_COM_DATA(uint16_t com1, uint16_t dat1) {
 }
 
 void setXY(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
-	if (orient==LANDSCAPE)
-	 {
-	// swap(word, x1, y1);
-	 //swap(word, x2, y2);
-	 y1=MAX_Y-y1;
-	 y2=MAX_Y-y2;
-	// swap(word, y1, y2);
-	 }
+	if (orient == LANDSCAPE) {
+		uint16_t temp = y1;
+		y1 = x1;
+		x1 = temp;
+		temp = y2;
+		y2 = x2;
+		x2 = temp;
+		y1 = MAX_Y - y1;
+		y2 = MAX_Y - y2;
 
+		temp = y2;
+		y2 = y1;
+		y1 = temp;
+
+	}
 
 	LCD_Write_COM_DATA(0x20, x1);
 	LCD_Write_COM_DATA(0x21, y1);
@@ -461,7 +471,7 @@ void clrXY() {
 }
 
 /*
- void _fast_fill_16(byte ch, byte cl, long pix)
+ void _fast_fill_16(uint8_t ch, uint8_t cl, long pix)
  {
  long blocks;
 
@@ -528,9 +538,9 @@ void drawVLine(int x, int y, int l, uint16_t color) {
 
 void drawLine(int x1, int y1, int x2, int y2, uint16_t color) {
 	if (y1 == y2)
-		drawHLine(x1, y1, x2 - x1,color);
+		drawHLine(x1, y1, x2 - x1, color);
 	else if (x1 == x2)
-		drawVLine(x1, y1, y2 - y1,color);
+		drawVLine(x1, y1, y2 - y1, color);
 	else {
 		unsigned int dx = (x2 > x1 ? x2 - x1 : x1 - x2);
 		short xstep = x2 > x1 ? 1 : -1;
@@ -573,6 +583,482 @@ void drawLine(int x1, int y1, int x2, int y2, uint16_t color) {
 	clrXY();
 }
 
+void setPixel(uint16_t color) {
+	LCD_Write_DATA(color);	// rrrrrggggggbbbbb
+}
+
+void drawPixel(int x, int y, uint16_t color) {
+	//cbi(P_CS, B_CS);
+	setXY(x, y, x, y);
+	setPixel(color/*(fch<<8)|fcl*/);
+	//sbi(P_CS, B_CS);
+	clrXY();
+}
+
+void drawRect(int x1, int y1, int x2, int y2, uint16_t color) {
+	if (x1 > x2) {
+		int temp = x1;
+		x1 = x2;
+		x2 = temp;
+	}
+	if (y1 > y2) {
+		int temp = y1;
+		y1 = y2;
+		y2 = temp;
+	}
+
+	drawHLine(x1, y1, x2 - x1, color);
+	drawHLine(x1, y2, x2 - x1, color);
+	drawVLine(x1, y1, y2 - y1, color);
+	drawVLine(x2, y1, y2 - y1, color);
+}
+
+void drawRoundRect(int x1, int y1, int x2, int y2, uint16_t color) {
+	if (x1 > x2) {
+		int temp = x1;
+		x1 = x2;
+		x2 = temp;
+	}
+	if (y1 > y2) {
+		int temp = y1;
+		y1 = y2;
+		y2 = temp;
+	}
+	if ((x2 - x1) > 4 && (y2 - y1) > 4) {
+		drawPixel(x1 + 1, y1 + 1, color);
+		drawPixel(x2 - 1, y1 + 1, color);
+		drawPixel(x1 + 1, y2 - 1, color);
+		drawPixel(x2 - 1, y2 - 1, color);
+		drawHLine(x1 + 2, y1, x2 - x1 - 4, color);
+		drawHLine(x1 + 2, y2, x2 - x1 - 4, color);
+		drawVLine(x1, y1 + 2, y2 - y1 - 4, color);
+		drawVLine(x2, y1 + 2, y2 - y1 - 4, color);
+	}
+}
+
+void fillRect(int x1, int y1, int x2, int y2, uint16_t color) {
+	if (x1 > x2) {
+		int temp = x1;
+		x1 = x2;
+		x2 = temp;
+		//swap(int, x1, x2);
+	}
+	if (y1 > y2) {
+		int temp = y1;
+		y1 = y2;
+		y2 = temp;
+		//swap(int, y1, y2);
+	}
+	if (orient == PORTRAIT) {
+		for (int i = 0; i < ((y2 - y1) / 2) + 1; i++) {
+			drawHLine(x1, y1 + i, x2 - x1, color);
+			drawHLine(x1, y2 - i, x2 - x1, color);
+		}
+	} else {
+		for (int i = 0; i < ((x2 - x1) / 2) + 1; i++) {
+			drawVLine(x1 + i, y1, y2 - y1, color);
+			drawVLine(x2 - i, y1, y2 - y1, color);
+		}
+	}
+}
+
+void fillRoundRect(int x1, int y1, int x2, int y2, uint16_t color) {
+	if (x1 > x2) {
+		int temp = x1;
+		x1 = x2;
+		x2 = temp;
+		//swap(int, x1, x2);
+	}
+	if (y1 > y2) {
+		int temp = y1;
+		y1 = y2;
+		y2 = temp;
+//swap(int, y1, y2);
+	}
+
+	if ((x2 - x1) > 4 && (y2 - y1) > 4) {
+		for (int i = 0; i < ((y2 - y1) / 2) + 1; i++) {
+			switch (i) {
+			case 0:
+				drawHLine(x1 + 2, y1 + i, x2 - x1 - 4, color);
+				drawHLine(x1 + 2, y2 - i, x2 - x1 - 4, color);
+				break;
+			case 1:
+				drawHLine(x1 + 1, y1 + i, x2 - x1 - 2, color);
+				drawHLine(x1 + 1, y2 - i, x2 - x1 - 2, color);
+				break;
+			default:
+				drawHLine(x1, y1 + i, x2 - x1, color);
+				drawHLine(x1, y2 - i, x2 - x1, color);
+			}
+		}
+	}
+}
+
+void drawCircle(int x, int y, int radius, uint16_t color) {
+	int f = 1 - radius;
+	int ddF_x = 1;
+	int ddF_y = -2 * radius;
+	int x1 = 0;
+	int y1 = radius;
+
+	//cbi(P_CS, B_CS);
+	setXY(x, y + radius, x, y + radius);
+	LCD_Write_DATA(color);
+	setXY(x, y - radius, x, y - radius);
+	LCD_Write_DATA(color);
+	setXY(x + radius, y, x + radius, y);
+	LCD_Write_DATA(color);
+	setXY(x - radius, y, x - radius, y);
+	LCD_Write_DATA(color);
+
+	while (x1 < y1) {
+		if (f >= 0) {
+			y1--;
+			ddF_y += 2;
+			f += ddF_y;
+		}
+		x1++;
+		ddF_x += 2;
+		f += ddF_x;
+		setXY(x + x1, y + y1, x + x1, y + y1);
+		LCD_Write_DATA(color);
+		setXY(x - x1, y + y1, x - x1, y + y1);
+		LCD_Write_DATA(color);
+		setXY(x + x1, y - y1, x + x1, y - y1);
+		LCD_Write_DATA(color);
+		setXY(x - x1, y - y1, x - x1, y - y1);
+		LCD_Write_DATA(color);
+		setXY(x + y1, y + x1, x + y1, y + x1);
+		LCD_Write_DATA(color);
+		setXY(x - y1, y + x1, x - y1, y + x1);
+		LCD_Write_DATA(color);
+		setXY(x + y1, y - x1, x + y1, y - x1);
+		LCD_Write_DATA(color);
+		setXY(x - y1, y - x1, x - y1, y - x1);
+		LCD_Write_DATA(color);
+	}
+	//sbi(P_CS, B_CS);
+	clrXY();
+}
+
+void fillCircle(int x, int y, int radius, uint16_t color) {
+	for (int y1 = -radius; y1 <= 0; y1++)
+		for (int x1 = -radius; x1 <= 0; x1++)
+			if (x1 * x1 + y1 * y1 <= radius * radius) {
+				drawHLine(x + x1, y + y1, 2 * (-x1), color);
+				drawHLine(x + x1, y - y1, 2 * (-x1), color);
+				break;
+			}
+}
+
+void clrScr() {
+	long i;
+
+	//cbi(P_CS, B_CS);
+	clrXY();
+
+	for (i = 0; i < ((MAX_X + 1) * (MAX_Y + 1)); i++) {
+
+		LCD_Write_DATA(0);
+	}
+//	sbi(P_CS, B_CS);
+}
+
+void printChar(uint8_t c, int x, int y, uint16_t color) {
+	uint8_t i, ch;
+	uint8_t j;
+	uint16_t temp;
+
+//	cbi(P_CS, B_CS);
+	if (orient == PORTRAIT) {
+		setXY(x, y, x + cfont.xSize - 1, y + cfont.ySize - 1);
+
+		temp = ((c - cfont.offset) * ((cfont.xSize / 8) * cfont.ySize)) + 4;
+		for (j = 0; j < ((cfont.xSize / 8) * cfont.ySize); j++) {
+			ch = cfont.font[temp];
+			for (i = 0; i < 8; i++) {
+				if ((ch & (1 << (7 - i))) != 0) {
+					setPixel(color);
+				} else {
+					setPixel(color);
+				}
+			}
+			temp++;
+		}
+	} else {
+		temp = ((c - cfont.offset) * ((cfont.xSize / 8) * cfont.ySize)) + 4;
+
+		for (j = 0; j < ((cfont.xSize / 8) * cfont.ySize); j +=
+				(cfont.xSize / 8)) {
+			setXY(x, y + (j / (cfont.xSize / 8)), x + cfont.xSize - 1,
+					y + (j / (cfont.xSize / 8)));
+			for (int zz = (cfont.xSize / 8) - 1; zz >= 0; zz--) {
+				ch = cfont.font[temp + zz];
+				for (i = 0; i < 8; i++) {
+					if ((ch & (1 << i)) != 0) {
+						setPixel(color);
+					} else {
+						setPixel(color);
+					}
+				}
+			}
+			temp += (cfont.xSize / 8);
+		}
+	}
+
+	//sbi(P_CS, B_CS);
+	clrXY();
+}
+
+void rotateChar(uint8_t c, int x, int y, int pos, int deg,uint16_t color) {
+	uint8_t i, j, ch;
+	uint16_t temp;
+	int newx, newy;
+	double radian;
+	radian = deg * 0.0175;
+
+	//cbi(P_CS, B_CS);
+
+	temp = ((c - cfont.offset) * ((cfont.xSize / 8) * cfont.ySize)) + 4;
+	for (j = 0; j < cfont.ySize; j++) {
+		for (int zz = 0; zz < (cfont.xSize / 8); zz++) {
+			ch = cfont.font[temp + zz];
+			for (i = 0; i < 8; i++) {
+				newx = x
+						+ (((i + (zz * 8) + (pos * cfont.xSize)) * cos(radian))
+								- ((j) * sin(radian)));
+				newy = y
+						+ (((j) * cos(radian))
+								+ ((i + (zz * 8) + (pos * cfont.xSize))
+										* sin(radian)));
+
+				setXY(newx, newy, newx + 1, newy + 1);
+
+				if ((ch & (1 << (7 - i))) != 0) {
+					setPixel(color);
+				} else {
+					setPixel(color);
+				}
+			}
+		}
+		temp += (cfont.xSize / 8);
+	}
+	//sbi(P_CS, B_CS);
+	clrXY();
+}
+
+void print(char *st, int x, int y, int deg, uint16_t color) {
+	int stl, i;
+
+	stl = strlen(st);
+
+	if (orient == PORTRAIT) {
+		if (x == RIGHT)
+			x = (MAX_X + 1) - (stl * cfont.xSize);
+		if (x == CENTER)
+			x = ((MAX_X + 1) - (stl * cfont.xSize)) / 2;
+	} else {
+		if (x == RIGHT)
+			x = (MAX_Y + 1) - (stl * cfont.xSize);
+		if (x == CENTER)
+			x = ((MAX_Y + 1) - (stl * cfont.xSize)) / 2;
+	}
+
+	for (i = 0; i < stl; i++)
+		if (deg == 0)
+			printChar(*st++, x + (i * (cfont.xSize)), y, color);
+		else
+			rotateChar(*st++, x, y, i, deg,color);
+}
+
+void printNumI(long num, int x, int y, int length, char filler, uint16_t color) {
+	char buf[25];
+	char st[27];
+	bool neg = false;
+	int c = 0, f = 0;
+
+	if (num == 0) {
+		if (length != 0) {
+			for (c = 0; c < (length - 1); c++)
+				st[c] = filler;
+			st[c] = 48;
+			st[c + 1] = 0;
+		} else {
+			st[0] = 48;
+			st[1] = 0;
+		}
+	} else {
+		if (num < 0) {
+			neg = true;
+			num = -num;
+		}
+
+		while (num > 0) {
+			buf[c] = 48 + (num % 10);
+			c++;
+			num = (num - (num % 10)) / 10;
+		}
+		buf[c] = 0;
+
+		if (neg) {
+			st[0] = 45;
+		}
+
+		if (length > (c + neg)) {
+			for (int i = 0; i < (length - c - neg); i++) {
+				st[i + neg] = filler;
+				f++;
+			}
+		}
+
+		for (int i = 0; i < c; i++) {
+			st[i + neg + f] = buf[c - i - 1];
+		}
+		st[c + neg + f] = 0;
+
+	}
+
+	print(st, x, y, 0, color);
+}
+
+void _convert_float(char *buf, double num, int width, uint8_t prec) {
+	char format[10];
+
+	sprintf(format, "%%%i.%if", width, prec);
+	sprintf(buf, format, num);
+}
+
+void printNumF(double num, uint8_t dec, int x, int y, char divider, int length,
+		char filler, uint16_t color) {
+	char st[27];
+	bool neg = false;
+
+	if (dec < 1)
+		dec = 1;
+	else if (dec > 5)
+		dec = 5;
+
+	if (num < 0)
+		neg = true;
+
+	_convert_float(st, num, length, dec);
+
+	if (divider != '.') {
+		for (int i = 0; i < sizeof(st); i++)
+			if (st[i] == '.')
+				st[i] = divider;
+	}
+
+	if (filler != ' ') {
+		if (neg) {
+			st[0] = '-';
+			for (int i = 1; i < sizeof(st); i++)
+				if ((st[i] == ' ') || (st[i] == '-'))
+					st[i] = filler;
+		} else {
+			for (int i = 0; i < sizeof(st); i++)
+				if (st[i] == ' ')
+					st[i] = filler;
+		}
+	}
+
+	print(st, x, y, 0, color);
+}
 
 
+void drawBitmap(int x, int y, int sx, int sy, uint16_t* data, int scale)
+{
+	uint16_t col;
+	int tx, ty, tc, tsx, tsy;
+
+	if (scale==1)
+	{
+		if (orient==PORTRAIT)
+		{
+			//cbi(P_CS, B_CS);
+			setXY(x, y, x+sx-1, y+sy-1);
+			for (tc=0; tc<(sx*sy); tc++)
+			{
+				col=data[tc];
+				LCD_Write_DATA(col);
+			}
+			//sbi(P_CS, B_CS);
+		}
+		else
+		{
+			//cbi(P_CS, B_CS);
+			for (ty=0; ty<sy; ty++)
+			{
+				setXY(x, y+ty, x+sx-1, y+ty);
+				for (tx=sx-1; tx>=0; tx--)
+				{
+					col=data[(ty*sx)+tx];
+					LCD_Write_DATA(col);
+				}
+			}
+			//sbi(P_CS, B_CS);
+		}
+	}
+	else
+	{
+		if (orient==PORTRAIT)
+		{
+			//cbi(P_CS, B_CS);
+			for (ty=0; ty<sy; ty++)
+			{
+				setXY(x, y+(ty*scale), x+((sx*scale)-1), y+(ty*scale)+scale);
+				for (tsy=0; tsy<scale; tsy++)
+					for (tx=0; tx<sx; tx++)
+					{
+						col=data[(ty*sx)+tx];
+						for (tsx=0; tsx<scale; tsx++)
+							LCD_Write_DATA(col);
+					}
+			}
+			//sbi(P_CS, B_CS);
+		}
+		else
+		{
+			//cbi(P_CS, B_CS);
+			for (ty=0; ty<sy; ty++)
+			{
+				for (tsy=0; tsy<scale; tsy++)
+				{
+					setXY(x, y+(ty*scale)+tsy, x+((sx*scale)-1), y+(ty*scale)+tsy);
+					for (tx=sx-1; tx>=0; tx--)
+					{
+						col=data[(ty*sx)+tx];
+						for (tsx=0; tsx<scale; tsx++)
+							LCD_Write_DATA(col);
+					}
+				}
+			}
+			//sbi(P_CS, B_CS);
+		}
+	}
+	clrXY();
+}
+
+
+
+void setFont(uint8_t* font) {
+	cfont.font = font;
+	cfont.xSize = fontbyte(0);
+	cfont.ySize = fontbyte(1);
+	cfont.offset = fontbyte(2);
+	cfont.numchars = fontbyte(3);
+}
+
+uint8_t* getFont() {
+	return cfont.font;
+}
+
+uint8_t getFontXsize() {
+	return cfont.xSize;
+}
+
+uint8_t getFontYsize() {
+	return cfont.ySize;
+}
 
