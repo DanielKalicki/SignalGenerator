@@ -1,12 +1,15 @@
 /*
  * SPFD5408.h
+ * Library for a TFT display , based on SPFD5408 driver
+ * library based on ST7781R TFT 8 bit Library written by Seeed Technology Inc.
  *
- *  Created on: 02-05-2015
- *      Author: lukasz based on UTFT library
+ *  Created on: 01-02-2015
+ *      Author: lukasz
  */
 
-#ifndef SPFD5408_H_
-#define SPFD5408_H_
+#ifndef _SPFD5408_H
+#define _SPFD5408_H
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -35,30 +38,13 @@
 #define GRAY1		0x8410
 #define GRAY2		0x4208
 
-static const uint16_t colors[] = { 0xf800, 0x07e0, 0x001f, 0x0000, 0xffe0, 0xffff,
+static const uint16_t defColors[] = { 0xf800, 0x07e0, 0x001f, 0x0000, 0xffe0, 0xffff,
 		0x07ff, 0xf810, 0x8410, 0x4208 };
 //TFT resolution 240*320
 #define MIN_X	    0
 #define MIN_Y	    0
 #define MAX_X	    239
 #define MAX_Y	    319
-
-
-#define PORTRAIT 0
-#define LANDSCAPE 1
-#define LEFT 0
-#define RIGHT 9999
-#define CENTER 9998
-
-#define fontbyte(x) (cfont.font[x])
-
-struct CurrentFont {
-	uint8_t* font;
-	uint8_t xSize;
-	uint8_t ySize;
-	uint8_t offset;
-	uint8_t numchars;
-};
 
 /*********************************Hardware dependent part*****************************************/
 /*********************************Hardware dependent part*****************************************/
@@ -181,40 +167,38 @@ struct CurrentFont {
 #endif
 /*********************************Hardware dependent part - END*****************************************/
 
-void SPFD5408init(void);
-void SPFD5408clrScr();
-void SPFD5408drawPixel(int x, int y, uint16_t color);
-void SPFD5408drawLine(int x1, int y1, int x2, int y2, uint16_t color);
-void SPFD5408fillScreenBackground(uint16_t color);
-void SPFD5408drawRect(int x1, int y1, int x2, int y2, uint16_t color);
-void SPFD5408drawRoundRect(int x1, int y1, int x2, int y2, uint16_t color);
-void SPFD5408fillRect(int x1, int y1, int x2, int y2, uint16_t color);
-void SPFD5408fillRoundRect(int x1, int y1, int x2, int y2, uint16_t color);
-void SPFD5408drawCircle(int x, int y, int radius, uint16_t color);
-void SPFD5408fillCircle(int x, int y, int radius, uint16_t color);
-void SPFD5408setFont(const uint8_t* font);
-uint8_t* SPFD5408getFont();
-uint8_t SPFD5408getFontXsize();
-uint8_t SPFD5408getFontYsize();
-void SPFD5408drawBitmap(int x, int y, int sx, int sy, const uint16_t* bitmap, int scale);
-void SPFD5408lcdOff();
-void SPFD5408lcdOn();
-void SPFD5408setContrast(char c);
-void SPFD5408lcdWriteCOMMAND(uint16_t data);
-void SPFD5408lcdWriteDATA(uint16_t data);
-void SPFD5408lcdWriteCOMMAND_DATA(uint16_t com1, uint16_t dat1);
-void SPFD5408setPixel(uint16_t color);
-void SPFD5408drawHLine(int x, int y, int l, uint16_t color);
-void SPFD5408drawVLine(int x, int y, int l, uint16_t color);
-void SPFD5408printChar(uint8_t c, int x, int y, uint16_t color);
-void SPFD5408rotateChar(uint8_t c, int x, int y, int pos, int deg,uint16_t color);
-void SPFD5408print(char *st, int x, int y, int deg, uint16_t color);
-void SPFD5408printNumI(long num, int x, int y, int length, char filler, uint16_t color);
-void SPFD5408printNumF(double num, uint8_t dec, int x, int y, char divider, int length,
-		char filler, uint16_t color);
-void SPFD5408setXY(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
-void SPFD5408clrXY(void);
+/**Macro definitions for char display direction**/
+#define LEFT2RIGHT  0
+#define DOWN2UP     1
+#define RIGHT2LEFT  2
+#define UP2DOWN     3
 
-void convertFloat(char *buf, double num, int width, uint8_t prec);
+void SPFD5408Init(void);
+void SPFD5408PaintScreenBackground(uint16_t color);
 
-#endif /* SPFD5408_H_ */
+void SPFD5408SetXY(uint16_t poX, uint16_t poY);
+void SPFD5408SetPixel(uint16_t poX, uint16_t poY, uint16_t color);
+void SPFD5408DrawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1,
+		uint16_t color);
+void SPFD5408DrawVerticalLine(uint16_t poX, uint16_t poY, uint16_t length,
+		uint16_t color);
+void SPFD5408DrawHorizontalLine(uint16_t poX, uint16_t poY, uint16_t length,
+		uint16_t color);
+void SPFD5408DrawRectangle(uint16_t poX, uint16_t poY, uint16_t length,
+		uint16_t width, uint16_t color);
+void SPFD5408FillRectangle(uint16_t poX, uint16_t poY, uint16_t length,
+		uint16_t width, uint16_t color);
+void SPFD5408DrawCircle(int poX, int poY, int r, uint16_t color);
+void SPFD5408FillCircle(int poX, int poY, int r, uint16_t color);
+void SPFD5408DrawChar(uint16_t poX, uint16_t poY, unsigned char ascii,
+		uint16_t size, uint16_t fgcolor);
+void SPFD5408DrawString(uint16_t poX, uint16_t poY, char *string, uint16_t size,
+		uint16_t fgcolor);
+void SPFD5408DrawBmp(unsigned short ulXs, unsigned short ulYs,
+		unsigned short length, unsigned short height, unsigned short *buf);
+
+void SPFD5408SetOrientation(uint16_t HV);
+void SPFD5408SetDisplayDirect(unsigned char Direction);
+
+#endif /*_SPFD5408_H*/
+
