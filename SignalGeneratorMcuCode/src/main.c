@@ -8,7 +8,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
+#include <math.h>
 #include "em_device.h"
 #include "em_chip.h"
 #include "em_cmu.h"
@@ -19,7 +19,9 @@
 #include "bsp_trace.h"
 #include "../drivers/segmentlcd.h"
 #include "spi.h"
+//#include "oldSPFD5408.h"
 #include "SPFD5408.h"
+#include "bitmaps.h"
 #include "ADS7843.h"
 #include "../FreeRtos/FreeRTOS.h"
 #include "../FreeRtos/task.h"
@@ -30,8 +32,8 @@
 #include "../drivers/sleep.h"
 #include "../drivers/usb/cdc.h"
 
-#define AD9106_DEMO_ENABLED 1
-#define LCD_DEMO_ENABLED 0
+#define AD9106_DEMO_ENABLED 0
+#define LCD_DEMO_ENABLED 1
 #define USB_DEMO_ENABLED 0
 #define FREE_RTOS_DEMO_ENABLED 0
 #define MAIN_APP 0
@@ -67,7 +69,7 @@ static TaskParams_t parametersToTask2 = {500 / portTICK_RATE_MS, 1};
 
 #endif
 
-#if LCD_DEMO_ENABLED
+#if LCD_DEMO_ENABLED||MAIN_APP
 
 volatile bool mADS7843ScreenTouched = false;
 
@@ -80,7 +82,7 @@ int main(void) {
 //----------------------- AD9106  working tests -----------------------
 	CHIP_Init();
 	CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
-	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO); //32MHZ
+	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO);//32MHZ
 	//BSP_TraceProfilerSetup();
 	CMU_ClockEnable(cmuClock_HFPER, true);
 	BSP_LedsInit();
@@ -114,40 +116,77 @@ int main(void) {
 	SegmentLCD_Init(false);
 	SegmentLCD_AllOff();
 	SegmentLCD_Number(100);
-	SPFD5408Init();
+	//SPFD5408Init();
+	SPFD5408init();
 	ADS7843Init();
-  //USB for Debug
 
-	if (CDC_Init()) { // Initialize the communication class device.
-		SegmentLCD_Write("donea");
-	}
+	/*
+	 //USB for Debug
 
-	else {
-		SegmentLCD_Write("fail");
-		while (1)
-		;
-	}
+	 if (CDC_Init()) { // Initialize the communication class device.
+	 SegmentLCD_Write("donea");
+	 }
+
+	 else {
+	 SegmentLCD_Write("fail");
+	 while (1)
+	 ;
+	 }
+	 */
 
 	uint16_t i = 0;
 	uint16_t counter = 0;
-	char buf[25] = {0};
+	char buf[25] = { 0 };
+
+	for (int i = 1; i < 318; i++) {
+		SPFD5408drawPixel(i, 119 + (sin(((i * 1.13) * 3.14) / 180) * 95),
+				BLACK);
+		Delay(1);
+
+	}
+
+	SPFD5408printChar('H', 10, 10, BLACK);
+	SPFD5408printChar('E', 25, 10, BLACK);
+	SPFD5408printChar('L', 40, 10, BLACK);
+	SPFD5408printChar('L', 55, 10, BLACK);
+	SPFD5408printChar('O', 70, 10, BLACK);
+	SPFD5408printChar('!', 85, 10, BLACK);
+	SPFD5408print("*TFTLibrary- TEST*", 70, 50, 0, RED);
+	Delay(2000);
+	SPFD5408drawBitmap(11, 10, 299, 210, mainPage, 1);
+	Delay(2000);
+	SPFD5408clrScr();
+	//SPFD5408drawBitmap(5, 5, 199, 199, thunder, 1);
+
+	SPFD5408fillCircle(40 + (1 * 20), 40 + (1 * 20), 30, GREEN);
+	Delay(2000);
+	SPFD5408fillRect(100, 15, 200, 200, RED);
+	Delay(2000);
+	SPFD5408fillRoundRect(190 - (1 * 20), 30 + (1 * 20), 250 - (1 * 20),
+			90 + (1 * 20), BLUE);
+	while (1) {
+		i++;
+		SPFD5408drawLine(i, 50, 200, 100, BLACK);
+		SPFD5408drawLine(i, 200, 100, 200, RED);
+		Delay(1000);
+
+	}
+
 	while (1) {
 		i++;
 		if (mADS7843ScreenTouched) {
 			SegmentLCD_Number((int) (getCoordinates().x));
 			//SPFD5408DrawString(getCoordinates().x, getCoordinates().y, "AA", 1, BLACK);
-			sniprintf(buf, 25, "X:%d , Y:%d\r\n", getCoordinates().x, getCoordinates().y);
+			sniprintf(buf, 25, "X:%d , Y:%d\r\n", getCoordinates().x,
+					getCoordinates().y);
 			USB_DEBUG_PUTS(buf);
 			//SPFD5408SetPixel(getCoordinates().x, getCoordinates().y, BLACK);
 			BSP_LedToggle(0);
 			mADS7843ScreenTouched = false;
 		} else
-		SegmentLCD_Number(i);
+			SegmentLCD_Number(i);
 		Delay(1000);
-		SPFD5408PaintScreenBackground(colors[i%10]);
-		//counter = snprintf(buf, 10, "N %d", i);
-		//if (counter != -1)
-		//SPFD5408DrawString(100, 100, buf, 3, BLACK);
+		SPFD5408PaintScreenBackground(colors[i % 10]);
 	}
 
 #elif USB_DEMO_ENABLED
@@ -212,15 +251,24 @@ int main(void) {
 	vTaskStartScheduler();
 
 #elif MAIN_APP
+
 	CHIP_Init();
 	CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
-	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO); //32MHZ
-	BSP_TraceProfilerSetup();
-	if (SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000))
-	while (1)
-	;
+	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO); //48MHZ
+	//BSP_TraceProfilerSetup();
 	CMU_ClockEnable(cmuClock_HFPER, true);
 
+	BSP_LedsInit();
+	BSP_LedSet(0);
+	BSP_LedSet(1);
+	utilsInit();
+	SegmentLCD_Init(false);
+	SegmentLCD_AllOff();
+	SegmentLCD_Number(100);
+	//SPFD5408Init();
+	_SPFD5408Init();
+	ADS7843Init();
+	drawBitmap(11,10,299,210,mainPage,1);
 	for (;;) {
 
 	}
