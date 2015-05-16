@@ -312,6 +312,8 @@ void SPFD5408lcdWriteCOMMAND_DATA(uint16_t command, uint16_t data) {
 
 void SPFD5408init(void) {
 	CLOCKS_ENABLE();
+
+	LCD_TRANS_ENABLE_OUTPUT(); //LCD ENABLE
 	Delay(1);
 	CS_OUTPUT();
 	Delay(1);

@@ -67,7 +67,7 @@ void TIMER0_IRQHandler(void) {
 	msTicks++;       // increment counter necessary in Delay()
 	/* Clear flag for TIMER0 overflow interrupt */
 	TIMER_IntClear(TIMER0, TIMER_IF_OF);
-	BSP_LedToggle(1);
+	//BSP_LedToggle(1);
 
 }
 

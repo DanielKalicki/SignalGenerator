@@ -32,8 +32,8 @@
 #include "../drivers/sleep.h"
 #include "../drivers/usb/cdc.h"
 
-#define AD9106_DEMO_ENABLED 0
-#define LCD_DEMO_ENABLED 1
+#define AD9106_DEMO_ENABLED 1
+#define LCD_DEMO_ENABLED 0
 #define USB_DEMO_ENABLED 0
 #define FREE_RTOS_DEMO_ENABLED 0
 #define MAIN_APP 0
@@ -80,6 +80,7 @@ int main(void) {
 #if AD9106_DEMO_ENABLED
 
 //----------------------- AD9106  working tests -----------------------
+#if 0 //1 FOR DEVBOARD
 	CHIP_Init();
 	CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
 	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO);//32MHZ
@@ -102,27 +103,123 @@ int main(void) {
 		BSP_LedToggle(1);
 		AD9106Test();
 	}
+#endif
+
+	CMU_OscillatorEnable(cmuOsc_HFRCO, true, true);
+	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFRCO); //32MHZ
+	CMU_ClockEnable(cmuClock_HFPER, true);
+	utilsInit();
+	AD9106Init();
+	uint16_t i = 0;
+	uint16_t counter = 0;
+	while (1) {
+		AD9106Test();
+	}
 #elif LCD_DEMO_ENABLED
 	CHIP_Init();
-	CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
-	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO); //32MHZ
-	//BSP_TraceProfilerSetup();
+	//CMU_OscillatorEnable(cmuOsc_HFRCO, true, true);
+	CMU_OscillatorEnable(cmuOsc_HFRCO, true, true);
+	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFRCO); //32MHZ
 	CMU_ClockEnable(cmuClock_HFPER, true);
 	//----------------------- SPFD5408 first working tests -----------------------
-	BSP_LedsInit();
-	BSP_LedSet(0);
-	BSP_LedSet(1);
+	//CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
+	//CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO); //32MHZ
+	//BSP_TraceProfilerSetup();
+	//CMU_ClockEnable(cmuClock_HFPER, true);
+	/*BSP_LedsInit();
+	 BSP_LedSet(0);
+	 BSP_LedSet(1);*/
 	utilsInit();
-	SegmentLCD_Init(false);
-	SegmentLCD_AllOff();
-	SegmentLCD_Number(100);
-	//SPFD5408Init();
+#if 0
+	// DEMO
+	CLOCKS_ENABLE();
+	while (1) {
+		/*TFT_PIN_D0_OUTPUT();
+		 TFT_PIN_D1_OUTPUT();
+		 TFT_PIN_D2_OUTPUT();
+		 TFT_PIN_D3_OUTPUT();
+		 TFT_PIN_D4_OUTPUT();
+		 TFT_PIN_D5_OUTPUT();
+		 TFT_PIN_D6_OUTPUT();
+		 TFT_PIN_D7_OUTPUT();
+
+		 TFT_PIN_D8_OUTPUT();
+		 TFT_PIN_D9_OUTPUT();
+		 TFT_PIN_D10_OUTPUT();
+		 TFT_PIN_D11_OUTPUT();
+		 TFT_PIN_D12_OUTPUT();
+		 TFT_PIN_D13_OUTPUT();
+		 TFT_PIN_D14_OUTPUT();
+		 TFT_PIN_D15_OUTPUT();
+
+		 CS_OUTPUT();
+		 CS_HIGH();
+
+		 RS_OUTPUT();
+		 RS_HIGH();
+
+		 WR_OUTPUT();
+		 WR_HIGH();
+
+		 RD_OUTPUT();
+		 RD_HIGH();
+		 */
+
+		ADS7843_CS_OUTPUT();
+		ADS7843_CS_HIGH();
+
+		ADS7843_INT_OUTPUT();
+		ADS7843_INT_HIGH();
+
+		ADS7843_CLK_OUTPUT();
+		ADS7843_CLK_HIGH() ;
+
+		ADS7843_MOSI_OUTPUT();
+		ADS7843_MOSI_HIGH();
+
+		ADS7843_MISO_OUTPUT();
+		 ADS7843_MISO_HIGH();
+
+		Delay(1000);
+		/*
+		 TFT_PIN_D0_INPUT();
+		 TFT_PIN_D1_INPUT();
+		 TFT_PIN_D2_INPUT();
+		 TFT_PIN_D3_INPUT();
+		 TFT_PIN_D4_INPUT();
+		 TFT_PIN_D5_INPUT();
+		 TFT_PIN_D6_INPUT();
+		 TFT_PIN_D7_INPUT();
+		 TFT_PIN_D8_INPUT();
+		 TFT_PIN_D9_INPUT();
+		 TFT_PIN_D10_INPUT();
+		 TFT_PIN_D11_INPUT();
+		 TFT_PIN_D12_INPUT();
+		 TFT_PIN_D13_INPUT();
+		 TFT_PIN_D14_INPUT();
+		 TFT_PIN_D15_INPUT();
+
+		 CS_LOW();
+		 RS_LOW();
+		 WR_LOW();
+		 RD_LOW();
+		 */
+		ADS7843_CS_LOW();
+		ADS7843_INT_LOW();
+		ADS7843_CLK_LOW();
+		ADS7843_MOSI_LOW();
+		ADS7843_MISO_LOW() ;
+		Delay(1000);
+	}
+#endif
 	SPFD5408init();
+	/*SegmentLCD_Init(false);
+	 SegmentLCD_AllOff();
+	 SegmentLCD_Number(100);
+	 */
 	ADS7843Init();
-
+	//USB for Debug
 	/*
-	 //USB for Debug
-
 	 if (CDC_Init()) { // Initialize the communication class device.
 	 SegmentLCD_Write("donea");
 	 }
@@ -133,60 +230,65 @@ int main(void) {
 	 ;
 	 }
 	 */
-
 	uint16_t i = 0;
 	uint16_t counter = 0;
 	char buf[25] = { 0 };
 
+	//while (1) {
 	for (int i = 1; i < 318; i++) {
 		SPFD5408drawPixel(i, 119 + (sin(((i * 1.13) * 3.14) / 180) * 95),
 				BLACK);
 		Delay(1);
 
 	}
-
-	SPFD5408printChar('H', 10, 10, BLACK);
-	SPFD5408printChar('E', 25, 10, BLACK);
-	SPFD5408printChar('L', 40, 10, BLACK);
-	SPFD5408printChar('L', 55, 10, BLACK);
-	SPFD5408printChar('O', 70, 10, BLACK);
-	SPFD5408printChar('!', 85, 10, BLACK);
-	SPFD5408print("*TFTLibrary- TEST*", 70, 50, 0, RED);
-	Delay(2000);
+	/*
+	 SPFD5408printChar('H', 10, 10, BLACK);
+	 SPFD5408printChar('E', 25, 10, BLACK);
+	 SPFD5408printChar('L', 40, 10, BLACK);
+	 SPFD5408printChar('L', 55, 10, BLACK);
+	 SPFD5408printChar('O', 70, 10, BLACK);
+	 SPFD5408printChar('!', 85, 10, BLACK);
+	 SPFD5408print("*TFTLibrary- TEST*", 10, 50, 0, RED);
+	 Delay(2000);
+	 */
 	SPFD5408drawBitmap(11, 10, 299, 210, mainPage, 1);
-	Delay(2000);
-	SPFD5408clrScr();
-	//SPFD5408drawBitmap(5, 5, 199, 199, thunder, 1);
 
-	SPFD5408fillCircle(40 + (1 * 20), 40 + (1 * 20), 30, GREEN);
-	Delay(2000);
-	SPFD5408fillRect(100, 15, 200, 200, RED);
-	Delay(2000);
-	SPFD5408fillRoundRect(190 - (1 * 20), 30 + (1 * 20), 250 - (1 * 20),
-			90 + (1 * 20), BLUE);
-	while (1) {
-		i++;
-		SPFD5408drawLine(i, 50, 200, 100, BLACK);
-		SPFD5408drawLine(i, 200, 100, 200, RED);
-		Delay(1000);
+	/*Delay(2000);
+	 SPFD5408clrScr();
+	 //SPFD5408drawBitmap(5, 5, 199, 199, thunder, 1);
 
-	}
+	 SPFD5408fillCircle(40 + (1 * 20), 40 + (1 * 20), 30, GREEN);
+	 Delay(2000);
+	 SPFD5408fillRect(100, 15, 200, 200, RED);
+	 Delay(2000);
+	 SPFD5408fillRoundRect(190 - (1 * 20), 30 + (1 * 20), 250 - (1 * 20),
+	 90 + (1 * 20), BLUE);
 
+	 while (1) {
+	 i++;
+	 SPFD5408drawLine(i, 50, 200, 100, BLACK);
+	 SPFD5408drawLine(i, 200, 100, 200, RED);
+	 Delay(1000);
+	 if (i == 50)
+	 break;
+	 }
+	 }
+	 */
 	while (1) {
 		i++;
 		if (mADS7843ScreenTouched) {
-			SegmentLCD_Number((int) (getCoordinates().x));
+			//SegmentLCD_Number((int) (getCoordinates().x));
 			//SPFD5408DrawString(getCoordinates().x, getCoordinates().y, "AA", 1, BLACK);
-			sniprintf(buf, 25, "X:%d , Y:%d\r\n", getCoordinates().x,
-					getCoordinates().y);
-			USB_DEBUG_PUTS(buf);
-			//SPFD5408SetPixel(getCoordinates().x, getCoordinates().y, BLACK);
-			BSP_LedToggle(0);
-			mADS7843ScreenTouched = false;
-		} else
-			SegmentLCD_Number(i);
-		Delay(1000);
-		SPFD5408PaintScreenBackground(colors[i % 10]);
+			//sniprintf(buf, 25, "X:%d,Y:%d\r\n", getCoordinates().x,
+			//.,		getCoordinates().y);
+			//USB_DEBUG_PUTS(buf);
+			SPFD5408drawPixel(getCoordinates().x/100,
+					getCoordinates().y/100,RED);
+			//BSP_LedToggle(0);
+			SPFD5408print(buf, 10, 50, 0, RED);
+		}/* else
+		 SegmentLCD_Number(i);
+		 */
 	}
 
 #elif USB_DEMO_ENABLED

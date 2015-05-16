@@ -3,3 +3,5 @@
 BSP
 *.mk
 *.axf
+/SignalGeneratorMcuCode/GNU ARM v4.8.3 - Release
+/SignalGeneratorMcuCode/.settings

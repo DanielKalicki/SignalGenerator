@@ -23,8 +23,8 @@ extern "C"
 /*********************************Hardware dependent part*****************************************/
 
 //==================CS=====================
-#define ADS7843_PIN_CS      3//0
-#define ADS7843_PORT_CS     gpioPortD//gpioPortE
+#define ADS7843_PIN_CS      8//3//0
+#define ADS7843_PORT_CS     gpioPortC//gpioPortD//gpioPortE
 #define ADS7843_CS_OUTPUT() GPIO_PinModeSet(ADS7843_PORT_CS, ADS7843_PIN_CS, gpioModePushPull, 1)
 #define ADS7843_CS_HIGH()   GPIO_PinOutSet(ADS7843_PORT_CS , ADS7843_PIN_CS )
 #define ADS7843_CS_LOW()    GPIO_PinOutClear(ADS7843_PORT_CS , ADS7843_PIN_CS )

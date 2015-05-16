@@ -30,7 +30,7 @@
  *  */
 //------------------CS----------------------
 #define AD9106_PIN_CS           5
-#define AD9106_PORT_CS          gpioPortC
+#define AD9106_PORT_CS          gpioPortD//gpioPortC
 #define AD9106_CS_OUTPUT() 		GPIO_PinModeSet(AD9106_PORT_CS, AD9106_PIN_CS, gpioModePushPull, 1)
 #define AD91063_CS_HIGH()   	GPIO_PinOutSet(AD9106_PORT_CS , AD9106_PIN_CS )
 #define AD9106_CS_LOW()    		GPIO_PinOutClear(AD9106_PORT_CS , AD9106_PIN_CS )

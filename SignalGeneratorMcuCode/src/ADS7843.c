@@ -17,7 +17,7 @@
 /* USART used for SPI access */
 #define USART_USED        USART1
 #define USART_CLK         cmuClock_USART1
-#define SPI_SW_ENABLED 0
+#define SPI_SW_ENABLED0
 
 static const USART_InitSync_TypeDef initSpi = { usartEnable, /* Enable RX/TX when init completed. */
 1000000, /* Use 1MHz reference clock */
@@ -185,25 +185,35 @@ static void ADS7843PenIRQCallback(uint8_t pin) {
 	if (pin == ADS7843_PIN_INT && !mADS7843ScreenTouched) {
 		uint16_t x, y;
 		ADS7843_INT_IRQ_CONFIG_PIN_DISABLE();
-		if (ADS7843_GET_INT_PIN()) {
-			// Change to falling trigger edge when pen up
-			ADS7843_INT_IRQ_CONFIG_FALLING(true);
-			tTouchData.touchStatus |= TOUCH_STATUS_PENUP;
-			tTouchData.touchStatus &= ~TOUCH_STATUS_PENDOWN;
-		} else {
 
-			// Modify status
-			tTouchData.touchStatus |= TOUCH_STATUS_PENDOWN;
-			tTouchData.touchStatus &= ~TOUCH_STATUS_PENUP;
+		/*
+		 if (ADS7843_GET_INT_PIN()) {
+		 // Change to falling trigger edge when pen up
+		 ADS7843_INT_IRQ_CONFIG_FALLING(true);
+		 tTouchData.touchStatus |= TOUCH_STATUS_PENUP;
+		 tTouchData.touchStatus &= ~TOUCH_STATUS_PENDOWN;
+		 } else {
+
+		 // Modify status
+		 tTouchData.touchStatus |= TOUCH_STATUS_PENDOWN;
+		 tTouchData.touchStatus &= ~TOUCH_STATUS_PENUP;
+		 // Read x,y coordinate
+		 ADS7843ReadPointXY(&x, &y);
+		 mPointCoordinates.x = x;
+		 mPointCoordinates.y = y;
+		 mADS7843ScreenTouched = true;
+		 ADS7843_INT_IRQ_CONFIG_FALLING(true);
+		 //ADS7843_INT_IRQ_CONFIG_RISING(true);
+		 }
+		*/
+		//if (ADS7843_GET_INT_PIN()) {
 			// Read x,y coordinate
 			ADS7843ReadPointXY(&x, &y);
 			mPointCoordinates.x = x;
 			mPointCoordinates.y = y;
 			mADS7843ScreenTouched = true;
 			ADS7843_INT_IRQ_CONFIG_FALLING(true);
-			//ADS7843_INT_IRQ_CONFIG_RISING(true);
-
-		}
+		//}
 
 	}
 
