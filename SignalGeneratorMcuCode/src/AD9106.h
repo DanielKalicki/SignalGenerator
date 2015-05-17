@@ -415,6 +415,7 @@ typedef enum {
 
 void AD9106Test(void);
 void AD9106Init(void);
+void AD9106TestType(uint8_t waveformType);
 
 //SRAM methods
 bool writePatternToSram(uint16_t* dataBuf, uint16_t bufLength, uint16_t sramAddr);

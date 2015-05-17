@@ -17,12 +17,14 @@
 #include "em_emu.h"
 #include "bsp.h"
 #include "bsp_trace.h"
+#include "main.h"
 #include "../drivers/segmentlcd.h"
 #include "spi.h"
 //#include "oldSPFD5408.h"
 #include "SPFD5408.h"
 #include "bitmaps.h"
 #include "ADS7843.h"
+#include "utils.h"
 #include "../FreeRtos/FreeRTOS.h"
 #include "../FreeRtos/task.h"
 #include "../FreeRtos/queue.h"
@@ -32,26 +34,23 @@
 #include "../drivers/sleep.h"
 #include "../drivers/usb/cdc.h"
 
-#define AD9106_DEMO_ENABLED 1
+#define AD9106_DEMO_ENABLED 0
 #define LCD_DEMO_ENABLED 0
 #define USB_DEMO_ENABLED 0
-#define FREE_RTOS_DEMO_ENABLED 0
+#define FREE_RTOS_DEMO_ENABLED 1
 #define MAIN_APP 0
 
-#if !FREE_RTOS_DEMO_ENABLED
-#include "utils.h"
-#endif
 //********************************RTOS****************************************
 #if FREE_RTOS_DEMO_ENABLED
 
-#define STACK_SIZE_FOR_TASK    (configMINIMAL_STACK_SIZE + 10)
+#define STACK_SIZE_FOR_TASK    (configMINIMAL_STACK_SIZE + 30)
 #define TASK_PRIORITY          (tskIDLE_PRIORITY + 1)
 
 typedef struct {
 	/* Delay between blink of led */portTickType delay;
 	/* Number of led */
 	int ledNo;
-}TaskParams_t;
+} TaskParams_t;
 
 static void ledBlinkTask(void *pParameters) {
 	TaskParams_t * pData = (TaskParams_t*) pParameters;
@@ -64,14 +63,44 @@ static void ledBlinkTask(void *pParameters) {
 }
 
 /* Parameters value for taks*/
-static TaskParams_t parametersToTask1 = {1000 / portTICK_RATE_MS, 0};
-static TaskParams_t parametersToTask2 = {500 / portTICK_RATE_MS, 1};
+static TaskParams_t parametersToTask1 = { 1000 / portTICK_RATE_MS, 0 };
+static TaskParams_t parametersToTask2 = { 500 / portTICK_RATE_MS, 1 };
+
+#if LCD_DEMO_ENABLED||MAIN_APP||FREE_RTOS_DEMO_ENABLED
+
+volatile bool mADS7843ScreenTouched = false;
 
 #endif
 
-#if LCD_DEMO_ENABLED||MAIN_APP
+static void touchControllerTask(void *pParameters) {
+	ADS7843Init();
+	SPFD5408init();
+	SPFD5408drawBitmap(11, 10, 299, 210, mainPage, 1);
+	for (;;) {
+		if (mADS7843ScreenTouched) {
 
-volatile bool mADS7843ScreenTouched = false;
+			SPFD5408drawPixel(getCoordinates().x / 100,
+					getCoordinates().y / 100, RED);
+		}
+		 SPFD5408clrScr();
+
+			 SPFD5408fillCircle(40 + (1 * 20), 40 + (1 * 20), 30, GREEN);
+		vTaskDelay(1000);
+	}
+}
+
+static void signalGenTask(void *pParameters) {
+	AD9106Init();
+	static uint8_t waveformType = 0;
+	for (;;) {
+		AD9106TestType(waveformType);
+
+		waveformType++;
+		if (waveformType > 2)
+			waveformType = 0;
+		vTaskDelay(10000);
+	}
+}
 
 #endif
 
@@ -119,7 +148,7 @@ int main(void) {
 	CHIP_Init();
 	//CMU_OscillatorEnable(cmuOsc_HFRCO, true, true);
 	CMU_OscillatorEnable(cmuOsc_HFRCO, true, true);
-	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFRCO); //32MHZ
+	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFRCO);//32MHZ
 	CMU_ClockEnable(cmuClock_HFPER, true);
 	//----------------------- SPFD5408 first working tests -----------------------
 	//CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
@@ -172,13 +201,13 @@ int main(void) {
 		ADS7843_INT_HIGH();
 
 		ADS7843_CLK_OUTPUT();
-		ADS7843_CLK_HIGH() ;
+		ADS7843_CLK_HIGH();
 
 		ADS7843_MOSI_OUTPUT();
 		ADS7843_MOSI_HIGH();
 
 		ADS7843_MISO_OUTPUT();
-		 ADS7843_MISO_HIGH();
+		ADS7843_MISO_HIGH();
 
 		Delay(1000);
 		/*
@@ -208,7 +237,7 @@ int main(void) {
 		ADS7843_INT_LOW();
 		ADS7843_CLK_LOW();
 		ADS7843_MOSI_LOW();
-		ADS7843_MISO_LOW() ;
+		ADS7843_MISO_LOW();
 		Delay(1000);
 	}
 #endif
@@ -232,7 +261,7 @@ int main(void) {
 	 */
 	uint16_t i = 0;
 	uint16_t counter = 0;
-	char buf[25] = { 0 };
+	char buf[25] = {0};
 
 	//while (1) {
 	for (int i = 1; i < 318; i++) {
@@ -333,45 +362,85 @@ int main(void) {
 	}
 #elif FREE_RTOS_DEMO_ENABLED
 	CHIP_Init();
+
+#ifdef HARDWARE_USED_DEV_BOARD_STK3800
 	CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
-	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO); //32MHZ
-	BSP_TraceProfilerSetup();
-	if (SysTick_Config(CMU_ClockFreqGet(cmuClock_CORE) / 1000))
-	while (1)
-	;
+	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO); //48MHZ
+	CMU_ClockEnable(cmuClock_HFPER, true);
+
+#else
+	CMU_OscillatorEnable(cmuOsc_HFRCO, true, true);
+	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFRCO); //32MHZ
+	CMU_ClockEnable(cmuClock_HFPER, true);
+#endif
 	CMU_ClockEnable(cmuClock_HFPER, true);
 	//********************************RTOS****************************************
 	/* Initialize SLEEP driver, no calbacks are used */
 	SLEEP_Init(NULL, NULL );
 	/*Create two task for blinking leds*/
+#ifdef HARDWARE_USED_DEV_BOARD_STK3800
+	BSP_LedsInit();
+	BSP_LedSet(0);
+	BSP_LedSet(1);
+	SegmentLCD_Init(false);
+	SegmentLCD_Number(100);
+#else
+	utilsInit();
+//	SPFD5408init();
+//	ADS7843Init();
+//	AD9106Init();
+
+	//SPFD5408drawBitmap(11, 10, 299, 210, mainPage, 1);
+#endif
+#ifdef HARDWARE_USED_DEV_BOARD_STK3800
 	xTaskCreate(ledBlinkTask, (const char * const ) "Led1", STACK_SIZE_FOR_TASK,
 			&parametersToTask1, TASK_PRIORITY, NULL);
 	xTaskCreate(ledBlinkTask, (const char * const ) "Led2", STACK_SIZE_FOR_TASK,
 			&parametersToTask2, TASK_PRIORITY, NULL);
 
+#else
+	xTaskCreate(touchControllerTask, (const char * const ) "lcd",
+			STACK_SIZE_FOR_TASK, NULL, TASK_PRIORITY, NULL);
+
+	xTaskCreate(signalGenTask, (const char * const ) "gen", STACK_SIZE_FOR_TASK,
+			NULL, TASK_PRIORITY, NULL);
+#endif
 	/*Start FreeRTOS Scheduler*/
 	vTaskStartScheduler();
 
 #elif MAIN_APP
 
 	CHIP_Init();
+
+#ifdef HARDWARE_USED_DEV_BOARD_STK3800
 	CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
 	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFXO); //48MHZ
-	//BSP_TraceProfilerSetup();
 	CMU_ClockEnable(cmuClock_HFPER, true);
 
+#else
+	CMU_OscillatorEnable(cmuOsc_HFRCO, true, true);
+	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFRCO); //32MHZ
+	CMU_ClockEnable(cmuClock_HFPER, true);
+#endif
+
+#ifdef HARDWARE_USED_DEV_BOARD_STK3800
 	BSP_LedsInit();
 	BSP_LedSet(0);
 	BSP_LedSet(1);
-	utilsInit();
 	SegmentLCD_Init(false);
 	SegmentLCD_AllOff();
 	SegmentLCD_Number(100);
-	//SPFD5408Init();
-	_SPFD5408Init();
+#endif
+
+	utilsInit();
+	SPFD5408init();
 	ADS7843Init();
-	drawBitmap(11,10,299,210,mainPage,1);
+	AD9106Init();
+
+	SPFD5408drawBitmap(11, 10, 299, 210, mainPage, 1);
 	for (;;) {
+
+		AD9106Test();
 
 	}
 #endif

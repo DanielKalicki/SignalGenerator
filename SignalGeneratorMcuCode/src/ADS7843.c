@@ -525,9 +525,7 @@ uint8_t ADS7843Calibration(void) {
 					&& (adxmax < (TOUCH_AD_X_MAX + TOUCH_AD_CALIB_ERROR))
 					&& (adxmin > (TOUCH_AD_X_MIN - TOUCH_AD_CALIB_ERROR))
 					&& (adxmin < (TOUCH_AD_X_MIN + TOUCH_AD_CALIB_ERROR))) {
-#ifdef __DEBUG_PRINT__
-				printf("x coordinate calibrate over\n\r");
-#endif
+
 				tTouchData.thAdLeft = adxmin;
 				tTouchData.thAdRight = adxmax;
 				calibrationFlag |= 1;
@@ -541,9 +539,6 @@ uint8_t ADS7843Calibration(void) {
 					&& (adymax < (TOUCH_AD_Y_MAX + TOUCH_AD_CALIB_ERROR))
 					&& (adymin > (TOUCH_AD_Y_MIN - TOUCH_AD_CALIB_ERROR))
 					&& (adymin < (TOUCH_AD_Y_MIN + TOUCH_AD_CALIB_ERROR))) {
-#ifdef __DEBUG_PRINT__
-				printf("y coordinate calibrate over\n\r");
-#endif
 				tTouchData.thAdUp = adymax;
 				tTouchData.thAdDown = adymin;
 				calibrationFlag |= 2;

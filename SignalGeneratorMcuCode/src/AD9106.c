@@ -452,22 +452,22 @@ void playWaveformFromSram(uint8_t nrOfDac, uint16_t startAddr,
 	ADS7843SpiWriteRegS((uint16_t) RAMUPDATE, 0x0001);
 	Delay(1);
 #else
-	ADS7843SpiWriteReg((uint16_t) WAV4_3CONFIG, 0x3000,0);
-	ADS7843SpiWriteReg((uint16_t) DDS_TW1, 0x1000,0); //frequency settings i dont know if its working with arbitrary pattern
-	ADS7843SpiWriteReg((uint16_t) DAC4_CST, 0xA200,0);
-	ADS7843SpiWriteReg((uint16_t) DAC4_DGAIN, 0x5000,0); //amplitude gain
-	ADS7843SpiWriteReg((uint16_t) DAC4RSET, 0x8002,0);
-	ADS7843SpiWriteReg((uint16_t) DACxRANGE, 0x00A0,0);
-	ADS7843SpiWriteReg((uint16_t) PAT_TIMEBASE, 0x0FF1,0); //this register changes the time between samples
-	ADS7843SpiWriteReg((uint16_t) PAT_PERIOD, 0x8000,0);
-	ADS7843SpiWriteReg((uint16_t) PAT_TYPE, 0x0001,0); //pattern repeats DAC4_3PATx number of times
-	ADS7843SpiWriteReg((uint16_t) DAC4_3PATx, 0x0202,0);	//pattern for DAC4 repeats 2 times
-	ADS7843SpiWriteReg((uint16_t) PAT_STATUS, 0,0);
-	ADS7843SpiWriteReg((uint16_t) START_ADDR4, startAddr,0); //read register description!!! this value starts from 0 and is shifted left 4 places, the same with STOP_ADDR4
-	ADS7843SpiWriteReg((uint16_t) STOP_ADDR4, (1023 << 4),0);
-	ADS7843SpiWriteReg((uint16_t) START_DLY4, 0x00,0);
-	ADS7843SpiWriteReg((uint16_t) PAT_STATUS, 0x01,0);
-	ADS7843SpiWriteReg((uint16_t) RAMUPDATE, 0x0001,0);
+	ADS7843SpiWriteReg((uint16_t) WAV4_3CONFIG, 0x3000, 0);
+	ADS7843SpiWriteReg((uint16_t) DDS_TW1, 0x1000, 0); //frequency settings i dont know if its working with arbitrary pattern
+	ADS7843SpiWriteReg((uint16_t) DAC4_CST, 0xA200, 0);
+	ADS7843SpiWriteReg((uint16_t) DAC4_DGAIN, 0x5000, 0); //amplitude gain
+	ADS7843SpiWriteReg((uint16_t) DAC4RSET, 0x8002, 0);
+	ADS7843SpiWriteReg((uint16_t) DACxRANGE, 0x00A0, 0);
+	ADS7843SpiWriteReg((uint16_t) PAT_TIMEBASE, 0x0FF1, 0); //this register changes the time between samples
+	ADS7843SpiWriteReg((uint16_t) PAT_PERIOD, 0x8000, 0);
+	ADS7843SpiWriteReg((uint16_t) PAT_TYPE, 0x0001, 0); //pattern repeats DAC4_3PATx number of times
+	ADS7843SpiWriteReg((uint16_t) DAC4_3PATx, 0x0202, 0); //pattern for DAC4 repeats 2 times
+	ADS7843SpiWriteReg((uint16_t) PAT_STATUS, 0, 0);
+	ADS7843SpiWriteReg((uint16_t) START_ADDR4, startAddr, 0); //read register description!!! this value starts from 0 and is shifted left 4 places, the same with STOP_ADDR4
+	ADS7843SpiWriteReg((uint16_t) STOP_ADDR4, (1023 << 4), 0);
+	ADS7843SpiWriteReg((uint16_t) START_DLY4, 0x00, 0);
+	ADS7843SpiWriteReg((uint16_t) PAT_STATUS, 0x01, 0);
+	ADS7843SpiWriteReg((uint16_t) RAMUPDATE, 0x0001, 0);
 
 #endif
 }
@@ -522,15 +522,15 @@ bool writePatternToSram(uint16_t* dataBuf, uint16_t bufLength,
 	ADS7843SpiWriteRegS((uint16_t) RAMUPDATE, 0x0001);
 	Delay(1);
 #else
-	ADS7843SpiWriteReg(PAT_STATUS, 0x04,0 );
-	ADS7843SpiWriteReg(RAMUPDATE, 0x0001,0);
+	ADS7843SpiWriteReg(PAT_STATUS, 0x04, 0);
+	ADS7843SpiWriteReg(RAMUPDATE, 0x0001, 0);
 
 #endif
 	for (int i = 0; i < bufLength; i++) {
 #if SPI_SW_ENABLED
 		ADS7843SpiWriteRegS(sramAddr+i,*(dataBuf++) );
 #else
-		ADS7843SpiWriteReg(sramAddr+i,*(dataBuf++),0 );
+		ADS7843SpiWriteReg(sramAddr + i, *(dataBuf++), 0);
 #endif
 	}
 	return true;
@@ -588,12 +588,11 @@ void setNoise(void) {
 #endif
 }
 
-
 void setSaw(void) {
 #if SPI_SW_ENABLED
 
 	ADS7843SpiWriteRegS((uint16_t) WAV4_3CONFIG, 0x1111);
-	Delay(1);//sawtooth test
+	Delay(1);	//sawtooth test
 
 	ADS7843SpiWriteRegS((uint16_t) DAC4_CST, 0xA200);
 	Delay(1);
@@ -668,5 +667,24 @@ void AD9106Test(void) {
 	//SegmentLCD_Number(i);
 	Delay(200);
 #endif
+}
+
+void AD9106TestType(uint8_t waveformType) {
+
+	switch (waveformType){
+
+	case 0:
+	setSinus();
+	break;
+
+	case 1:
+	setNoise();
+
+	case 2:
+	setSaw();
+	break;
+	default:
+	break;
+	}
 }
 
