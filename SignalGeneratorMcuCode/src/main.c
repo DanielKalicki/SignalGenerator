@@ -37,8 +37,13 @@
 #define AD9106_DEMO_ENABLED 0
 #define LCD_DEMO_ENABLED 0
 #define USB_DEMO_ENABLED 0
-#define FREE_RTOS_DEMO_ENABLED 1
-#define MAIN_APP 0
+#define FREE_RTOS_DEMO_ENABLED 0
+#define MAIN_APP 1
+
+#if LCD_DEMO_ENABLED||MAIN_APP||FREE_RTOS_DEMO_ENABLED
+
+volatile bool mADS7843ScreenTouched = false;
+#endif
 
 //********************************RTOS****************************************
 #if FREE_RTOS_DEMO_ENABLED
@@ -50,7 +55,7 @@ typedef struct {
 	/* Delay between blink of led */portTickType delay;
 	/* Number of led */
 	int ledNo;
-} TaskParams_t;
+}TaskParams_t;
 
 static void ledBlinkTask(void *pParameters) {
 	TaskParams_t * pData = (TaskParams_t*) pParameters;
@@ -63,14 +68,8 @@ static void ledBlinkTask(void *pParameters) {
 }
 
 /* Parameters value for taks*/
-static TaskParams_t parametersToTask1 = { 1000 / portTICK_RATE_MS, 0 };
-static TaskParams_t parametersToTask2 = { 500 / portTICK_RATE_MS, 1 };
-
-#if LCD_DEMO_ENABLED||MAIN_APP||FREE_RTOS_DEMO_ENABLED
-
-volatile bool mADS7843ScreenTouched = false;
-
-#endif
+static TaskParams_t parametersToTask1 = {1000 / portTICK_RATE_MS, 0};
+static TaskParams_t parametersToTask2 = {500 / portTICK_RATE_MS, 1};
 
 static void touchControllerTask(void *pParameters) {
 	ADS7843Init();
@@ -82,9 +81,9 @@ static void touchControllerTask(void *pParameters) {
 			SPFD5408drawPixel(getCoordinates().x / 100,
 					getCoordinates().y / 100, RED);
 		}
-		 SPFD5408clrScr();
+		SPFD5408clrScr();
 
-			 SPFD5408fillCircle(40 + (1 * 20), 40 + (1 * 20), 30, GREEN);
+		SPFD5408fillCircle(40 + (1 * 20), 40 + (1 * 20), 30, GREEN);
 		vTaskDelay(1000);
 	}
 }
@@ -97,7 +96,7 @@ static void signalGenTask(void *pParameters) {
 
 		waveformType++;
 		if (waveformType > 2)
-			waveformType = 0;
+		waveformType = 0;
 		vTaskDelay(10000);
 	}
 }
@@ -148,7 +147,7 @@ int main(void) {
 	CHIP_Init();
 	//CMU_OscillatorEnable(cmuOsc_HFRCO, true, true);
 	CMU_OscillatorEnable(cmuOsc_HFRCO, true, true);
-	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFRCO);//32MHZ
+	CMU_ClockSelectSet(cmuClock_HF, cmuSelect_HFRCO); //32MHZ
 	CMU_ClockEnable(cmuClock_HFPER, true);
 	//----------------------- SPFD5408 first working tests -----------------------
 	//CMU_OscillatorEnable(cmuOsc_HFXO, true, true);
@@ -261,15 +260,10 @@ int main(void) {
 	 */
 	uint16_t i = 0;
 	uint16_t counter = 0;
-	char buf[25] = {0};
+	char buf[25] = { 0 };
 
 	//while (1) {
-	for (int i = 1; i < 318; i++) {
-		SPFD5408drawPixel(i, 119 + (sin(((i * 1.13) * 3.14) / 180) * 95),
-				BLACK);
-		Delay(1);
 
-	}
 	/*
 	 SPFD5408printChar('H', 10, 10, BLACK);
 	 SPFD5408printChar('E', 25, 10, BLACK);
@@ -280,8 +274,7 @@ int main(void) {
 	 SPFD5408print("*TFTLibrary- TEST*", 10, 50, 0, RED);
 	 Delay(2000);
 	 */
-	SPFD5408drawBitmap(11, 10, 299, 210, mainPage, 1);
-
+	//SPFD5408drawBitmap(11, 10, 299, 210, mainPage, 1);
 	/*Delay(2000);
 	 SPFD5408clrScr();
 	 //SPFD5408drawBitmap(5, 5, 199, 199, thunder, 1);
@@ -303,18 +296,20 @@ int main(void) {
 	 }
 	 }
 	 */
+	for (int i = 1; i < 318; i++) {
+		SPFD5408drawPixel(i, 119 + (sin(((i * 1.13) * 3.14) / 180) * 95),
+				BLACK);
+		Delay(1);
+
+	}
 	while (1) {
 		i++;
 		if (mADS7843ScreenTouched) {
 			//SegmentLCD_Number((int) (getCoordinates().x));
-			//SPFD5408DrawString(getCoordinates().x, getCoordinates().y, "AA", 1, BLACK);
-			//sniprintf(buf, 25, "X:%d,Y:%d\r\n", getCoordinates().x,
-			//.,		getCoordinates().y);
 			//USB_DEBUG_PUTS(buf);
-			SPFD5408drawPixel(getCoordinates().x/100,
-					getCoordinates().y/100,RED);
+			SPFD5408drawPixel(getCoordinates().x / 100,
+					getCoordinates().y / 100, RED);
 			//BSP_LedToggle(0);
-			SPFD5408print(buf, 10, 50, 0, RED);
 		}/* else
 		 SegmentLCD_Number(i);
 		 */
@@ -434,14 +429,25 @@ int main(void) {
 
 	utilsInit();
 	SPFD5408init();
-	ADS7843Init();
+	//ADS7843Init();
 	AD9106Init();
+	for (int i = 1; i < 318; i++) {
+		SPFD5408drawPixel(i, 119 + (sin(((i * 1.13) * 3.14) / 180) * 95),
+				BLACK);
 
+	}
+	Delay(2);
 	SPFD5408drawBitmap(11, 10, 299, 210, mainPage, 1);
 	for (;;) {
 
-		AD9106Test();
+		static uint8_t waveformType = 0;
+		AD9106TestType(waveformType);
 
+
+		waveformType++;
+		if (waveformType > 2)
+		waveformType = 0;
+		Delay(10000);
 	}
 #endif
 

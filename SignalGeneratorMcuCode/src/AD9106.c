@@ -50,6 +50,7 @@ static StatusTypeDef spiPeripheralsConfig(void) {
 	GPIO_PinModeSet(AD9106_PORT_CLK, AD9106_PIN_CLK, gpioModePushPull, 0);
 	// Keep CS high to not activate slave
 	GPIO_PinModeSet(AD9106_PORT_CS, AD9106_PIN_CS, gpioModePushPull, 1);
+	AD9106_TRIGGER_OUTPUT(); ///tRIGGER AS OUTPUT
 	return STATUS_OK;
 }
 
@@ -69,7 +70,7 @@ void AD9106Init(void) {
 
 #if SPI_SW_ENABLED
 
-	spiInitSoftware();
+	AD9106spiInitSoftware();
 
 #else
 	spiHandle.spiInstance = USART_USED;
@@ -247,7 +248,7 @@ static bool ADS7843SpiWriteReg(AD9106RegAddress regAddress, uint16_t data,
 
 //software SPI
 
-void spiInitSoftware(void) {
+void AD9106spiInitSoftware(void) {
 	CMU_ClockEnable(cmuClock_GPIO, true);
 	AD9106_MOSI_OUTPUT();
 	AD9106_MISO_INPUT();
@@ -258,7 +259,7 @@ void spiInitSoftware(void) {
 	AD9106_MOSI_LOW();
 }
 
-uint16_t ADS7843SpiWriteRegS(uint16_t addr, uint16_t data) {
+uint16_t ADS9106SpiWriteRegS(uint16_t addr, uint16_t data) {
 	AD9106_CLK_HIGH();
 	Delay(1);
 	addr &= ~0x8000; //writing
@@ -297,7 +298,7 @@ uint16_t ADS7843SpiWriteRegS(uint16_t addr, uint16_t data) {
 
 }
 
-uint16_t ADS7843SpiReadRegS(uint16_t addr) {
+uint16_t ADS9106SpiReadRegS(uint16_t addr) {
 	uint16_t data = 0;
 	AD9106_CLK_HIGH();
 	Delay(1);
@@ -418,38 +419,38 @@ void playWaveformFromSram(uint8_t nrOfDac, uint16_t startAddr,
 #define  GET_REG(reg,nrOfDac)    reg##nrOfDac
 #define  GET_NR_OF_DAC(nrOfDac)   4
 #if SPI_SW_ENABLED
-	ADS7843SpiWriteRegS((uint16_t)WAV4_3CONFIG,0x3000);
+	ADS9106SpiWriteRegS((uint16_t)WAV4_3CONFIG,0x3000);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DDS_TW1, 0x1000); //frequency settings i dont know if its working with arbitrary pattern
+	ADS9106SpiWriteRegS((uint16_t) DDS_TW1, 0x1000); //frequency settings i dont know if its working with arbitrary pattern
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DAC4_CST, 0xA200);
+	ADS9106SpiWriteRegS((uint16_t) DAC4_CST, 0xA200);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DAC4_DGAIN, 0x5000);//amplitude gain
+	ADS9106SpiWriteRegS((uint16_t) DAC4_DGAIN, 0x5000);//amplitude gain
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DAC4RSET, 0x8002);
+	ADS9106SpiWriteRegS((uint16_t) DAC4RSET, 0x8002);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DACxRANGE, 0x00A0);
+	ADS9106SpiWriteRegS((uint16_t) DACxRANGE, 0x00A0);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) PAT_TIMEBASE, 0x0FF1);//this register changes the time between samples
+	ADS9106SpiWriteRegS((uint16_t) PAT_TIMEBASE, 0x0FF1);//this register changes the time between samples
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) PAT_PERIOD, 0x8000);
+	ADS9106SpiWriteRegS((uint16_t) PAT_PERIOD, 0x8000);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) PAT_TYPE, 0x0001);//pattern repeats DAC4_3PATx number of times
+	ADS9106SpiWriteRegS((uint16_t) PAT_TYPE, 0x0001);//pattern repeats DAC4_3PATx number of times
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DAC4_3PATx, 0x0202);//pattern for DAC4 repeats 2 times
+	ADS9106SpiWriteRegS((uint16_t) DAC4_3PATx, 0x0202);//pattern for DAC4 repeats 2 times
 	Delay(1);
 
-	ADS7843SpiWriteRegS((uint16_t)PAT_STATUS, 0 );
+	ADS9106SpiWriteRegS((uint16_t)PAT_STATUS, 0 );
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t)START_ADDR4 ,startAddr );//read register description!!! this value starts from 0 and is shifted left 4 places, the same with STOP_ADDR4
+	ADS9106SpiWriteRegS((uint16_t)START_ADDR4 ,startAddr );//read register description!!! this value starts from 0 and is shifted left 4 places, the same with STOP_ADDR4
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t)STOP_ADDR4 ,(1023<<4) );
+	ADS9106SpiWriteRegS((uint16_t)STOP_ADDR4 ,(1023<<4) );
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t)START_DLY4 ,0x00 );
+	ADS9106SpiWriteRegS((uint16_t)START_DLY4 ,0x00 );
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t)PAT_STATUS, 0x01 );
+	ADS9106SpiWriteRegS((uint16_t)PAT_STATUS, 0x01 );
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) RAMUPDATE, 0x0001);
+	ADS9106SpiWriteRegS((uint16_t) RAMUPDATE, 0x0001);
 	Delay(1);
 #else
 	ADS7843SpiWriteReg((uint16_t) WAV4_3CONFIG, 0x3000, 0);
@@ -474,27 +475,27 @@ void playWaveformFromSram(uint8_t nrOfDac, uint16_t startAddr,
 
 void setSinus(void) {
 #if SPI_SW_ENABLED
-	ADS7843SpiWriteRegS((uint16_t)WAV4_3CONFIG,0x3100);Delay(1);
+	ADS9106SpiWriteRegS((uint16_t)WAV4_3CONFIG,0x3100);Delay(1);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DDS_TW1, 0x1000); //frequency settings
+	ADS9106SpiWriteRegS((uint16_t) DDS_TW1, 0x1000); //frequency settings
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DDS_CYC4, 0x0001);
+	ADS9106SpiWriteRegS((uint16_t) DDS_CYC4, 0x0001);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DAC4_CST, 0xA200);
+	ADS9106SpiWriteRegS((uint16_t) DAC4_CST, 0xA200);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DAC4_DGAIN, 0x1000);//amplitude gain
+	ADS9106SpiWriteRegS((uint16_t) DAC4_DGAIN, 0x1000);//amplitude gain
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DAC4RSET, 0x8002);
+	ADS9106SpiWriteRegS((uint16_t) DAC4RSET, 0x8002);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DACxRANGE, 0x00A0);
+	ADS9106SpiWriteRegS((uint16_t) DACxRANGE, 0x00A0);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) PAT_TIMEBASE, 0x0111);
+	ADS9106SpiWriteRegS((uint16_t) PAT_TIMEBASE, 0x0111);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) PAT_PERIOD, 0x8000);
+	ADS9106SpiWriteRegS((uint16_t) PAT_PERIOD, 0x8000);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) PAT_STATUS, 0x0001);
+	ADS9106SpiWriteRegS((uint16_t) PAT_STATUS, 0x0001);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) RAMUPDATE, 0x0001);
+	ADS9106SpiWriteRegS((uint16_t) RAMUPDATE, 0x0001);
 	Delay(1);
 #else
 	ADS7843SpiWriteReg(WAV4_3CONFIG, 0x3100, 0);
@@ -517,9 +518,9 @@ bool writePatternToSram(uint16_t* dataBuf, uint16_t bufLength,
 	if (sramAddr < SRAMDATA)
 		return false;
 #if SPI_SW_ENABLED
-	ADS7843SpiWriteRegS(PAT_STATUS, 0x04 );
+	ADS9106SpiWriteRegS(PAT_STATUS, 0x04 );
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) RAMUPDATE, 0x0001);
+	ADS9106SpiWriteRegS((uint16_t) RAMUPDATE, 0x0001);
 	Delay(1);
 #else
 	ADS7843SpiWriteReg(PAT_STATUS, 0x04, 0);
@@ -528,7 +529,7 @@ bool writePatternToSram(uint16_t* dataBuf, uint16_t bufLength,
 #endif
 	for (int i = 0; i < bufLength; i++) {
 #if SPI_SW_ENABLED
-		ADS7843SpiWriteRegS(sramAddr+i,*(dataBuf++) );
+		ADS9106SpiWriteRegS(sramAddr+i,*(dataBuf++) );
 #else
 		ADS7843SpiWriteReg(sramAddr + i, *(dataBuf++), 0);
 #endif
@@ -548,29 +549,29 @@ void testPattern() {
 
 void setNoise(void) {
 #if SPI_SW_ENABLED
-	ADS7843SpiWriteRegS((uint16_t)WAV4_3CONFIG,0x2100);Delay(1); //noise output test
+	ADS9106SpiWriteRegS((uint16_t)WAV4_3CONFIG,0x2100);Delay(1); //noise output test
 	//ADS7843SpiWriteRegS((uint16_t) WAV4_3CONFIG, 0x1111);
 	Delay(1);//sawtooth test
 
-	ADS7843SpiWriteRegS((uint16_t) DAC4_CST, 0xA200);
+	ADS9106SpiWriteRegS((uint16_t) DAC4_CST, 0xA200);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DAC4_DGAIN, 0x1000);
+	ADS9106SpiWriteRegS((uint16_t) DAC4_DGAIN, 0x1000);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DAC4RSET, 0x8002);
+	ADS9106SpiWriteRegS((uint16_t) DAC4RSET, 0x8002);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DACxRANGE, 0x00A0);
+	ADS9106SpiWriteRegS((uint16_t) DACxRANGE, 0x00A0);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) PAT_TIMEBASE, 0x0000);
+	ADS9106SpiWriteRegS((uint16_t) PAT_TIMEBASE, 0x0000);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) PAT_PERIOD, 0x0100);
+	ADS9106SpiWriteRegS((uint16_t) PAT_PERIOD, 0x0100);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) PAT_STATUS, 0x0001);
+	ADS9106SpiWriteRegS((uint16_t) PAT_STATUS, 0x0001);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) RAMUPDATE, 0x0001);
+	ADS9106SpiWriteRegS((uint16_t) RAMUPDATE, 0x0001);
 	Delay(1);
 
 	//sawtooth configuration
-	ADS7843SpiWriteRegS((uint16_t) SAW4_3CONFIG, 0x0808);
+	ADS9106SpiWriteRegS((uint16_t) SAW4_3CONFIG, 0x0808);
 	Delay(1);
 
 #else
@@ -591,28 +592,28 @@ void setNoise(void) {
 void setSaw(void) {
 #if SPI_SW_ENABLED
 
-	ADS7843SpiWriteRegS((uint16_t) WAV4_3CONFIG, 0x1111);
+	ADS9106SpiWriteRegS((uint16_t) WAV4_3CONFIG, 0x1111);
 	Delay(1);	//sawtooth test
 
-	ADS7843SpiWriteRegS((uint16_t) DAC4_CST, 0xA200);
+	ADS9106SpiWriteRegS((uint16_t) DAC4_CST, 0xA200);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DAC4_DGAIN, 0x1000);
+	ADS9106SpiWriteRegS((uint16_t) DAC4_DGAIN, 0x1000);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DAC4RSET, 0x8002);
+	ADS9106SpiWriteRegS((uint16_t) DAC4RSET, 0x8002);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) DACxRANGE, 0x00A0);
+	ADS9106SpiWriteRegS((uint16_t) DACxRANGE, 0x00A0);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) PAT_TIMEBASE, 0x0000);
+	ADS9106SpiWriteRegS((uint16_t) PAT_TIMEBASE, 0x0000);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) PAT_PERIOD, 0x0100);
+	ADS9106SpiWriteRegS((uint16_t) PAT_PERIOD, 0x0100);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) PAT_STATUS, 0x0001);
+	ADS9106SpiWriteRegS((uint16_t) PAT_STATUS, 0x0001);
 	Delay(1);
-	ADS7843SpiWriteRegS((uint16_t) RAMUPDATE, 0x0001);
+	ADS9106SpiWriteRegS((uint16_t) RAMUPDATE, 0x0001);
 	Delay(1);
 
 	//sawtooth configuration
-	ADS7843SpiWriteRegS((uint16_t) SAW4_3CONFIG, 0x0808);
+	ADS9106SpiWriteRegS((uint16_t) SAW4_3CONFIG, 0x0808);
 	Delay(1);
 
 #else
@@ -662,7 +663,7 @@ void AD9106Test(void) {
 	//testPattern();
 
 	Delay(200);
-	i = ADS7843SpiReadRegS((uint16_t) CFG_ERROR);
+	i = ADS9106SpiReadRegS((uint16_t) CFG_ERROR);
 	//i = ADS7843SpiReadRegS((uint16_t) PAT_STATUS);
 	//SegmentLCD_Number(i);
 	Delay(200);
@@ -670,7 +671,7 @@ void AD9106Test(void) {
 }
 
 void AD9106TestType(uint8_t waveformType) {
-
+	AD9106_TRIGGER_HIGH();
 	switch (waveformType){
 
 	case 0:
@@ -686,5 +687,6 @@ void AD9106TestType(uint8_t waveformType) {
 	default:
 	break;
 	}
+	AD9106_TRIGGER_LOW();
 }
 

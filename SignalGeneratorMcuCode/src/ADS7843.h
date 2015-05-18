@@ -3,11 +3,11 @@
  *
  *  Created on: 11-03-2015
  *      Author: lukasz
+ *      based on coocox library
  */
 
 #ifndef ADS7843_H_
 #define ADS7843_H_
-
 
 #include <stdbool.h>
 #include "em_device.h"
@@ -28,6 +28,22 @@ extern "C"
 #define ADS7843_CS_OUTPUT() GPIO_PinModeSet(ADS7843_PORT_CS, ADS7843_PIN_CS, gpioModePushPull, 1)
 #define ADS7843_CS_HIGH()   GPIO_PinOutSet(ADS7843_PORT_CS , ADS7843_PIN_CS )
 #define ADS7843_CS_LOW()    GPIO_PinOutClear(ADS7843_PORT_CS , ADS7843_PIN_CS )
+
+//------------------BUSY_PIN----------------------
+#define ADS7843_USE_PIN_BUSY
+
+#ifdef ADS7843_USE_PIN_BUSY
+#define ADS7843_PIN_BUSY       6
+#define ADS7843_PORT_BUSY      gpioPortD
+#define ADS7843_BUSY_OUTPUT()  GPIO_PinModeSet(ADS7843_PORT_BUSY, ADS7843_PIN_BUSY, gpioModePushPull, 1)
+#define ADS7843_BUSY_PULLED_INPUT()   GPIO_PinModeSet(ADS7843_PORT_BUSY, ADS7843_PIN_BUSY,  gpioModeInputPull , 1)
+#define ADS7843_BUSY_INPUT()   GPIO_PinModeSet(ADS7843_PORT_BUSY, ADS7843_PIN_BUSY, gpioModeInput, 0)
+#define ADS7843_BUSY_HIGH()    GPIO_PinOutSet(ADS7843_PORT_BUSY , ADS7843_PIN_BUSY )
+#define ADS7843_BUSY_LOW()     GPIO_PinOutClear(ADS7843_PORT_BUSY , ADS7843_PIN_BUSY )
+#define ADS7843_GET_BUSY_PIN() GPIO_PinInGet(ADS7843_PORT_BUSY, ADS7843_PIN_BUSY)
+
+#endif
+
 //------------------INT_IRQ----------------------
 
 #define ADS7843_PIN_INT      13//10
@@ -39,13 +55,13 @@ extern "C"
 #define ADS7843_INT_IRQ_CONFIG_PIN_DISABLE() GPIO_IntConfig(ADS7843_PORT_INT, ADS7843_PIN_INT, false, false, false)
 #define ADS7843_INT_HIGH()   GPIO_PinOutSet(ADS7843_PORT_INT , ADS7843_PIN_INT )
 #define ADS7843_INT_LOW()    GPIO_PinOutClear(ADS7843_PORT_INT , ADS7843_PIN_INT )
-#define ADS7843_GET_INT_PIN() GPIO_PinInGet(ADS7843_PORT_INT, ADS7843_PORT_INT)
+#define ADS7843_GET_INT_PIN() GPIO_PinInGet(ADS7843_PORT_INT, ADS7843_PIN_INT)
 
 //------------------CLK----------------------
 
 #define ADS7843_PIN_CLK      2//1
 #define ADS7843_PORT_CLK     gpioPortD//gpioPortE
-#define ADS7843_CLK_OUTPUT() GPIO_PinModeSet(ADS7843_PORT_CLK, ADS7843_PIN_CLK, gpioModePushPull, 1)
+#define ADS7843_CLK_OUTPUT() GPIO_PinModeSet(ADS7843_PORT_CLK, ADS7843_PIN_CLK, gpioModePushPull, 0)
 #define ADS7843_CLK_HIGH()   GPIO_PinOutSet(ADS7843_PORT_CLK , ADS7843_PIN_CLK )
 #define ADS7843_CLK_LOW()    GPIO_PinOutClear(ADS7843_PORT_CLK , ADS7843_PIN_CLK )
 
@@ -62,20 +78,16 @@ extern "C"
 #define ADS7843_PIN_MISO      1//3
 #define ADS7843_PORT_MISO     gpioPortD//gpioPortE
 #define ADS7843_MISO_OUTPUT() GPIO_PinModeSet(ADS7843_PORT_MISO, ADS7843_PIN_MISO, gpioModePushPull, 1)
+#define ADS7843_MISO_INPUT()   GPIO_PinModeSet(ADS7843_PORT_MISO, ADS7843_PIN_MISO, gpioModeInput, 0)
 #define ADS7843_MISO_HIGH()   GPIO_PinOutSet(ADS7843_PORT_MISO , ADS7843_PIN_MISO )
 #define ADS7843_MISO_LOW()    GPIO_PinOutClear(ADS7843_PORT_MISO , ADS7843_PIN_MISO )
 
 /*********************************Hardware dependent part - END*****************************************/
 
-#ifdef ADS7843_USE_PIN_BUSY
-#define ADS7843_PIN_BUSY           PB11
-#endif
-
 //
 // Enable touch interrupt
 //
 //#define ADS7843_ENABLE_TOUCH_INT
-
 #define TOUCH_SCREEN_WIDTH         240
 #define TOUCH_SCREEN_HEIGHT        320
 
@@ -85,10 +97,9 @@ extern "C"
 #define TOUCH_AD_X_MAX             1840
 #define TOUCH_AD_X_MIN             200
 #define TOUCH_AD_Y_MAX             1830
-#define TOUCH_AD_Y_MIN             200//125
+#define TOUCH_AD_Y_MIN             125
 //#define TOUCH_AD_Y_MIN_SCREEN      200
 #define TOUCH_AD_CALIB_ERROR       80
-
 
 //*****************************************************************************
 //
@@ -106,15 +117,12 @@ extern "C"
 #define TOUCH_STATUS_PENDOWN       0x01
 #define TOUCH_STATUS_PENUP         0x02
 
-
-typedef struct
-{
+typedef struct {
 	uint16_t x;
 	uint16_t y;
-}TouchPoint;
+} TouchPoint;
 
-typedef struct
-{
+typedef struct {
 	uint16_t thAdLeft;
 	uint16_t thAdRight;
 	uint16_t thAdUp;
@@ -124,51 +132,37 @@ typedef struct
 	uint16_t curX;
 	uint16_t curY;
 	uint8_t touchStatus;
-}TouchInfo;
+} TouchInfo;
 
 extern TouchInfo tTouchData;
 
+void ADS7843Init(void);
 
-extern void ADS7843Init(void);
+// Read raw value of x,y axis's AD conversion value.
+void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y);
 
-//
-//! Read raw value of x,y axis's AD conversion value.
-//
-extern void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y);
+// Read x,y axis's AD conversion value with software filter.
+void ADS7843ReadADXY(uint16_t *x, uint16_t *y);
 
-//
-//! Read x,y axis's AD conversion value with software filter.
-//
-extern void ADS7843ReadADXY(uint16_t *x, uint16_t *y);
-
-//
-//! Read x,y coordinate.
-//
+// Read x,y coordinate.
 uint8_t ADS7843ReadPointXY(uint16_t *x, uint16_t *y);
 
-//
 //! Get pen status (pen down or pen up).
-//
-extern uint16_t ADS7843PenInq(void);
+uint16_t ADS7843PenInq(void);
 
-//
 //! Touch screen calibration.
-//
-extern uint8_t ADS7843Calibration(void);
+uint8_t ADS7843Calibration(void);
 
-//
 //! Read single channel of conversion(x,y,IN3,IN4).
-//
-uint16_t ADS7843ReadInputChannel( uint8_t ucChannel);
+uint16_t ADS7843ReadInputChannel(uint8_t ucChannel);
 
 TouchPoint getCoordinates(void);
+
+//software SPI
+void ADS7843spiInitSoftware(void);
 
 #ifdef __cplusplus
 }
 #endif
-
-
-
-
 
 #endif /* ADS7843_H_ */

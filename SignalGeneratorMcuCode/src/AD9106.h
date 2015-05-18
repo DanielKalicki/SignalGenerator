@@ -59,15 +59,23 @@
 #define AD9106_MISO_LOW()    	GPIO_PinOutClear(AD9106_PORT_MISO , AD9106_PIN_MISO )
 #define AD9106_MISO_GET_PIN()     GPIO_PinInGet(AD9106_PORT_MISO, AD9106_PIN_MISO)
 #define AD9106_MISO_DISABLED()  GPIO_PinModeSet(AD9106_PORT_MISO, AD9106_PIN_MISO, gpioModeDisabled, 0)
+
+//------------------TRIGGER PIN---------------------
+#define AD9106_PIN_TRIGGER        	7
+#define AD9106_PORT_TRIGGER      	gpioPortD
+#define AD9106_TRIGGER_OUTPUT() 	GPIO_PinModeSet(AD9106_PORT_TRIGGER,AD9106_PIN_TRIGGER,gpioModePushPull, 1)
+#define AD9106_TRIGGER_HIGH()   	GPIO_PinOutSet(AD9106_PORT_TRIGGER , AD9106_PIN_TRIGGER )
+#define AD9106_TRIGGER_LOW()    	GPIO_PinOutClear(AD9106_PORT_TRIGGER , AD9106_PIN_TRIGGER )
+#define AD9106_TRIGGER_GET_PIN()    GPIO_PinInGet(AD9106_PORT_TRIGGER, AD9106_PIN_TRIGGER)
+#define AD9106_TRIGGER_DISABLED()  	GPIO_PinModeSet(AD9106_PORT_TRIGGER, AD9106_PIN_TRIGGER, gpioModeDisabled, 0)
 /*********************************Hardware dependent part - END*****************************************/
 
 /*hardware SPI*/
 
-
 /*Software SPI*/
-void spiInitSoftware(void);
-uint16_t ADS7843SpiWriteRegS(uint16_t addr, uint16_t data);
-uint16_t ADS7843SpiReadRegS(uint16_t addr); //
+void AD9106spiInitSoftware(void);
+uint16_t ADS9106SpiWriteRegS(uint16_t addr, uint16_t data);
+uint16_t ADS9106SpiReadRegS(uint16_t addr); //
 
 typedef enum {
 	SPICONFIG_ADDR = 0x00,
@@ -336,10 +344,10 @@ typedef enum {
 
 typedef enum {
 	TRIG_DELAY_EN = 0x0002 //Enable start delay as trigger delay for all four channels.
-/* Settings
- 0 Delay repeats for all patterns.
- 1 Delay is only at the start of first pattern.
- */
+	/* Settings
+	 0 Delay repeats for all patterns.
+	 1 Delay is only at the start of first pattern.
+	 */
 } TRIG_TW_SEL_Reg;
 
 typedef enum {
@@ -418,7 +426,9 @@ void AD9106Init(void);
 void AD9106TestType(uint8_t waveformType);
 
 //SRAM methods
-bool writePatternToSram(uint16_t* dataBuf, uint16_t bufLength, uint16_t sramAddr);
-void playWaveformFromSram(uint8_t nrOfDac ,uint16_t startAddr, uint16_t stopAddr,uint16_t nrOfWaveCycles, uint16_t startDelay  );
+bool writePatternToSram(uint16_t* dataBuf, uint16_t bufLength,
+		uint16_t sramAddr);
+void playWaveformFromSram(uint8_t nrOfDac, uint16_t startAddr,
+		uint16_t stopAddr, uint16_t nrOfWaveCycles, uint16_t startDelay);
 
 #endif /* AD9106_H_ */

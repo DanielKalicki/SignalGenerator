@@ -3,6 +3,7 @@
  *
  *  Created on: 11-03-2015
  *      Author: lukasz
+ *      based on coocox library
  */
 
 #include "spi.h"
@@ -17,7 +18,9 @@
 /* USART used for SPI access */
 #define USART_USED        USART1
 #define USART_CLK         cmuClock_USART1
-#define SPI_SW_ENABLED0
+#define SPI_SW_ENABLED 0
+
+
 
 static const USART_InitSync_TypeDef initSpi = { usartEnable, /* Enable RX/TX when init completed. */
 1000000, /* Use 1MHz reference clock */
@@ -52,14 +55,34 @@ static StatusTypeDef spiPeripheralsConfig(void) {
 	USART_USED ->CMD = USART_CMD_TXEN | USART_CMD_RXEN;
 	// Clear previous interrupts
 	USART_USED ->IFC = _USART_IFC_MASK;
+#ifdef ADS7843_USE_PIN_BUSY
+	ADS7843_BUSY_INPUT();
 
-	GPIO_PinModeSet(ADS7843_PORT_MOSI, ADS7843_PIN_MOSI, gpioModePushPull, 1);
-	GPIO_PinModeSet(ADS7843_PORT_MISO, ADS7843_PIN_MISO, gpioModeInput, 0);
-	GPIO_PinModeSet(ADS7843_PORT_CLK, ADS7843_PIN_CLK, gpioModePushPull, 0);
+
+#endif
+	ADS7843_MOSI_OUTPUT();
+	ADS7843_MISO_INPUT();
+	ADS7843_CLK_OUTPUT();
+	ADS7843_CS_OUTPUT();
+	//GPIO_PinModeSet(ADS7843_PORT_MOSI, ADS7843_PIN_MOSI, gpioModePushPull, 1);
+	//GPIO_PinModeSet(ADS7843_PORT_MISO, ADS7843_PIN_MISO, gpioModeInput, 0);
+	//GPIO_PinModeSet(ADS7843_PORT_CLK, ADS7843_PIN_CLK, gpioModePushPull, 0);
 	// Keep CS high to not activate slave
-	GPIO_PinModeSet(ADS7843_PORT_CS, ADS7843_PIN_CS, gpioModePushPull, 1);
+	//GPIO_PinModeSet(ADS7843_PORT_CS, ADS7843_PIN_CS, gpioModePushPull, 1);
 	return STATUS_OK;
 }
+
+void ADS7843spiInitSoftware(void) {
+	CMU_ClockEnable(cmuClock_GPIO, true);
+	ADS7843_MOSI_OUTPUT();
+	ADS7843_MISO_INPUT();
+	ADS7843_CLK_OUTPUT();
+	// Keep CS high to not activate slave
+	ADS7843_CS_OUTPUT();
+	ADS7843_CLK_LOW();
+	ADS7843_MOSI_LOW();
+}
+
 
 TouchInfo tTouchData;
 static TouchPoint mPointCoordinates = { 100 };
@@ -69,23 +92,20 @@ extern volatile bool mADS7843ScreenTouched;
 static SpiHandleTypeDef spiHandle;
 static void ADS7843PenIRQCallback(uint8_t pin);
 //*****************************************************************************
-//
-//! \brief Initialize ADS7843
-//!
-//! \param None.
-//!
-//! This function initialize ADS7843's SPI interface and .
-//!
-//! \return None.
-//
+// \brief Initialize ADS7843
+// \param None.
+// This function initialize ADS7843's SPI interface and .
+//return None.
 //*****************************************************************************
 void ADS7843Init(void) {
 
 #if SPI_SW_ENABLED
 
-	spiInitSoftware(ADS7843_PORT_MOSI, ADS7843_PIN_MOSI, ADS7843_PORT_MISO,
-			ADS7843_PIN_MISO, ADS7843_PORT_CLK, ADS7843_PIN_CLK,
-			ADS7843_PORT_CS, ADS7843_PIN_CS);
+	ADS7843spiInitSoftware();
+#ifdef ADS7843_USE_PIN_BUSY
+	ADS7843_BUSY_INPUT();
+	//ADS7843_BUSY_PULLED_INPUT();
+#endif
 
 #else
 	spiHandle.spiInstance = USART_USED;
@@ -186,35 +206,33 @@ static void ADS7843PenIRQCallback(uint8_t pin) {
 		uint16_t x, y;
 		ADS7843_INT_IRQ_CONFIG_PIN_DISABLE();
 
-		/*
-		 if (ADS7843_GET_INT_PIN()) {
-		 // Change to falling trigger edge when pen up
-		 ADS7843_INT_IRQ_CONFIG_FALLING(true);
-		 tTouchData.touchStatus |= TOUCH_STATUS_PENUP;
-		 tTouchData.touchStatus &= ~TOUCH_STATUS_PENDOWN;
-		 } else {
+		if (ADS7843_GET_INT_PIN()) {
+			// Change to falling trigger edge when pen up
+			tTouchData.touchStatus |= TOUCH_STATUS_PENUP;
+			tTouchData.touchStatus &= ~TOUCH_STATUS_PENDOWN;
+			ADS7843_INT_IRQ_CONFIG_FALLING(true);
+		} else {
 
-		 // Modify status
-		 tTouchData.touchStatus |= TOUCH_STATUS_PENDOWN;
-		 tTouchData.touchStatus &= ~TOUCH_STATUS_PENUP;
-		 // Read x,y coordinate
-		 ADS7843ReadPointXY(&x, &y);
-		 mPointCoordinates.x = x;
-		 mPointCoordinates.y = y;
-		 mADS7843ScreenTouched = true;
-		 ADS7843_INT_IRQ_CONFIG_FALLING(true);
-		 //ADS7843_INT_IRQ_CONFIG_RISING(true);
-		 }
-		*/
-		//if (ADS7843_GET_INT_PIN()) {
+			// Modify status
+			tTouchData.touchStatus |= TOUCH_STATUS_PENDOWN;
+			tTouchData.touchStatus &= ~TOUCH_STATUS_PENUP;
 			// Read x,y coordinate
 			ADS7843ReadPointXY(&x, &y);
 			mPointCoordinates.x = x;
 			mPointCoordinates.y = y;
 			mADS7843ScreenTouched = true;
 			ADS7843_INT_IRQ_CONFIG_FALLING(true);
-		//}
+			//ADS7843_INT_IRQ_CONFIG_RISING(true);
+		}
 
+
+/*
+		ADS7843ReadPointXY(&x, &y);
+		mPointCoordinates.x = x;
+		mPointCoordinates.y = y;
+		mADS7843ScreenTouched = true;
+		ADS7843_INT_IRQ_CONFIG_FALLING(true);
+		*/
 	}
 
 }
@@ -223,15 +241,11 @@ uint16_t ADS7843PenInq(void) {
 	return (uint16_t) ADS7843_GET_INT_PIN();
 }
 
-//*****************************************************************************
-//
-//! \brief Read the x, y axis ADC convert value once from ADS7843
-//!
-//! \param x To save the x axis ADC convert value.
-//! \param y To save the y axis ADC convert value.
-//!
-//! \return None.
-//
+//****************************************************************************
+// \brief Read the x, y axis ADC convert value once from ADS7843
+// \param x To save the x axis ADC convert value.
+// \param y To save the y axis ADC convert value.
+// \return None.
 //*****************************************************************************
 #if SPI_SW_ENABLED
 void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
@@ -239,15 +253,13 @@ void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 
 	ADS7843_CS_LOW();
 	// Send read x command
-	ADS7843SpiWriteByteSoftware(ADS7843_READ_X);//read x command
+	ADS7843SpiWriteByteSoftware(ADS7843_READ_X); //read x command
 #ifdef ADS7843_USE_PIN_BUSY
 	// wait for conversion complete
-	while(xGPIOSPinRead(ADS7843_PIN_BUSY));
+	while (ADS7843_GET_BUSY_PIN())
+		;
 #else
-
-	// The conversion needs 8us to complete
-	for (int ii = 0; ii < 0x100; ii++)
-	;
+	for (volatile int i = 0; i < 1000; i++);
 #endif
 
 	// Read the high 8bit of the 12bit conversion result
@@ -257,21 +269,20 @@ void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 	*x |= (uint16_t) ADS7843SpiReadByteSoftware() >> 4;
 	ADS7843_CS_HIGH();
 
-	for (int ii = 0; ii < 1000; ii++);
+	for (int ii = 0; ii < 1000; ii++)
+		;
 
 // Send read y command
 	ADS7843_CS_LOW();
 	//for (int x = 0; x < 0x100; x++);
-	ADS7843SpiWriteByteSoftware(ADS7843_READ_Y);//read y command
+	ADS7843SpiWriteByteSoftware(ADS7843_READ_Y); //read y command
 #ifdef ADS7843_USE_PIN_BUSY
-
 	// wait for conversion complete
-	while(xGPIOSPinRead(ADS7843_PIN_BUSY));
+	while (ADS7843_GET_BUSY_PIN())
+		;
 #else
-
 	// The conversion needs 8us to complete
-	for (int ii = 0; ii < 100; ii++)
-	;
+	for (volatile int i = 0; i < 1000; i++);
 #endif
 
 	// Read the high 8bit of the 12bit conversion result
@@ -281,7 +292,8 @@ void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 	// Read the low 4bit of the 12bit conversion result
 	*y |= (uint16_t) ADS7843SpiReadByteSoftware() >> 4;
 	ADS7843_CS_HIGH();
-	for (int ii = 0; ii < 1000; ii++);
+	for (int ii = 0; ii < 1000; ii++)
+		;
 
 }
 #else
@@ -289,13 +301,16 @@ void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 // Chip select
 	for (int i = 0; i < 10000; i++)
-		;
+	;
 	ADS7843_CS_LOW();
-	for (int i = 0; i < 1000; i++)
-		;
+
 	*x = ADS7843SpiReadData(ADS7843_READ_X);
-	//ADS7843_CS_HIGH();
-	//ADS7843_CS_LOW();
+#ifdef ADS7843_USE_PIN_BUSY
+	// wait for conversion complete
+	while(ADS7843_GET_BUSY_PIN());
+#else
+	for (volatile int i = 0; i < 1000; i++);
+#endif
 	*y = ADS7843SpiReadData(ADS7843_READ_Y);
 	ADS7843_CS_HIGH();
 
@@ -304,20 +319,15 @@ void ADS7843ReadADXYRaw(uint16_t *x, uint16_t *y) {
 #endif
 
 //*****************************************************************************
-//
-//! \brief read the x, y axis ADC convert value from ADS7843(with software filter)
-//!
-//! \param x To save the x axis ADC convert value.
-//! \param y To save the y axis ADC convert value.
-//!
-//! This function Reads the x,y axis's ADC value from ADS7843 with software
-//! filter. The function first read out TOUCH_SMAPLE_LEN samples. Then discard
-//! the first data and the last data and sort the remained data. Then discard
-//! the first and the last one of the remained data and compute the average
-//! value of the final remained data.
-//!
-//! \return None.
-//
+//brief read the x, y axis ADC convert value from ADS7843(with software filter)
+// \param x To save the x axis ADC convert value.
+// \param y To save the y axis ADC convert value.
+// This function Reads the x,y axis's ADC value from ADS7843 with software
+// filter. The function first read out TOUCH_SMAPLE_LEN samples. Then discard
+// the first data and the last data and sort the remained data. Then discard
+// the first and the last one of the remained data and compute the average
+// value of the final remained data.
+// \return None.
 //*****************************************************************************
 void ADS7843ReadADXY(uint16_t *x, uint16_t *y) {
 	uint16_t usXYArray[2][TOUCH_SMAPLE_LEN];
@@ -360,19 +370,14 @@ void ADS7843ReadADXY(uint16_t *x, uint16_t *y) {
 }
 
 //*****************************************************************************
-//
-//! \brief Read the XY coordinate of touch point.
-//!
-//! \param x To save the x coordinate
-//! \param y To save the y coordinate
-//!
-//! This function is to read current touch point. The x,y coordinates will be
-//! read out from the input parameters. If the screen is not touched, it will
-//! return last value, after the last value is read out, additional read will
-//! return fail information and nothing will be read out.
-//!
-//! \return None.
-//
+// \brief Read the XY coordinate of touch point.
+// \param x To save the x coordinate
+// \param y To save the y coordinate
+// This function is to read current touch point. The x,y coordinates will be
+// read out from the input parameters. If the screen is not touched, it will
+// return last value, after the last value is read out, additional read will
+// return fail information and nothing will be read out.
+// \return None.
 //*****************************************************************************
 uint8_t ADS7843ReadPointXY(uint16_t *x, uint16_t *y) {
 	uint16_t usADX;
@@ -441,11 +446,11 @@ uint16_t ADS7843ReadInputChannel(unsigned char ucChannel) {
 	Delay(10);
 	ADS7843SpiWriteByteSoftware(ucChannel);
 #ifdef ADS7843_USE_PIN_BUSY
-
-// Waiting for conversion complete
-	while(xGPIOSPinRead(ADS7843_PIN_BUSY));
+	// wait for conversion complete
+	while (ADS7843_GET_BUSY_PIN())
+		;
 #else
-	Delay(240);
+	for (volatile int i = 0; i < 1000; i++);
 #endif
 	res = (uint16_t) ADS7843SpiReadByteSoftware() & 0x00FF;
 	res <<= 4;
@@ -456,29 +461,25 @@ uint16_t ADS7843ReadInputChannel(unsigned char ucChannel) {
 }
 
 //*****************************************************************************
-//
-//! \brief Touch screen calibration.
-//!
-//! \param None.
-//!
-//! This function is to calibrate the touch screen. If the read out coordinate
-//! is not accurate, you can use this function to calibrate it. After this
-//! function is called, you must touch the screen in about 10 seconds or the
-//! function will return with no effect. After you touch the screen, the counter
-//! will be zeroed and restart counting. If the calibration is not over and the
-//! touch is always applied on the screen, the counter will not increase, so you
-//! don't have to worry about the calibrate time.
-//!     All you need to do with the calibration is to use a touch pen or other
-//! object which is a little sharp but will not damage the touch screen to touch
-//! the screen and slide the pen from top edge of the screen to the bottom edge.
-//! Then slide the pen from left edge to right edge. Make sure that the pen should
-//! not leave the screen until it slides to the edge or the calibrate may be
-//! inaccurate. The direction or sequence is optional. If __DEBUG_PRINT__ is defined
-//! you can see the calibration result. The calibration will calibrate both x axis
-//! and y axis. Also you can calibration only one axis. the axis which is not
-//! calibrated will retain its original value.
-//!
-//! \return None.
+// \brief Touch screen calibration.
+// \param None.
+// This function is to calibrate the touch screen. If the read out coordinate
+// is not accurate, you can use this function to calibrate it. After this
+// function is called, you must touch the screen in about 10 seconds or the
+// function will return with no effect. After you touch the screen, the counter
+// will be zeroed and restart counting. If the calibration is not over and the
+// touch is always applied on the screen, the counter will not increase, so you
+// don't have to worry about the calibrate time.
+//     All you need to do with the calibration is to use a touch pen or other
+// object which is a little sharp but will not damage the touch screen to touch
+// the screen and slide the pen from top edge of the screen to the bottom edge.
+// Then slide the pen from left edge to right edge. Make sure that the pen should
+// not leave the screen until it slides to the edge or the calibrate may be
+// inaccurate. The direction or sequence is optional. If __DEBUG_PRINT__ is defined
+// you can see the calibration result. The calibration will calibrate both x axis
+// and y axis. Also you can calibration only one axis. the axis which is not
+// calibrated will retain its original value.
+// \return None.
 //
 //*****************************************************************************
 uint8_t ADS7843Calibration(void) {
